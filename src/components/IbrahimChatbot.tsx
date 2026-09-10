@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, Bot, User, Sparkles, RefreshCw, ChevronRight } from "lucide-react";
+import { X, Send, Bot, User, Sparkles, RefreshCw, ChevronRight, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAssistantResponse } from "@/data/ibrahimKnowledge";
 import profileImg from "@/assets/profile-main.jpg";
@@ -10,14 +10,26 @@ interface Message {
   sender: "bot" | "user";
   text: string;
   timestamp: string;
+  isSecurityWarning?: boolean;
 }
 
 const suggestedPrompts = [
-  "🚀 What are your top AI projects?",
-  "💼 Tell me about your work experience",
-  "🧠 What is your expertise in RAG & LLMs?",
-  "📩 How can I contact or hire Ibrahim?",
+  "What are your top AI projects?",
+  "Tell me about your work experience",
+  "What is your expertise in RAG & LLMs?",
+  "How can I contact or hire Ibrahim?",
 ];
+
+// Sanitize output helper for clean text without formatting characters
+const cleanPunctuation = (text: string): string => {
+  let cleaned = text.replace(/#+/g, "");
+  cleaned = cleaned.replace(/[*_`~#\-]+/g, " ");
+  cleaned = cleaned.replace(/[\[\]\{\}\<\>]/g, "");
+  cleaned = cleaned.replace(/ +/g, " ");
+  return cleaned.trim();
+};
+
+const CHATBOT_API_URL = "http://127.0.0.1:8000/api/chat";
 
 const IbrahimChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +39,7 @@ const IbrahimChatbot = () => {
     {
       id: "welcome",
       sender: "bot",
-      text: "👋 **Hi there! I'm Ibrahim's AI Assistant.**\n\nAsk me anything about Ibrahim Abdelsattar's AI projects, experience at HAMS.AI & Minders, education, or technical skills!",
+      text: "Hi there! I am Ibrahim's AI Assistant. Ask me anything about Ibrahim Abdelsattar's AI projects, work experience at HAMS.AI and Minders, education, or technical skills.",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -44,7 +56,7 @@ const IbrahimChatbot = () => {
     }
   }, [messages, isOpen, isTyping]);
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const messageText = textToSend || input;
     if (!messageText.trim()) return;
 
@@ -59,17 +71,50 @@ const IbrahimChatbot = () => {
     if (!textToSend) setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const responseText = getAssistantResponse(messageText);
+    try {
+      const res = await fetch(CHATBOT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: messageText }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const warnText = errData.detail || "Security Warning: Request rejected by security policy or rate limiter.";
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sender: "bot",
+            text: cleanPunctuation(warnText),
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            isSecurityWarning: true,
+          },
+        ]);
+        setIsTyping(false);
+        return;
+      }
+
+      const data = await res.json();
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: responseText,
+        text: cleanPunctuation(data.reply || ""),
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, botMsg]);
+    } catch {
+      const fallbackReply = getAssistantResponse(messageText);
+      const botMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: "bot",
+        text: cleanPunctuation(fallbackReply),
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } finally {
       setIsTyping(false);
-    }, 600);
+    }
   };
 
   const handleReset = () => {
@@ -77,7 +122,7 @@ const IbrahimChatbot = () => {
       {
         id: "welcome",
         sender: "bot",
-        text: "👋 **Hi there! I'm Ibrahim's AI Assistant.**\n\nAsk me anything about Ibrahim Abdelsattar's AI projects, experience at HAMS.AI & Minders, education, or technical skills!",
+        text: "Hi there! I am Ibrahim's AI Assistant. Ask me anything about Ibrahim Abdelsattar's AI projects, work experience at HAMS.AI and Minders, education, or technical skills.",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       },
     ]);
@@ -135,7 +180,7 @@ const IbrahimChatbot = () => {
                     <h3 className="font-bold text-foreground text-sm">Ibrahim's AI Assistant</h3>
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
                   </div>
-                  <p className="text-xs text-muted-foreground">Ask me about my AI work & skills</p>
+                  <p className="text-xs text-muted-foreground">FastAPI & OmniRoute Secured</p>
                 </div>
               </div>
 
@@ -164,8 +209,8 @@ const IbrahimChatbot = () => {
                   className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.sender === "bot" && (
-                    <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                      <Bot className="w-4 h-4 text-primary" />
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.isSecurityWarning ? "bg-red-500/20 border border-red-500/30" : "bg-primary/20 border border-primary/30"}`}>
+                      {msg.isSecurityWarning ? <ShieldAlert className="w-4 h-4 text-red-400" /> : <Bot className="w-4 h-4 text-primary" />}
                     </div>
                   )}
 
@@ -173,20 +218,12 @@ const IbrahimChatbot = () => {
                     className={`max-w-[82%] p-3.5 rounded-2xl ${
                       msg.sender === "user"
                         ? "bg-primary text-primary-foreground rounded-tr-none shadow-md"
+                        : msg.isSecurityWarning
+                        ? "bg-red-500/10 border border-red-500/30 text-red-200 rounded-tl-none"
                         : "bg-secondary/40 border border-border text-foreground rounded-tl-none"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap leading-relaxed">
-                      {msg.text.split("\n").map((line, idx) => {
-                        // Simple formatting for bold and links
-                        let rendered = line;
-                        return (
-                          <p key={idx} className={idx > 0 ? "mt-1.5" : ""}>
-                            {rendered}
-                          </p>
-                        );
-                      })}
-                    </div>
+                    <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                     <span className="text-[10px] opacity-60 block text-right mt-1">
                       {msg.timestamp}
                     </span>
@@ -222,7 +259,7 @@ const IbrahimChatbot = () => {
                 <button
                   key={i}
                   onClick={() => handleSend(prompt)}
-                  className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary transition-all text-left flex items-center gap-1"
+                  className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary transition-all text-left flex items-center gap-1 cursor-pointer"
                 >
                   <span>{prompt}</span>
                   <ChevronRight className="w-3 h-3 opacity-60" />
