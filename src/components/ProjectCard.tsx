@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Github, Eye, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import TiltCard3D from "@/components/3d/TiltCard3D";
 
 interface ProjectCardProps {
   title: string;
@@ -33,20 +32,20 @@ const ProjectCard = ({
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.3) }}
+      transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
       className="h-full"
     >
-      <TiltCard3D
-        maxTilt={5}
-        scale={1.02}
+      <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className="h-full group rounded-3xl cursor-pointer"
         onClick={() => onLiveClick?.()}
       >
         <div
-          className={`h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col justify-between transition-all duration-300 ${
+          className={`h-full glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 relative ${
             isPinned
-              ? "border-primary/50 shadow-[0_0_25px_rgba(20,184,166,0.18)] ring-1 ring-primary/40"
-              : "border-border/60 hover:border-primary/40"
+              ? "border-primary/50 shadow-[0_4px_30px_rgba(20,184,166,0.18)] hover:shadow-[0_12px_40px_rgba(20,184,166,0.3)] ring-1 ring-primary/40"
+              : "border-border/60 hover:border-primary/50 hover:shadow-[0_12px_35px_rgba(0,0,0,0.35)]"
           }`}
         >
           {/* Top Section: Image & Header */}
@@ -54,12 +53,12 @@ const ProjectCard = ({
             <div className="relative h-44 sm:h-48 overflow-hidden bg-card/40">
               <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 pointer-events-none"
                 style={{ backgroundImage: `url(${image})` }}
               />
               <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent pointer-events-none"
+                className="absolute inset-0 bg-gradient-to-t from-card via-card/25 to-transparent pointer-events-none"
               />
 
               {/* Pinned Badge */}
@@ -70,8 +69,8 @@ const ProjectCard = ({
                 </div>
               )}
 
-              {/* Quick Image Action Overlay - pointer-events-none on container, auto on buttons */}
-              <div className="absolute inset-0 z-20 flex items-center justify-center gap-3 p-4 pointer-events-none opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+              {/* Quick Image Action Overlay - Centered buttons */}
+              <div className="absolute inset-0 z-30 flex items-center justify-center gap-3 p-4 pointer-events-none opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200 bg-black/30 backdrop-blur-[2px]">
                 {githubUrl && (
                   <a
                     href={githubUrl}
@@ -80,7 +79,7 @@ const ProjectCard = ({
                     title="View Source on GitHub"
                     aria-label={`View ${title} source on GitHub`}
                     onClick={(e) => e.stopPropagation()}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/65 border border-white/25 text-white shadow-xl hover:bg-primary hover:border-primary hover:scale-110 active:scale-95 transition-all"
+                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-white shadow-xl hover:bg-primary hover:border-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
                   >
                     <Github className="w-5 h-5 pointer-events-none" />
                   </a>
@@ -93,7 +92,7 @@ const ProjectCard = ({
                     title="Live Preview"
                     aria-label={`Open ${title} live preview`}
                     onClick={(e) => e.stopPropagation()}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/65 border border-white/25 text-primary shadow-xl hover:bg-primary hover:text-white hover:scale-110 active:scale-95 transition-all"
+                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-primary shadow-xl hover:bg-primary hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
                   >
                     <ExternalLink className="w-5 h-5 pointer-events-none" />
                   </a>
@@ -107,7 +106,7 @@ const ProjectCard = ({
                       e.stopPropagation();
                       onLiveClick();
                     }}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/65 border border-white/25 text-white shadow-xl hover:bg-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-white shadow-xl hover:bg-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
                   >
                     <Eye className="w-5 h-5 pointer-events-none" />
                   </button>
@@ -199,7 +198,7 @@ const ProjectCard = ({
             )}
           </div>
         </div>
-      </TiltCard3D>
+      </motion.div>
     </motion.div>
   );
 };
