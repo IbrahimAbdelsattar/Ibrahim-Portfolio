@@ -34,7 +34,7 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/70 backdrop-blur-md"
           />
 
           {/* Modal Content */}
@@ -43,12 +43,12 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3 }}
-            className="relative w-full max-w-5xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
+            className="relative w-full max-w-5xl glass-panel rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 text-muted-foreground hover:text-foreground bg-background/50 backdrop-blur-md rounded-full transition-colors"
+              className="absolute top-4 right-4 z-10 p-2.5 text-muted-foreground hover:text-foreground bg-card/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-full transition-all hover:scale-105"
             >
               <X className="w-5 h-5" />
             </button>

@@ -73,7 +73,7 @@ const Projects = () => {
                 placeholder="Search projects or technologies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-card/60 border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm"
               />
             </div>
 
@@ -85,10 +85,10 @@ const Projects = () => {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 text-xs md:text-sm font-medium rounded-xl transition-all cursor-pointer ${
+                    className={`px-4 py-2 text-xs md:text-sm font-medium rounded-xl transition-all cursor-pointer backdrop-blur-md ${
                       isActive
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                        : "bg-card/40 hover:bg-card border border-border text-muted-foreground hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
+                        : "glass-card hover:border-primary/40 text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {category}

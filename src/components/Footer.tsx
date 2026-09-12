@@ -12,7 +12,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-border/50 bg-background/50 backdrop-blur-xl">
+    <footer className="relative border-t border-white/10 dark:border-white/10 bg-card/35 backdrop-blur-2xl">
       <div className="container mx-auto px-4 lg:px-8 py-6">
         <div className="text-center">
           <p className="text-muted-foreground text-sm">

@@ -157,14 +157,14 @@ const Home = () => {
                 <motion.div 
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -left-8 top-20 bg-background/80 backdrop-blur-md p-4 rounded-xl border border-border shadow-lg z-20"
+                    className="absolute -left-8 top-20 glass-card p-4 rounded-2xl z-20"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                        <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
                             <Brain className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium">AI Solutions</p>
+                            <p className="text-sm font-semibold text-foreground">AI Solutions</p>
                             <p className="text-xs text-muted-foreground">Certified Expert</p>
                         </div>
                     </div>
@@ -173,14 +173,14 @@ const Home = () => {
                 <motion.div 
                     animate={{ y: [0, 10, 0] }}
                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -right-8 bottom-32 bg-background/80 backdrop-blur-md p-4 rounded-xl border border-border shadow-lg z-20"
+                    className="absolute -right-8 bottom-32 glass-card p-4 rounded-2xl z-20"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
+                        <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-secondary backdrop-blur-md">
                             <BarChart className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium">Data Driven</p>
+                            <p className="text-sm font-semibold text-foreground">Data Driven</p>
                             <p className="text-xs text-muted-foreground">Detailed Analysis</p>
                         </div>
                     </div>
@@ -192,7 +192,7 @@ const Home = () => {
       </section>
 
       {/* Tech Stack Strip (Marquee) */}
-      <section className="py-10 border-y border-border/50 bg-secondary/5 overflow-hidden">
+      <section className="py-10 border-y border-white/10 dark:border-white/10 bg-card/20 backdrop-blur-xl overflow-hidden">
          <div className="flex overflow-hidden relative w-full">
              <motion.div 
                 className="flex gap-16 items-center whitespace-nowrap will-change-transform"
@@ -248,7 +248,7 @@ const Home = () => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="p-6 rounded-2xl bg-background border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all group"
+                    className="p-6 rounded-2xl glass-card hover-glow transition-all group"
                 >
                     <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
                         {skill.icon}
@@ -296,7 +296,7 @@ const Home = () => {
       </section>
 
       {/* Achievements / Impact */}
-      <section className="py-20 bg-primary/5 border-y border-primary/10">
+      <section className="py-20 border-y border-white/10 dark:border-white/10 bg-card/30 backdrop-blur-xl">
           <div className="container mx-auto px-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-primary/20">
                   {stats.map((stat, index) => (
@@ -351,7 +351,7 @@ const Home = () => {
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="p-8 rounded-2xl bg-secondary/5 border border-border relative flex flex-col"
+                      className="p-8 rounded-3xl glass-card hover-glow relative flex flex-col"
                     >
                         <div className="text-4xl text-primary/20 absolute top-4 left-4">"</div>
                         <p className="text-base italic mb-6 relative z-10 text-muted-foreground flex-grow">
@@ -378,7 +378,7 @@ const Home = () => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-r from-primary/10 via-background to-secondary/10 rounded-3xl p-12 text-center border border-primary/20 relative overflow-hidden"
+                className="card-premium rounded-3xl p-12 text-center relative overflow-hidden border border-white/15 dark:border-white/15"
               >
                   <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:linear-gradient(0deg,white,transparent)]" />
                   <div className="relative z-10">

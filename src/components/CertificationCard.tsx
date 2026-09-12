@@ -24,7 +24,7 @@ const CertificationCard = ({
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group glass-card rounded-2xl overflow-hidden hover-glow cursor-pointer"
+      className="group glass-card rounded-3xl overflow-hidden hover-glow cursor-pointer flex flex-col"
       onClick={onClick}
     >
       {/* Certificate Image */}
@@ -33,10 +33,10 @@ const CertificationCard = ({
           className="absolute inset-0 bg-cover bg-center opacity-80 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
           style={{ backgroundImage: `url(${image})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
         
         {/* Badge */}
-        <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center backdrop-blur-sm">
+        <div className="absolute top-4 right-4 w-10 h-10 rounded-full glass-card border border-white/20 flex items-center justify-center backdrop-blur-md shadow-md">
           <Award className="w-5 h-5 text-primary" />
         </div>
       </div>

@@ -124,7 +124,7 @@ const Contact = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    className="bg-secondary/30 border-border/50 focus:border-primary/50"
+                    className="glass-input"
                   />
                 </div>
                 <div>
@@ -138,7 +138,7 @@ const Contact = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    className="bg-secondary/30 border-border/50 focus:border-primary/50"
+                    className="glass-input"
                   />
                 </div>
                 <div>
@@ -152,7 +152,7 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     required
                     rows={5}
-                    className="bg-secondary/30 border-border/50 focus:border-primary/50 resize-none"
+                    className="glass-input resize-none"
                   />
                 </div>
                 <Button 
@@ -195,7 +195,7 @@ const Contact = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center gap-4 p-4 rounded-xl bg-secondary/30 border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 group"
+                      className="flex items-center gap-4 p-4 rounded-2xl glass-card hover-glow group"
                     >
                       <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
                         <item.icon className="w-5 h-5 text-primary" />
