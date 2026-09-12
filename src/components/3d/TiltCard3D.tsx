@@ -40,7 +40,7 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   const mouseY = useMotionValue(0);
 
   // Smooth springs for high-end organic physics (no sudden snaps or jitter)
-  const springConfig = { stiffness: 280, damping: 22, mass: 0.8 };
+  const springConfig = { stiffness: 220, damping: 26, mass: 0.8 };
   const mouseXSpring = useSpring(mouseX, springConfig);
   const mouseYSpring = useSpring(mouseY, springConfig);
 
@@ -60,6 +60,18 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isCoarsePointer || !cardRef.current) return;
+
+    // If mouse button is pressed down, don't move card under cursor
+    if (e.buttons > 0) return;
+
+    // If hovering over buttons or links, stabilize rotation so clicks never miss
+    const target = e.target as HTMLElement | null;
+    if (target && (target.closest("button") || target.closest("a"))) {
+      mouseX.set(0);
+      mouseY.set(0);
+      return;
+    }
+
     const rect = cardRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;

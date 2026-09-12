@@ -27,7 +27,7 @@ Key Highlights:
 	✅ Glassmorphic Design System – Custom theme with fluid dark mode and responsive layout
 	✅ Scalable Architecture – Dockerized backend with PostgreSQL and caching layers`,
     technologies: ["Python", "FastAPI", "React", "TypeScript", "Tailwind CSS", "Docker", "PostgreSQL", "Elasticsearch"],
-    image: "/project-images/rag-chatbot.png",
+    image: "/project-images/dawrly-platform.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Dawrly",
     liveUrl: "https://dawrly.space",
     isPinned: true,
@@ -45,7 +45,7 @@ Key Highlights:
 	✅ Adaptive Curriculum Synthesis – Synthesizes custom learning milestones and curated resources
 	✅ Interactive Tech & Career Insights – Rotating market trend forecasts and skill readiness checks`,
     technologies: ["TypeScript", "React", "Node.js", "Generative AI", "Tailwind CSS", "Recharts", "PostgreSQL"],
-    image: "/project-images/job-recommendation-system.jpg",
+    image: "/project-images/wajehni-ai.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Nexus_Academy",
     isPinned: true,
     featured: true,
@@ -62,7 +62,7 @@ Key Highlights:
 	✅ Visualized Real-time Logistics Dashboards for operational transparency
 	✅ Built Automated Risk Alerts for vendor performance and shipment delays`,
     technologies: ["Python", "Generative AI", "Predictive Analytics", "Pandas", "Scikit-Learn", "Streamlit", "Docker"],
-    image: "/project-images/ecommerce-analytics.png",
+    image: "/project-images/supplymind-ai.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/SupplyMindAI",
     isPinned: true,
     featured: true,
@@ -79,7 +79,7 @@ Key Highlights:
 	✅ Instructor & Student Portals for tracking course completions and grading
 	✅ Cloud-Synced Architecture with offline lesson caching capabilities`,
     technologies: ["Kotlin", "Android SDK", "TypeScript", "React", "Tailwind CSS", "Firebase", "REST API"],
-    image: "/project-images/student-grades.png",
+    image: "/project-images/teatec-platform.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/tea-tec",
     isPinned: true,
     featured: true,
@@ -96,7 +96,7 @@ Key Highlights:
 	✅ Automated Assessment Engine – Instant grading for quizzes, coding tasks, and written submissions
 	✅ Secure Multi-Role Authentication – Tailored permissions for Admins, Teachers, and Students`,
     technologies: ["TypeScript", "React", "Next.js", "Tailwind CSS", "PostgreSQL", "Prisma", "Docker"],
-    image: "/project-images/student-grade-prediction.png",
+    image: "/project-images/trio-lms.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/trio-lms",
     isPinned: true,
     featured: true,
@@ -113,7 +113,7 @@ Key Highlights:
 	✅ High-Speed Streaming API – Real-time token streaming with sub-second response latency
 	✅ Extensible Tool Integrations – Supports search APIs, code interpreters, and file analyzers`,
     technologies: ["Python", "Generative AI", "LangChain", "LLMs", "FastAPI", "Vector DB", "ChromaDB"],
-    image: "/project-images/rag-chatbot.png",
+    image: "/project-images/eva-ai.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Eva-AI",
     isPinned: true,
     featured: true,
@@ -130,7 +130,7 @@ Key Highlights:
 	✅ Compliance & Risk Flagging – Scans organizational documentation for regulatory adherence
 	✅ Modern Glassmorphic Web App – Built with React, TypeScript, and high-security API endpoints`,
     technologies: ["TypeScript", "Python", "Generative AI", "React", "Tailwind CSS", "FastAPI", "Vector Search"],
-    image: "/project-images/content-moderation.png",
+    image: "/project-images/mesdaq-ai.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Mesdaq_AI",
     isPinned: true,
     featured: true,
@@ -182,7 +182,7 @@ Key Highlights:
 	✅ Multi-tool orchestration for terminal execution, web browsing, and code analysis
 	✅ High-concurrency async runtime with memory persistence`,
     technologies: ["Python", "LLMs", "Autonomous Agents", "Tool Calling", "Prompt Engineering"],
-    image: "/project-images/rag-chatbot.png",
+    image: "/project-images/hermes-agent.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/hermes-agent",
     liveUrl: "https://hermes-agent.nousresearch.com",
   },
@@ -197,7 +197,7 @@ Key Highlights:
 	✅ Local vector similarity using cosine distance
 	✅ Easy integration with OpenAI, Claude, and local open-source LLMs`,
     technologies: ["Python", "RAG", "Sentence Transformers", "Vector Search", "FastAPI"],
-    image: "/project-images/rag-chatbot.png",
+    image: "/project-images/mini-rag.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/mini-rag",
   },
   {
@@ -605,7 +605,7 @@ Key Highlights:
 	✅ Markdown Generator with live preview rendering
 	✅ Custom Badges, Shields, and Theme customization options`,
     technologies: ["TypeScript", "React", "Tailwind CSS", "Vite", "Markdown Parser"],
-    image: "/project-images/content-moderation.png",
+    image: "/project-images/readme-builder.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/profile-readme-generator",
     liveUrl: "https://profile-readme-generator.com",
     featured: true,
@@ -620,7 +620,7 @@ Key Highlights:
 	✅ Dynamic SVG stat cards and visitor badges
 	✅ Clean responsive markdown layouts for developers of all seniority levels`,
     technologies: ["Markdown", "GitHub Actions", "SVG", "Developer Tools"],
-    image: "/project-images/content-moderation.png",
+    image: "/project-images/readme-builder.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Profile-README-Templates",
   },
   {
@@ -633,7 +633,7 @@ Key Highlights:
 	✅ Implemented numerical analysis algorithms (Newton-Raphson, Gauss-Elimination, Runge-Kutta)
 	✅ Interactive graph visualization for mathematical functions in real time`,
     technologies: ["TypeScript", "Python", "React", "Chart.js", "Math.js"],
-    image: "/project-images/flight-reservation.png",
+    image: "/project-images/numerix-platform.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Numerix",
   },
   {
@@ -659,7 +659,7 @@ Key Highlights:
 	✅ Multi-engine asynchronous scraping and result deduplication
 	✅ Containerized production stack with Docker and Redis caching`,
     technologies: ["Python", "SearXNG", "Docker", "Redis", "Search Infrastructure"],
-    image: "/project-images/rag-chatbot.png",
+    image: "/project-images/searxng-metasearch.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/searxng",
     liveUrl: "https://docs.searxng.org",
   },
@@ -699,7 +699,7 @@ Key Highlights:
 	✅ Three.js particle systems and responsive 3D scene rendering
 	✅ Fluid micro-interactions powered by Framer Motion`,
     technologies: ["TypeScript", "React", "Three.js", "Framer Motion", "Tailwind CSS"],
-    image: "/project-images/content-moderation.png",
+    image: "/project-images/alien-ai-venture.jpg",
     githubUrl: "https://github.com/IbrahimAbdelsattar/alien-ai-venture-main",
   },
   {
