@@ -19,6 +19,7 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectModal from "@/components/ProjectModal";
+import TiltCard3D from "@/components/3d/TiltCard3D";
 import { projects } from "@/data";
 import profileImg from "@/assets/profile-main.jpg";
 
@@ -143,48 +144,52 @@ const Home = () => {
               transition={{ duration: 0.8 }}
               className="relative hidden lg:block flex justify-center"
             >
-              <div className="relative w-full max-w-[400px] mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[80px] animate-pulse" />
-                <div className="absolute inset-0 bg-gradient-to-bl from-primary/30 to-secondary/30 rounded-full blur-[100px] animate-pulse delay-75" />
-                <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px] animate-pulse [animation-duration:3000ms]" />
-                <img 
-                  src={profileImg} 
-                  alt="Ibrahim Abdelsattar" 
-                  className="relative z-10 w-full aspect-square object-cover rounded-full border-2 border-primary/20 shadow-2xl"
-                />
-                
-                {/* Floating Achievement Cards */}
-                <motion.div 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -left-8 top-20 glass-card p-4 rounded-2xl z-20"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
-                            <Brain className="w-6 h-6" />
+              <div className="relative w-full max-w-[420px] mx-auto">
+                <TiltCard3D maxTilt={16} scale={1.03} glare={false} className="w-full">
+                  <div className="relative w-full aspect-square preserve-3d">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[80px] animate-pulse" />
+                    <div className="absolute inset-0 bg-gradient-to-bl from-primary/30 to-secondary/30 rounded-full blur-[100px] animate-pulse delay-75" />
+                    <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px] animate-pulse [animation-duration:3000ms]" />
+                    <img 
+                      src={profileImg} 
+                      alt="Ibrahim Abdelsattar" 
+                      className="relative z-10 w-full aspect-square object-cover rounded-full border-2 border-primary/30 shadow-2xl translate-z-20"
+                    />
+                    
+                    {/* Floating Achievement Cards with true 3D spatial depth */}
+                    <motion.div 
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute -left-8 top-20 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
+                                <Brain className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">AI Solutions</p>
+                                <p className="text-xs text-muted-foreground">Certified Expert</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm font-semibold text-foreground">AI Solutions</p>
-                            <p className="text-xs text-muted-foreground">Certified Expert</p>
-                        </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
 
-                <motion.div 
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -right-8 bottom-32 glass-card p-4 rounded-2xl z-20"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-secondary backdrop-blur-md">
-                            <BarChart className="w-6 h-6" />
+                    <motion.div 
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        className="absolute -right-8 bottom-32 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-secondary backdrop-blur-md">
+                                <BarChart className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Data Driven</p>
+                                <p className="text-xs text-muted-foreground">Detailed Analysis</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm font-semibold text-foreground">Data Driven</p>
-                            <p className="text-xs text-muted-foreground">Detailed Analysis</p>
-                        </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                  </div>
+                </TiltCard3D>
               </div>
             </motion.div>
           </div>
@@ -247,14 +252,21 @@ const Home = () => {
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="p-6 rounded-2xl glass-card hover-glow transition-all group"
+                    className="h-full"
                 >
-                    <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                        {skill.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{skill.name}</h3>
-                    <p className="text-sm text-muted-foreground">{skill.desc}</p>
+                    <TiltCard3D maxTilt={14} scale={1.03} className="h-full rounded-2xl">
+                      <div className="p-6 h-full rounded-2xl glass-card hover-glow transition-all group flex flex-col justify-between preserve-3d">
+                        <div>
+                          <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300 translate-z-30">
+                              {skill.icon}
+                          </div>
+                          <h3 className="text-xl font-semibold mb-2 translate-z-20">{skill.name}</h3>
+                          <p className="text-sm text-muted-foreground translate-z-10">{skill.desc}</p>
+                        </div>
+                      </div>
+                    </TiltCard3D>
                 </motion.div>
             ))}
           </div>
@@ -347,25 +359,29 @@ const Home = () => {
                   ].map((testimonial, index) => (
                     <motion.div 
                       key={index}
-                      whileHover={{ y: -5 }}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
                       transition={{ delay: index * 0.1 }}
-                      className="p-8 rounded-3xl glass-card hover-glow relative flex flex-col"
+                      className="h-full"
                     >
-                        <div className="text-4xl text-primary/20 absolute top-4 left-4">"</div>
-                        <p className="text-base italic mb-6 relative z-10 text-muted-foreground flex-grow">
+                      <TiltCard3D maxTilt={10} scale={1.02} className="h-full rounded-3xl">
+                        <div className="p-8 h-full rounded-3xl glass-card hover-glow relative flex flex-col justify-between preserve-3d">
+                          <div className="text-4xl text-primary/20 absolute top-4 left-4 pointer-events-none">"</div>
+                          <p className="text-base italic mb-6 relative z-10 text-muted-foreground flex-grow translate-z-10">
                             "{testimonial.text}"
-                        </p>
-                        <div className="flex items-center gap-4 mt-auto">
-                            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white font-bold shrink-0`}>
+                          </p>
+                          <div className="flex items-center gap-4 mt-auto translate-z-20">
+                            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white font-bold shrink-0 shadow-md`}>
                               {testimonial.initials}
                             </div>
                             <div>
-                                <p className="font-semibold text-sm">{testimonial.name}</p>
-                                <p className="text-xs text-muted-foreground line-clamp-1" title={testimonial.role}>{testimonial.role}</p>
+                              <p className="font-semibold text-sm">{testimonial.name}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-1" title={testimonial.role}>{testimonial.role}</p>
                             </div>
+                          </div>
                         </div>
+                      </TiltCard3D>
                     </motion.div>
                   ))}
               </div>
