@@ -14,29 +14,29 @@ const skills = {
 const About = () => {
   return (
     <Layout>
-      <section className="py-20">
+      <section className="py-12 sm:py-20 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-10 sm:mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium mb-4">
               <Sparkles className="w-4 h-4" />
               <span>Data Scientist & AI Specialist</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 text-balance">
               About <span className="gradient-text">Ibrahim Abdelsattar</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Transforming complex data and state-of-the-art AI research into scalable, intelligent production solutions.
             </p>
           </motion.div>
 
           {/* Overview & Experience */}
-          <div className="grid lg:grid-cols-2 gap-12 mb-20">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12 sm:mb-20">
             {/* Left Column: Work Experience */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -104,13 +104,13 @@ const About = () => {
                     transition={{ delay: index * 0.1 }}
                   >
                     <TiltCard3D maxTilt={6} scale={1.01} className="h-full">
-                      <div className="glass-card rounded-xl p-6 hover-glow h-full preserve-3d">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 translate-z-10">
-                          <div>
-                            <h3 className="font-semibold text-foreground text-lg">{job.role}</h3>
-                            <p className="text-primary font-medium">{job.company}</p>
+                      <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow h-full preserve-3d">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between mb-2 translate-z-10">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-foreground text-base sm:text-lg leading-snug">{job.role}</h3>
+                            <p className="text-primary font-medium text-sm sm:text-base">{job.company}</p>
                           </div>
-                          <span className="text-xs text-muted-foreground mt-2 md:mt-0 bg-secondary/50 px-3 py-1 rounded-full border border-border">
+                          <span className="text-xs text-muted-foreground self-start sm:self-auto shrink-0 bg-secondary/50 px-3 py-1.5 rounded-full border border-border">
                             {job.period}
                           </span>
                         </div>
@@ -136,7 +136,7 @@ const About = () => {
             >
               {/* Bio / Overview */}
               <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-8 preserve-3d">
+                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
                   <div className="flex items-center gap-4 mb-6 translate-z-10">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
                       <Cpu className="w-6 h-6 text-primary" />
@@ -178,7 +178,7 @@ const About = () => {
 
               {/* Why Work With Me */}
               <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-xl p-6 hover-glow preserve-3d">
+                <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow preserve-3d">
                   <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 translate-z-10">
                     <Target className="w-6 h-6 text-primary" />
                     Why Work With Me?
@@ -207,20 +207,20 @@ const About = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-12 sm:mb-20"
           >
-            <h2 className="text-3xl font-bold text-foreground text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">
               Education
             </h2>
             <TiltCard3D maxTilt={5} scale={1.01} className="max-w-3xl mx-auto">
-              <div className="glass-card rounded-2xl p-8 flex items-start gap-6 hover-glow preserve-3d">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 translate-z-10">
-                  <GraduationCap className="w-8 h-8 text-primary" />
+              <div className="glass-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover-glow preserve-3d">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 translate-z-10">
+                  <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div className="translate-z-5">
-                  <h3 className="text-xl font-bold text-foreground">MTI University</h3>
-                  <p className="text-primary font-medium">Bachelor of Computer Science & Artificial Intelligence</p>
-                  <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
+                <div className="translate-z-5 min-w-0">
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground">MTI University</h3>
+                  <p className="text-primary font-medium text-sm sm:text-base">Bachelor of Computer Science & Artificial Intelligence</p>
+                  <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-muted-foreground">
                     <span className="flex items-center gap-1 font-semibold text-foreground"><Target className="w-4 h-4 text-primary"/> GPA 3.5 / 4.0</span>
                     <span className="flex items-center gap-1"><Briefcase className="w-4 h-4"/> Oct 2023 - Expected 2027</span>
                     <span className="flex items-center gap-1">📍 Cairo, Egypt</span>
@@ -235,17 +235,17 @@ const About = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12"
+            className="mb-8 sm:mb-12"
           >
-            <h2 className="text-3xl font-bold text-foreground text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">
               Tools & <span className="gradient-text">Technologies</span>
             </h2>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Programming */}
               <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-6 h-full preserve-3d">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
+                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
                     <Code2 className="w-5 h-5 text-primary" />
                     Languages
                   </h3>
@@ -259,8 +259,8 @@ const About = () => {
 
               {/* GenAI & NLP */}
               <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-6 h-full preserve-3d">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
+                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
                     <Sparkles className="w-5 h-5 text-primary" />
                     GenAI & NLP
                   </h3>
@@ -274,8 +274,8 @@ const About = () => {
 
               {/* ML & DL */}
               <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-6 h-full preserve-3d">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
+                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
                     <Layers className="w-5 h-5 text-primary" />
                     Machine Learning
                   </h3>
@@ -289,8 +289,8 @@ const About = () => {
 
               {/* Data & Ops */}
               <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-6 h-full preserve-3d">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
+                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
                     <Terminal className="w-5 h-5 text-primary" />
                     Data & MLOps
                   </h3>

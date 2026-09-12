@@ -88,53 +88,73 @@ const Home = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+      <section className="relative min-h-[92dvh] sm:min-h-[90vh] flex items-center pt-24 pb-10 sm:pt-20 sm:pb-0 overflow-x-clip">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Mobile profile image — compact, shown first on small screens */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="lg:hidden flex justify-center order-first"
+            >
+              <div className="relative w-40 h-40 sm:w-52 sm:h-52">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[40px]" />
+                <img
+                  src={profileImg}
+                  alt="Ibrahim Abdelsattar"
+                  loading="eager"
+                  decoding="async"
+                  className="relative z-10 w-full h-full object-cover rounded-full border-2 border-primary/30 shadow-2xl"
+                />
+              </div>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
+              className="text-center lg:text-left"
             >
-              <h2 className="text-2xl font-medium text-primary mb-4">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-medium text-primary mb-3 sm:mb-4">
                 Hi, I'm Ibrahim Abdelsattar
               </h2>
-              <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium mb-6">
-                 AI & Data Scientist
+              <div className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium mb-4 sm:mb-6 text-sm sm:text-base">
+                  AI & Data Scientist
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Turning Data into <br />
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 leading-[1.15] sm:leading-tight text-balance">
+                Turning Data into <br className="hidden sm:block" />
                 <span className="gradient-text">Intelligent Solutions</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-lg">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0">
                 I build advanced AI systems, from predictive models to LLM-powered applications, helping businesses unlock the true potential of their data.
               </p>
               
-              <div className="flex flex-wrap gap-4">
-                <Link to="/projects">
-                  <Button size="lg" className="rounded-full h-12 px-8 text-base">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 justify-center lg:justify-start">
+                <Link to="/projects" className="w-full sm:w-auto">
+                  <Button size="lg" className="rounded-full h-12 px-8 text-base w-full sm:w-auto min-h-[48px]">
                     View Work <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
-                <a href="/Ibrahim Abdelsattar Data Scientist resume.pdf" download="Ibrahim Abdelsattar Data Scientist resume">
-                  <Button variant="outline" size="lg" className="rounded-full h-12 px-8 text-base">
+                <a href="/Ibrahim Abdelsattar Data Scientist resume.pdf" download="Ibrahim Abdelsattar Data Scientist resume" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="rounded-full h-12 px-8 text-base w-full sm:w-auto min-h-[48px]">
                     Download CV <Download className="ml-2 w-4 h-4" />
                   </Button>
                 </a>
               </div>
 
-              {/* Floating Quick Actions (Desktop) */}
-              <div className="hidden lg:flex gap-4 mt-12 opacity-70 hover:opacity-100 transition-opacity">
-                 <a href="https://github.com/IbrahimAbdelsattar" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-primary/10 rounded-full transition-colors">
-                    <Github className="w-6 h-6" />
-                 </a>
-                 <a href="https://linkedin.com/in/ibrahim-abdelsattar" target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-primary/10 rounded-full transition-colors">
-                    <Linkedin className="w-6 h-6" />
-                 </a>
-                 <a href="mailto:ibrahimabdelsattar042@gmail.com" className="p-2 hover:bg-primary/10 rounded-full transition-colors">
-                    <Mail className="w-6 h-6" />
-                 </a>
+              {/* Social actions — visible on mobile too, centered */}
+              <div className="flex gap-2 mt-8 justify-center lg:justify-start lg:mt-12 opacity-80 hover:opacity-100 transition-opacity">
+                  <a href="https://github.com/IbrahimAbdelsattar" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+                     <Github className="w-6 h-6" />
+                  </a>
+                  <a href="https://linkedin.com/in/ibrahim-abdelsattar" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+                     <Linkedin className="w-6 h-6" />
+                  </a>
+                  <a href="mailto:ibrahimabdelsattar042@gmail.com" aria-label="Email" className="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+                     <Mail className="w-6 h-6" />
+                  </a>
               </div>
             </motion.div>
 
@@ -142,7 +162,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative hidden lg:block flex justify-center"
+              className="relative hidden lg:flex justify-center"
             >
               <div className="relative w-full max-w-[420px] mx-auto">
                 <TiltCard3D maxTilt={16} scale={1.03} glare={false} className="w-full">
@@ -153,6 +173,8 @@ const Home = () => {
                     <img 
                       src={profileImg} 
                       alt="Ibrahim Abdelsattar" 
+                      loading="eager"
+                      decoding="async"
                       className="relative z-10 w-full aspect-square object-cover rounded-full border-2 border-primary/30 shadow-2xl translate-z-20"
                     />
                     
@@ -197,10 +219,10 @@ const Home = () => {
       </section>
 
       {/* Tech Stack Strip (Marquee) */}
-      <section className="py-10 border-y border-white/10 dark:border-white/10 bg-card/20 backdrop-blur-xl overflow-hidden">
+      <section className="py-8 sm:py-10 border-y border-white/10 dark:border-white/10 bg-card/20 backdrop-blur-xl overflow-x-clip">
          <div className="flex overflow-hidden relative w-full">
              <motion.div 
-                className="flex gap-16 items-center whitespace-nowrap will-change-transform"
+                className="flex gap-10 sm:gap-16 items-center whitespace-nowrap will-change-transform"
                 animate={{ x: ["0%", "-50%"] }}
                 transition={{ 
                     repeat: Infinity, 
@@ -214,7 +236,7 @@ const Home = () => {
                         className="flex flex-col items-center gap-2 grayscale hover:grayscale-0 transition-all duration-300 transform hover:scale-110 shrink-0"
                         title={tech.name}
                     >
-                        <img src={tech.logo} alt={tech.name} className="h-12 w-auto object-contain" />
+                        <img src={tech.logo} alt={tech.name} loading="lazy" decoding="async" className="h-8 sm:h-12 w-auto object-contain" />
                     </div>
                 ))}
              </motion.div>
@@ -222,11 +244,11 @@ const Home = () => {
       </section>
 
       {/* About Preview */}
-      <section className="py-20 bg-background relative">
+      <section className="py-12 sm:py-20 bg-background relative">
           <div className="container mx-auto px-4 lg:px-8">
               <motion.div {...fadeInUp} className="max-w-3xl mx-auto text-center">
-                  <h2 className="text-3xl font-bold mb-6">Who I Am</h2>
-                  <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Who I Am</h2>
+                  <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
                       I am a passionate <span className="text-primary font-semibold">AI & Data Science Engineer</span> dedicated to bridging the gap between complex data and actionable insights. With a strong foundation in machine learning, deep learning, and NLP, I create scalable solutions that solve real-world problems. My experience spans across finance, healthcare, and retail analytics, where I've helped organizations optimize their operations through intelligent automation.
                   </p>
                   <Link to="/about">
@@ -239,14 +261,14 @@ const Home = () => {
       </section>
 
       {/* Skills Snapshot */}
-      <section className="py-20 bg-secondary/5">
+      <section className="py-12 sm:py-20 bg-secondary/5 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-             <h2 className="text-3xl md:text-5xl font-bold mb-4">My <span className="gradient-text">Expertise</span></h2>
-             <p className="text-muted-foreground">Core technical skills and areas of specialization</p>
+          <motion.div {...fadeInUp} className="text-center mb-10 sm:mb-16">
+             <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4">My <span className="gradient-text">Expertise</span></h2>
+             <p className="text-sm sm:text-base text-muted-foreground">Core technical skills and areas of specialization</p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {skills.map((skill, index) => (
                 <motion.div
                     key={index}
@@ -257,12 +279,12 @@ const Home = () => {
                     className="h-full"
                 >
                     <TiltCard3D maxTilt={14} scale={1.03} className="h-full rounded-2xl">
-                      <div className="p-6 h-full rounded-2xl glass-card hover-glow transition-all group flex flex-col justify-between preserve-3d">
+                      <div className="p-5 sm:p-6 h-full rounded-2xl glass-card hover-glow transition-all group flex flex-col justify-between preserve-3d">
                         <div>
-                          <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300 translate-z-30">
+                          <div className="mb-3 sm:mb-4 transform group-hover:scale-110 transition-transform duration-300 translate-z-30">
                               {skill.icon}
                           </div>
-                          <h3 className="text-xl font-semibold mb-2 translate-z-20">{skill.name}</h3>
+                          <h3 className="text-lg sm:text-xl font-semibold mb-1.5 sm:mb-2 translate-z-20">{skill.name}</h3>
                           <p className="text-sm text-muted-foreground translate-z-10">{skill.desc}</p>
                         </div>
                       </div>
@@ -274,21 +296,21 @@ const Home = () => {
       </section>
 
       {/* Featured Projects */}
-      <section className="py-20 bg-background">
+      <section className="py-12 sm:py-20 bg-background overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
-            <div className="flex justify-between items-end mb-12">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-12">
                 <motion.div {...fadeInUp}>
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Featured <span className="gradient-text">Projects</span></h2>
-                    <p className="text-muted-foreground">A selection of my recent AI and Data Science work</p>
+                    <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4">Featured <span className="gradient-text">Projects</span></h2>
+                    <p className="text-sm sm:text-base text-muted-foreground">A selection of my recent AI and Data Science work</p>
                 </motion.div>
-                <Link to="/projects" className="hidden md:block">
-                    <Button variant="ghost" className="group">
+                <Link to="/projects" className="hidden md:block shrink-0">
+                    <Button variant="ghost" className="group min-h-[44px]">
                         View All Projects <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                 </Link>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
                 {featuredProjects.map((project, index) => (
                     <ProjectCard
                         key={project.title}
@@ -299,28 +321,28 @@ const Home = () => {
                 ))}
             </div>
 
-            <div className="mt-12 text-center md:hidden">
-                <Link to="/projects">
-                    <Button variant="outline" className="w-full">View All Projects</Button>
+            <div className="mt-8 sm:mt-12 text-center md:hidden">
+                <Link to="/projects" className="block">
+                    <Button variant="outline" className="w-full min-h-[48px]">View All Projects</Button>
                 </Link>
             </div>
         </div>
       </section>
 
       {/* Achievements / Impact */}
-      <section className="py-20 border-y border-white/10 dark:border-white/10 bg-card/30 backdrop-blur-xl">
+      <section className="py-12 sm:py-20 border-y border-white/10 dark:border-white/10 bg-card/30 backdrop-blur-xl">
           <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-primary/20">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-center sm:divide-x divide-primary/20 divide-y sm:divide-y-0">
                   {stats.map((stat, index) => (
                       <motion.div 
                         key={index}
                         initial={{ opacity: 0, scale: 0.5 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.2 }}
-                        className="py-6 md:py-0"
+                        className="py-4 sm:py-6 md:py-0 first:pt-0 last:pb-0 sm:py-0"
                       >
-                          <div className="text-5xl font-bold gradient-text mb-2">{stat.value}</div>
-                          <div className="text-lg text-muted-foreground font-medium">{stat.label}</div>
+                          <div className="text-4xl sm:text-5xl font-bold gradient-text mb-1.5 sm:mb-2">{stat.value}</div>
+                          <div className="text-base sm:text-lg text-muted-foreground font-medium">{stat.label}</div>
                       </motion.div>
                   ))}
               </div>
@@ -328,12 +350,12 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-background">
+      <section className="py-12 sm:py-20 bg-background overflow-x-clip">
           <div className="container mx-auto px-4 lg:px-8">
-              <motion.div {...fadeInUp} className="text-center mb-16">
-                  <h2 className="text-3xl font-bold mb-4">What People Say</h2>
+              <motion.div {...fadeInUp} className="text-center mb-10 sm:mb-16">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">What People Say</h2>
               </motion.div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
                   {[
                     {
                       name: "Abdullah Wagih",
@@ -366,9 +388,9 @@ const Home = () => {
                       className="h-full"
                     >
                       <TiltCard3D maxTilt={10} scale={1.02} className="h-full rounded-3xl">
-                        <div className="p-8 h-full rounded-3xl glass-card hover-glow relative flex flex-col justify-between preserve-3d">
+                        <div className="p-6 sm:p-8 h-full rounded-3xl glass-card hover-glow relative flex flex-col justify-between preserve-3d">
                           <div className="text-4xl text-primary/20 absolute top-4 left-4 pointer-events-none">"</div>
-                          <p className="text-base italic mb-6 relative z-10 text-muted-foreground flex-grow translate-z-10">
+                          <p className="text-sm sm:text-base italic mb-6 relative z-10 text-muted-foreground flex-grow translate-z-10 leading-relaxed">
                             "{testimonial.text}"
                           </p>
                           <div className="flex items-center gap-4 mt-auto translate-z-20">
@@ -389,21 +411,21 @@ const Home = () => {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20">
+      <section className="py-12 sm:py-20 overflow-x-clip">
           <div className="container mx-auto px-4 lg:px-8">
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                className="card-premium rounded-3xl p-12 text-center relative overflow-hidden border border-white/15 dark:border-white/15"
+                className="card-premium rounded-3xl p-6 sm:p-8 lg:p-12 text-center relative overflow-hidden border border-white/15 dark:border-white/15"
               >
                   <div className="absolute inset-0 bg-grid-white/[0.02] [mask-image:linear-gradient(0deg,white,transparent)]" />
                   <div className="relative z-10">
-                      <h2 className="text-4xl font-bold mb-6">Ready to bring your ideas to life?</h2>
-                      <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-balance">Ready to bring your ideas to life?</h2>
+                      <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto">
                           Whether you need a custom AI model, data analysis, or a full-stack automated solution, I'm here to help.
                       </p>
-                      <Link to="/contact">
-                          <Button size="lg" className="rounded-full px-12 h-14 text-lg shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-shadow">
+                      <Link to="/contact" className="inline-block w-full sm:w-auto">
+                          <Button size="lg" className="rounded-full px-8 sm:px-12 h-12 sm:h-14 text-base sm:text-lg w-full sm:w-auto min-h-[48px] shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-shadow">
                               Let's Work Together <Mail className="ml-2 w-5 h-5" />
                           </Button>
                       </Link>

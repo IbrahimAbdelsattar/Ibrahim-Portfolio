@@ -39,15 +39,15 @@ const ProjectCard = ({
       >
         <div className="h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col preserve-3d">
           {/* Project Image with 3D Depth */}
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-44 sm:h-48 overflow-hidden">
             <div 
               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
               style={{ backgroundImage: `url(${image})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/40 to-transparent" />
             
-            {/* Overlay buttons with high 3D pop */}
-            <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-z-30">
+            {/* Overlay buttons — always visible on touch, hover-reveal on desktop */}
+            <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-within:opacity-100 transition-all duration-300 translate-z-30">
               {githubUrl && (
                 <a href={githubUrl} target="_blank" rel="noopener noreferrer">
                   <Button variant="glass" size="icon" className="rounded-full shadow-xl hover:scale-110">
@@ -70,12 +70,12 @@ const ProjectCard = ({
           </div>
 
           {/* Content with Z-Depth */}
-          <div className="p-6 flex-1 flex flex-col justify-between preserve-3d">
+          <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between preserve-3d">
             <div className="translate-z-20">
-              <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
                 {title}
               </h3>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 leading-relaxed">
                 {description}
               </p>
             </div>

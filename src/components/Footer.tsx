@@ -12,10 +12,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-white/10 dark:border-white/10 bg-card/35 backdrop-blur-2xl">
-      <div className="container mx-auto px-4 lg:px-8 py-6">
+    <footer className="relative border-t border-white/10 dark:border-white/10 bg-card/35 backdrop-blur-2xl overflow-x-clip">
+      <div className="container mx-auto px-4 lg:px-8 py-6 pb-safe">
         <div className="text-center">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs sm:text-sm px-2">
             © {currentYear} Ibrahim Abdelsattar. All rights reserved.
           </p>
         </div>

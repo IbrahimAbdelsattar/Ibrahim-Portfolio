@@ -86,24 +86,24 @@ const Contact = () => {
 
   return (
     <Layout>
-      <section className="py-20">
+      <section className="py-12 sm:py-20 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-10 sm:mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
               Get In <span className="gradient-text">Touch</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Have a project in mind or want to collaborate? Feel free to reach out!
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-6xl mx-auto">
             {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -112,9 +112,9 @@ const Contact = () => {
               transition={{ duration: 0.6 }}
             >
               <TiltCard3D maxTilt={4} scale={1.01} glare={false}>
-                <div className="glass-card rounded-2xl p-8 preserve-3d">
-                  <h2 className="text-2xl font-semibold text-foreground mb-6 translate-z-10">Send a Message</h2>
-                  <form onSubmit={handleSubmit} className="space-y-6 translate-z-5">
+                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6 translate-z-10">Send a Message</h2>
+                  <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 translate-z-5">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                         Your Name
@@ -161,7 +161,7 @@ const Contact = () => {
                       type="submit" 
                       variant="hero" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full min-h-[52px] text-base"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -187,8 +187,8 @@ const Contact = () => {
               className="space-y-6"
             >
               <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-8 preserve-3d">
-                  <h2 className="text-2xl font-semibold text-foreground mb-6 translate-z-10">Contact Information</h2>
+                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6 translate-z-10">Contact Information</h2>
                   <div className="space-y-4 translate-z-5">
                     {contactInfo.map((item, index) => (
                       <motion.a
@@ -200,14 +200,14 @@ const Contact = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 rounded-2xl glass-card hover-glow group"
+                        className="flex items-center gap-4 p-4 rounded-2xl glass-card hover-glow group min-h-[72px]"
                       >
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
                           <item.icon className="w-5 h-5 text-primary" />
                         </div>
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <div className="text-sm text-muted-foreground">{item.label}</div>
-                          <div className="font-medium text-foreground">{item.value}</div>
+                          <div className="font-medium text-foreground text-sm sm:text-base truncate">{item.value}</div>
                         </div>
                       </motion.a>
                     ))}
@@ -217,7 +217,7 @@ const Contact = () => {
 
               {/* Location Card */}
               <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-8 preserve-3d">
+                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
                   <div className="flex items-center gap-4 mb-4 translate-z-10">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-primary" />

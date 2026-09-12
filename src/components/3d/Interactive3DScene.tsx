@@ -64,8 +64,12 @@ export const Interactive3DScene: React.FC = () => {
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
+    // Mobile detection: fewer nodes + slower frame rate = smooth scrolling
+    const isMobile = window.innerWidth < 768;
+    const isSmallScreen = window.innerWidth < 480;
+
     // Generate 3D nodes clustered in a spherical cloud
-    const nodeCount = 55;
+    const nodeCount = isSmallScreen ? 20 : isMobile ? 28 : 55;
     const sphereRadius = Math.min(width, height) * 0.42;
     const nodes: Node3D[] = [];
 
@@ -88,8 +92,19 @@ export const Interactive3DScene: React.FC = () => {
 
     const fov = 450; // Camera distance perspective
     let angle = 0;
+    let lastFrameTime = 0;
+    const frameInterval = isMobile ? 1000 / 30 : 1000 / 60; // 30fps on mobile, 60fps desktop
 
-    const render = () => {
+    const render = (now: number = 0) => {
+      // Throttle mobile frame rate for smoothness + battery
+      if (now - lastFrameTime < frameInterval) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = now;
+
+      // Pause rendering when page is scrolled far beyond hero on mobile
+      // (canvas is fixed background; still skip heavy work when tab hidden handled above)
       ctx.clearRect(0, 0, width, height);
 
       // Smooth interpolation towards mouse-guided rotation
@@ -178,8 +193,8 @@ export const Interactive3DScene: React.FC = () => {
         ctx.arc(p.x2d, p.y2d, Math.max(0.8, p.radius), 0, Math.PI * 2);
         ctx.fill();
 
-        // Node glow
-        if (p.alpha > 0.6) {
+        // Node glow (desktop only — expensive on mobile GPUs)
+        if (p.alpha > 0.6 && !isMobile) {
           ctx.fillStyle = `rgba(54, 135, 227, ${p.alpha * 0.25})`;
           ctx.beginPath();
           ctx.arc(p.x2d, p.y2d, p.radius * 2.4, 0, Math.PI * 2);
@@ -203,7 +218,8 @@ export const Interactive3DScene: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-40 dark:opacity-50 transition-opacity duration-700"
+      aria-hidden="true"
+      className="fixed inset-0 pointer-events-none z-0 opacity-30 md:opacity-40 dark:opacity-40 dark:md:opacity-50 transition-opacity duration-700"
     />
   );
 };

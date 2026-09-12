@@ -15,6 +15,49 @@ const MODEL_NAME = "gh/gpt-4o-mini";
 // Optional local backend URL (if user runs python chatbot_api.py locally on port 8000)
 const LOCAL_BACKEND_URL = import.meta.env.VITE_CHATBOT_API_URL || "http://127.0.0.1:8000/api/chat";
 
+/**
+ * Removes dashes (-), asterisks (*), and hashtags (#) from chatbot responses
+ * while preserving valid URLs, punctuation, and links.
+ */
+export function stripForbiddenCharacters(text: string): string {
+  if (!text) return "";
+
+  // 1. Remove all hashtags '#'
+  let cleaned = text.replace(/#/g, "");
+
+  // 2. Remove all asterisks '*'
+  cleaned = cleaned.replace(/\*/g, "");
+
+  // 3. Protect URLs so hyphens inside URLs are not corrupted
+  const urlPlaceholders: string[] = [];
+  cleaned = cleaned.replace(/https?:\/\/[^\s\)]+/g, (match) => {
+    urlPlaceholders.push(match);
+    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
+  });
+
+  // Remove horizontal divider rules: '---', '–—–', etc.
+  cleaned = cleaned.replace(/^[-–—]{2,}\s*$/gm, "");
+
+  // Remove bullet dashes at start of lines: '- item', '– item', '— item'
+  cleaned = cleaned.replace(/^(\s*)[-–—]\s+/gm, "$1");
+
+  // Replace standalone dashes between words: ' - ', ' – ', ' — ' with clean punctuation
+  cleaned = cleaned.replace(/\s+[-–—]+\s+/g, ", ");
+
+  // Remove trailing or standalone dashes at line endings
+  cleaned = cleaned.replace(/\s+[-–—]+$/gm, "");
+
+  // Remove leading dashes on any line
+  cleaned = cleaned.replace(/^(\s*)[-–—]+/gm, "$1");
+
+  // Restore protected URLs
+  cleaned = cleaned.replace(/__URL_PLACEHOLDER_(\d+)__/g, (_, idx) => {
+    return urlPlaceholders[parseInt(idx, 10)] || "";
+  });
+
+  return cleaned.trim();
+}
+
 export async function sendChatMessage(
   userQuery: string,
   history: ChatMessage[] = []
@@ -53,10 +96,38 @@ export async function sendChatMessage(
     clearTimeout(timeoutId);
 
     if (res.ok) {
-      const data = await res.json();
-      const reply = data.choices?.[0]?.message?.content;
+      const rawText = await res.text();
+      let reply = "";
+
+      if (rawText.includes("data: ")) {
+        const lines = rawText.split("\n");
+        const parts: string[] = [];
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
+            try {
+              const chunkJson = JSON.parse(trimmed.slice(6));
+              const delta = chunkJson.choices?.[0]?.delta?.content;
+              const msgContent = chunkJson.choices?.[0]?.message?.content;
+              if (delta) parts.push(delta);
+              else if (msgContent) parts.push(msgContent);
+            } catch {
+              // skip unparseable chunk
+            }
+          }
+        }
+        reply = parts.join("");
+      } else {
+        try {
+          const data = JSON.parse(rawText);
+          reply = data.choices?.[0]?.message?.content || "";
+        } catch {
+          // ignore
+        }
+      }
+
       if (reply && typeof reply === "string" && reply.trim()) {
-        return { text: reply.trim(), isLive: true };
+        return { text: stripForbiddenCharacters(reply.trim()), isLive: true };
       }
     }
   } catch (cloudErr) {
@@ -80,7 +151,7 @@ export async function sendChatMessage(
     if (res.ok) {
       const data = await res.json();
       if (data.reply) {
-        return { text: data.reply.trim(), isLive: true };
+        return { text: stripForbiddenCharacters(data.reply.trim()), isLive: true };
       }
     }
   } catch {
@@ -89,5 +160,5 @@ export async function sendChatMessage(
 
   // 3. Fallback: Full-coverage local intelligent knowledge engine
   const offlineReply = getAssistantResponse(userQuery);
-  return { text: offlineReply, isLive: false };
+  return { text: stripForbiddenCharacters(offlineReply), isLive: false };
 }

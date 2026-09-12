@@ -53,6 +53,19 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location.pathname]);
 
+  // Lock body scroll when mobile menu is open + close on Escape
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen]);
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -67,11 +80,11 @@ const Navbar = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
+          <Link to="/" className="flex items-center gap-2 group min-h-[44px]" aria-label="Go to home">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
               <Brain className="w-5 h-5 text-primary" />
             </div>
-            <span className="font-semibold text-lg text-foreground">Ibrahim</span>
+            <span className="font-semibold text-base sm:text-lg text-foreground">Ibrahim</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -119,12 +132,13 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-1 sm:gap-2 lg:hidden">
             <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="rounded-full hover:bg-primary/10 hover:text-primary"
+                aria-label="Toggle theme"
+                className="rounded-full hover:bg-primary/10 hover:text-primary min-h-[44px] min-w-[44px]"
               >
                  <AnimatePresence mode="wait">
                   <motion.div
@@ -143,6 +157,9 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              className="min-h-[44px] min-w-[44px]"
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -157,10 +174,10 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="lg:hidden bg-card/85 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 shadow-2xl"
+            transition={{ duration: 0.25 }}
+            className="lg:hidden bg-card/90 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 shadow-2xl overflow-hidden"
           >
-            <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
+            <div className="container mx-auto px-4 py-4 pb-safe flex flex-col gap-2 max-h-[70dvh] overflow-y-auto scroll-smooth-touch custom-scrollbar">
               {navLinks.map((link, index) => (
                 <motion.div
                   key={link.path}
@@ -170,7 +187,7 @@ const Navbar = () => {
                 >
                   <Link
                     to={link.path}
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    className={`block px-4 py-3.5 min-h-[48px] flex items-center rounded-xl text-[15px] font-medium transition-colors ${
                       location.pathname === link.path
                         ? "bg-primary/10 text-primary border border-primary/20"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"

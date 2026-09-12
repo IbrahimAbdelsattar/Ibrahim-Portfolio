@@ -1,10 +1,11 @@
 import React from "react";
+import { stripForbiddenCharacters } from "@/services/chatService";
 
 interface ChatMessageContentProps {
   text: string;
 }
 
-// Parses inline tokens (bold, links, inline code)
+// Parses inline tokens (links, inline code, bold if any remains)
 const renderInlineTokens = (content: string): React.ReactNode[] => {
   // Regex to match markdown links [label](url), bold **bold**, or `code`
   const tokenRegex = /(\[.*?\]\(https?:\/\/[^\s\)]+\)|\*\*.*?\*\*|`.*?`)/g;
@@ -57,7 +58,8 @@ const renderInlineTokens = (content: string): React.ReactNode[] => {
 };
 
 export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) => {
-  const lines = text.split("\n");
+  const sanitizedText = stripForbiddenCharacters(text);
+  const lines = sanitizedText.split("\n");
 
   const elements: React.ReactNode[] = [];
   let currentList: React.ReactNode[] = [];

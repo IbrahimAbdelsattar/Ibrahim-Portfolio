@@ -11,11 +11,11 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden">
+    <div className="min-h-dvh bg-background relative overflow-x-clip">
       <FloatingShapes />
       <Interactive3DScene />
       <Navbar />
-      <main className="relative z-10 pt-16 lg:pt-20">
+      <main className="relative z-10 pt-16 lg:pt-20 overflow-x-clip">
         {children}
       </main>
       <Footer />

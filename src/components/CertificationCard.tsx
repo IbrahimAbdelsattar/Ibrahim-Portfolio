@@ -35,7 +35,7 @@ const CertificationCard = ({
       >
         <div className="h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col preserve-3d">
           {/* Certificate Image */}
-          <div className="relative h-40 overflow-hidden bg-secondary/30">
+          <div className="relative h-36 sm:h-40 overflow-hidden bg-secondary/30">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-85 transition-all duration-700 group-hover:scale-110 group-hover:opacity-100"
               style={{ backgroundImage: `url(${image})` }}
@@ -49,9 +49,9 @@ const CertificationCard = ({
           </div>
 
           {/* Content with Z-Depth */}
-          <div className="p-5 flex-1 flex flex-col justify-between preserve-3d">
+          <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between preserve-3d">
             <div className="translate-z-20">
-              <h3 className="text-base font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
                 {title}
               </h3>
             </div>
