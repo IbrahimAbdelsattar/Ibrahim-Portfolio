@@ -141,7 +141,7 @@ const IbrahimChatbot = () => {
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
-              className="relative group flex items-center gap-3 px-4 py-3 rounded-full bg-gradient-to-r from-primary via-purple-600 to-secondary text-white shadow-2xl hover:shadow-primary/50 transition-all cursor-pointer border border-white/20"
+              className="relative group flex items-center gap-3 px-4 py-3 rounded-full bg-gradient-to-r from-primary via-blue-600 to-secondary text-white shadow-2xl hover:shadow-primary/50 transition-all cursor-pointer border border-white/20"
             >
               <div className="relative">
                 <Bot className="w-6 h-6 animate-bounce" />

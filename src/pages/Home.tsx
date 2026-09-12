@@ -145,8 +145,8 @@ const Home = () => {
             >
               <div className="relative w-full max-w-[400px] mx-auto">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[80px] animate-pulse" />
-                <div className="absolute inset-0 bg-gradient-to-bl from-blue-500/30 to-purple-500/30 rounded-full blur-[100px] animate-pulse delay-75" />
-                <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px] animate-pulse duration-[3000ms]" />
+                <div className="absolute inset-0 bg-gradient-to-bl from-primary/30 to-secondary/30 rounded-full blur-[100px] animate-pulse delay-75" />
+                <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px] animate-pulse [animation-duration:3000ms]" />
                 <img 
                   src={profileImg} 
                   alt="Ibrahim Abdelsattar" 

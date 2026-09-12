@@ -29,8 +29,10 @@ const Navbar = () => {
     const root = window.document.documentElement;
     if (theme === 'light') {
       root.classList.add('light');
+      root.classList.remove('dark');
     } else {
       root.classList.remove('light');
+      root.classList.add('dark');
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -58,7 +60,7 @@ const Navbar = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50" 
+          ? "bg-background/65 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]" 
           : "bg-transparent"
       }`}
     >
@@ -66,7 +68,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(187_85%_53%/0.3)] transition-all duration-300">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
               <Brain className="w-5 h-5 text-primary" />
             </div>
             <span className="font-semibold text-lg text-foreground">Ibrahim</span>

@@ -197,7 +197,7 @@ const Contact = () => {
                       transition={{ delay: index * 0.1 }}
                       className="flex items-center gap-4 p-4 rounded-xl bg-secondary/30 border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 group"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(187_85%_53%/0.3)] transition-all duration-300">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
                         <item.icon className="w-5 h-5 text-primary" />
                       </div>
                       <div>

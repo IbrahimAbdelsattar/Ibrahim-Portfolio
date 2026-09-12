@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_hsl(187_85%_53%/0.4)]",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-border bg-transparent hover:bg-secondary hover:border-primary/30",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-secondary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-primary text-primary-foreground font-semibold hover:bg-primary/90 hover:shadow-[0_0_40px_hsl(187_85%_53%/0.5)] hover:scale-[1.02]",
-        heroOutline: "border-2 border-primary/50 bg-transparent text-foreground hover:bg-primary/10 hover:border-primary hover:shadow-[0_0_30px_hsl(187_85%_53%/0.3)]",
+        hero: "bg-primary text-primary-foreground font-semibold hover:bg-primary/90 hover:shadow-[0_0_40px_hsl(var(--primary)/0.5)] hover:scale-[1.02]",
+        heroOutline: "border-2 border-primary/50 bg-transparent text-foreground hover:bg-primary/10 hover:border-primary hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)]",
         glass: "backdrop-blur-xl bg-secondary/30 border border-border/50 text-foreground hover:bg-secondary/50 hover:border-primary/30",
       },
       size: {

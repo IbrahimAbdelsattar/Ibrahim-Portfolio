@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'Amiri', 'system-ui', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+        amiri: ['Amiri', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -26,6 +28,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          dark: "hsl(var(--primary-dark))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -97,8 +100,8 @@ export default {
           "50%": { transform: "translateY(-20px)" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(187 85% 53% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(187 85% 53% / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.5)" },
         },
       },
       animation: {
