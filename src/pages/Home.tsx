@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   ArrowRight, 
@@ -16,6 +16,7 @@ import {
   MessageSquareText
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import Reveal from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectModal from "@/components/ProjectModal";
@@ -27,6 +28,16 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Subtle hero parallax (background drifts slower than scroll)
+  const heroRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroBgY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 90]);
+  const heroFade = useTransform(heroProgress, [0, 0.85], [1, reduceMotion ? 1 : 0.25]);
+
   // Filter 3 featured projects (prioritizing pinned flagship projects)
   const featuredProjects = projects.filter((p) => p.isPinned).slice(0, 3);
   if (featuredProjects.length < 3) {
@@ -37,13 +48,6 @@ const Home = () => {
   const handleProjectClick = (project: typeof projects[0]) => {
     setSelectedProject(project);
     setIsModalOpen(true);
-  };
-
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.6 }
   };
 
   const stats = [
@@ -82,9 +86,9 @@ const Home = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[92dvh] sm:min-h-[90vh] flex items-center pt-24 pb-10 sm:pt-20 sm:pb-0 overflow-x-clip">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+      <section ref={heroRef} className="relative min-h-[92dvh] sm:min-h-[90vh] flex items-center pt-24 pb-10 sm:pt-20 sm:pb-0 overflow-x-clip">
+        <motion.div style={{ y: heroBgY }} className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
+        <motion.div style={{ opacity: heroFade }} className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Mobile profile image — compact, shown first on small screens */}
             <motion.div
@@ -209,7 +213,7 @@ const Home = () => {
               </div>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Tech Stack Strip (Marquee) */}
@@ -240,7 +244,7 @@ const Home = () => {
       {/* About Preview */}
       <section className="py-12 sm:py-20 bg-background relative">
           <div className="container mx-auto px-4 lg:px-8">
-              <motion.div {...fadeInUp} className="max-w-3xl mx-auto text-center">
+              <Reveal className="max-w-3xl mx-auto text-center">
                   <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Who I Am</h2>
                   <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
                       I am a passionate <span className="text-primary font-semibold">AI & Data Science Engineer</span> dedicated to bridging the gap between complex data and actionable insights. With a strong foundation in machine learning, deep learning, and NLP, I create scalable solutions that solve real-world problems. My experience spans across finance, healthcare, and retail analytics, where I've helped organizations optimize their operations through intelligent automation.
@@ -250,17 +254,17 @@ const Home = () => {
                           Read More About Me <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                   </Link>
-              </motion.div>
+              </Reveal>
           </div>
       </section>
 
       {/* Skills Snapshot */}
       <section className="py-12 sm:py-20 bg-secondary/5 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
-          <motion.div {...fadeInUp} className="text-center mb-10 sm:mb-16">
+          <Reveal className="text-center mb-10 sm:mb-16">
              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4">My <span className="gradient-text">Expertise</span></h2>
              <p className="text-sm sm:text-base text-muted-foreground">Core technical skills and areas of specialization</p>
-          </motion.div>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {skills.map((skill, index) => (
@@ -293,10 +297,10 @@ const Home = () => {
       <section className="py-12 sm:py-20 bg-background overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 sm:mb-12">
-                <motion.div {...fadeInUp}>
+                <Reveal>
                     <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4">Featured <span className="gradient-text">Projects</span></h2>
                     <p className="text-sm sm:text-base text-muted-foreground">A selection of my recent AI and Data Science work</p>
-                </motion.div>
+                </Reveal>
                 <Link to="/projects" className="hidden md:block shrink-0">
                     <Button variant="ghost" className="group min-h-[44px]">
                         View All Projects <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -346,9 +350,9 @@ const Home = () => {
       {/* Testimonials */}
       <section className="py-12 sm:py-20 bg-background overflow-x-clip">
           <div className="container mx-auto px-4 lg:px-8">
-              <motion.div {...fadeInUp} className="text-center mb-10 sm:mb-16">
+              <Reveal className="text-center mb-10 sm:mb-16">
                   <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">What People Say</h2>
-              </motion.div>
+              </Reveal>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
                   {[
                     {

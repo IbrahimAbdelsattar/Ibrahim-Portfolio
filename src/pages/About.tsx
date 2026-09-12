@@ -1,17 +1,21 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, GraduationCap, Target, Code2, Sparkles, Cpu, Layers, Terminal } from "lucide-react";
 import Layout from "@/components/Layout";
 import SkillBadge from "@/components/SkillBadge";
+import AnimatedTabs, { AnimatedTabPanel } from "@/components/AnimatedTabs";
+import Reveal from "@/components/Reveal";
 import { TiltCard3D } from "@/components/3d/TiltCard3D";
 
-const skills = {
-  programming: ["Python", "SQL", "TypeScript", "JavaScript", "C++", "Java", "R"],
-  genAiAndNlp: ["Generative AI", "LLMs", "RAG Systems", "LangChain", "Vector DBs (FAISS/Chroma)", "Hugging Face", "BERT", "Transformers", "Librosa (Audio AI)"],
-  machineLearning: ["Deep Learning", "Machine Learning", "PyTorch", "TensorFlow", "Scikit-Learn", "XGBoost", "LightGBM", "Computer Vision", "OpenCV"],
-  dataAndOps: ["Pandas", "NumPy", "Power BI", "Matplotlib", "Seaborn", "Docker", "Dokploy", "FastAPI", "Flask", "Streamlit", "Git/GitHub", "PostgreSQL"]
-};
+const skillGroups = [
+  { value: "languages", label: "Languages", icon: Code2, items: ["Python", "SQL", "TypeScript", "JavaScript", "C++", "Java", "R"] },
+  { value: "genai", label: "GenAI & NLP", icon: Sparkles, items: ["Generative AI", "LLMs", "RAG Systems", "LangChain", "Vector DBs (FAISS/Chroma)", "Hugging Face", "BERT", "Transformers", "Librosa (Audio AI)"] },
+  { value: "ml", label: "Machine Learning", icon: Layers, items: ["Deep Learning", "Machine Learning", "PyTorch", "TensorFlow", "Scikit-Learn", "XGBoost", "LightGBM", "Computer Vision", "OpenCV"] },
+  { value: "dataops", label: "Data & MLOps", icon: Terminal, items: ["Pandas", "NumPy", "Power BI", "Matplotlib", "Seaborn", "Docker", "Dokploy", "FastAPI", "Flask", "Streamlit", "Git/GitHub", "PostgreSQL"] },
+];
 
 const About = () => {
+  const [activeSkillTab, setActiveSkillTab] = useState(skillGroups[0].value);
   return (
     <Layout>
       <section className="py-12 sm:py-20 overflow-x-clip">
@@ -231,78 +235,40 @@ const About = () => {
           </motion.div>
 
           {/* Skills Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-8 sm:mb-12"
-          >
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">
+          <Reveal className="mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-6 sm:mb-8">
               Tools & <span className="gradient-text">Technologies</span>
             </h2>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Programming */}
-              <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
-                    <Code2 className="w-5 h-5 text-primary" />
-                    Languages
-                  </h3>
-                  <div className="flex flex-wrap gap-2 translate-z-5">
-                    {skills.programming.map((skill, index) => (
-                      <SkillBadge key={skill} name={skill} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </TiltCard3D>
-
-              {/* GenAI & NLP */}
-              <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    GenAI & NLP
-                  </h3>
-                  <div className="flex flex-wrap gap-2 translate-z-5">
-                    {skills.genAiAndNlp.map((skill, index) => (
-                      <SkillBadge key={skill} name={skill} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </TiltCard3D>
-
-              {/* ML & DL */}
-              <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
-                    <Layers className="w-5 h-5 text-primary" />
-                    Machine Learning
-                  </h3>
-                  <div className="flex flex-wrap gap-2 translate-z-5">
-                    {skills.machineLearning.map((skill, index) => (
-                      <SkillBadge key={skill} name={skill} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </TiltCard3D>
-
-              {/* Data & Ops */}
-              <TiltCard3D maxTilt={7} scale={1.02} className="h-full">
-                <div className="glass-card rounded-2xl p-5 sm:p-6 h-full preserve-3d">
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2 translate-z-10">
-                    <Terminal className="w-5 h-5 text-primary" />
-                    Data & MLOps
-                  </h3>
-                  <div className="flex flex-wrap gap-2 translate-z-5">
-                    {skills.dataAndOps.map((skill, index) => (
-                      <SkillBadge key={skill} name={skill} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </TiltCard3D>
+            <div className="max-w-3xl mx-auto">
+              <AnimatedTabs
+                id="about-skills"
+                ariaLabel="Browse skills by category"
+                tabs={skillGroups.map(({ value, label }) => ({ value, label }))}
+                value={activeSkillTab}
+                onChange={setActiveSkillTab}
+              />
+              <div className="mt-4 sm:mt-6 glass-card rounded-2xl p-5 sm:p-8 min-h-[220px]">
+                {skillGroups.map((group) => (
+                  <AnimatedTabPanel
+                    key={group.value}
+                    tabValue={group.value}
+                    activeValue={activeSkillTab}
+                  >
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <group.icon className="w-5 h-5 text-primary" />
+                      {group.label}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {group.items.map((skill, index) => (
+                        <SkillBadge key={skill} name={skill} index={index} />
+                      ))}
+                    </div>
+                  </AnimatedTabPanel>
+                ))}
+              </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </section>
     </Layout>

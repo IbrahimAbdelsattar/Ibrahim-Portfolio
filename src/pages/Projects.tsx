@@ -4,6 +4,8 @@ import { Search, Sparkles, FolderGit2, Pin } from "lucide-react";
 import Layout from "@/components/Layout";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectModal from "@/components/ProjectModal";
+import AnimatedTabs from "@/components/AnimatedTabs";
+import Reveal from "@/components/Reveal";
 import { projects, Project } from "@/data";
 
 const categories = [
@@ -97,24 +99,15 @@ const Projects = () => {
               />
             </div>
 
-            {/* Category Pills */}
-            <div className="flex flex-nowrap md:flex-wrap items-center gap-2 w-full md:w-auto overflow-x-auto no-scrollbar scroll-smooth-touch py-1 -mx-4 px-4 md:mx-0 md:px-0">
-              {categories.map((category) => {
-                const isActive = selectedCategory === category;
-                return (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2.5 min-h-[44px] shrink-0 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer backdrop-blur-md ${
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
-                        : "glass-card hover:border-primary/40 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                );
-              })}
+            {/* Category Tabs — animated sliding pill */}
+            <div className="w-full md:w-auto md:max-w-xl md:flex md:justify-end">
+              <AnimatedTabs
+                id="project-categories"
+                ariaLabel="Filter projects by category"
+                tabs={categories.map((c) => ({ value: c, label: c }))}
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+              />
             </div>
           </div>
 

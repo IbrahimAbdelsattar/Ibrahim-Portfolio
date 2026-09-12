@@ -4,6 +4,8 @@ import Footer from "./Footer";
 import FloatingShapes from "./FloatingShapes";
 import Interactive3DScene from "./3d/Interactive3DScene";
 import IbrahimChatbot from "./IbrahimChatbot";
+import ScrollProgress from "./ScrollProgress";
+import BackToTop from "./BackToTop";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,6 +14,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-dvh bg-background relative overflow-x-clip">
+      <ScrollProgress />
       <FloatingShapes />
       <Interactive3DScene />
       <Navbar />
@@ -19,6 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
       <Footer />
+      <BackToTop />
       <IbrahimChatbot />
     </div>
   );
