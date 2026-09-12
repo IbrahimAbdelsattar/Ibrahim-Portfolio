@@ -413,21 +413,23 @@ export function getAssistantResponse(query: string): string {
     normalized.includes("جيت هاب") ||
     normalized.includes("github")
   ) {
-    return `🚀 أنا عملت أكتر من 50 مشروع على GitHub، ودي أبرز مشاريعي اللي بفتخر بيها:
+    return `🚀 أنا بنيت كل مشاريعي المفتوحة على GitHub، ودي أبرز المشاريع المثبتة والأساسية اللي بفتخر بيها:
 
-1. [SupplyMind AI](https://github.com/IbrahimAbdelsattar/SupplyMindAI): نظام ذكي للتنبؤ بالطلب في سلاسل الإمداد وإدارة المخزون بيجمع بين الـ Predictive ML و GenAI Agents عشان يقلل الهدر وتكاليف التخزين بنسبة 25%.
+1. [Dawrly](https://github.com/IbrahimAbdelsattar/Dawrly): محرك بحث ومنصة ذكية لاكتشاف الخدمات والأماكن المحلية مدعومة بالذكاء الاصطناعي وبواجهة عصرية بتصميم Glassmorphism، شغال لايف على [dawrly.space](https://dawrly.space).
 
-2. [MR-NLP Robust RAG Chatbot](https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot): شات بوت RAG فائق الدقة بيعتمد على 3 كتب NLP مفهرسة كـ Vector Index وكتاب مفهرس كـ Knowledge Graph على أكتر من 2000 قطعة بيانات، وحقق دقة استرجاع 90%+ مع موديول أوامر صوتية.
+2. [Wajehni AI](https://github.com/IbrahimAbdelsattar/Nexus_Academy): منصة توجيه أكاديمي ومهني ذكية بتعتمد على مرشد AI "زعتر" ورادار قياس القدرات الذهنية وتحليل ميول الطالب لتحديد المسار الجامعي الأنسب.
 
-3. [Arabic Egyptian Dialect Sentiment Analysis](https://github.com/IbrahimAbdelsattar/Arabic-Sentiment-Analysis): نموذج Deep Learning بنيته بتنسرفلو مخصص لفهم الكلمات والمصطلحات الدارجة في اللهجة المصرية العامية وتصنيف مشاعر العملاء.
+3. [SupplyMind AI](https://github.com/IbrahimAbdelsattar/SupplyMindAI): نظام ذكي للتنبؤ بالطلب في سلاسل الإمداد وإدارة المخزون بيجمع بين الـ Predictive ML و GenAI Agents لتقليل الهدر بنسبة 25%.
 
-4. [RAG Knowledge Assistant for Teachers](https://github.com/IbrahimAbdelsattar/RAG-Powered-Knowledge-Assistantf-for-Teachers): مساعد ذكي للمدرسين بيبحث في المناهج والكتب المدرسية وبيولد خطط الدروس والأسئلة آلياً، وفر 50% من وقت التحضير.
+4. [TeaTec](https://github.com/IbrahimAbdelsattar/tea-tec): منصة تعليم تقني متكاملة تجمع بين تطبيق ويب عصري وتطبيق أندرويد نيتف مكتوب بـ Kotlin لتتبع الدروس والكويزات التفاعلية.
 
-5. [Audio Model Classification](https://github.com/IbrahimAbdelsattar/Audio-Model-Classification-Gender): تصنيف وتحليل الإشارات الصوتية باستخدام Mel-spectrograms ومكتبة Librosa مع شبكات 2D CNNs.
+5. [Trio-LMS](https://github.com/IbrahimAbdelsattar/trio-lms): نظام إدارة تعلم متطور وشامل للمؤسسات والطلاب لإدارة الكورسات، والتقييم الآلي، والتحليلات الأكاديمية المبنية بـ TypeScript و Next.js.
 
-6. [Credit Card Fraud Detection](https://github.com/IbrahimAbdelsattar/Credit-card-Fraud-Detection): كشف الاحتيال المالي ومعالجة عدم توازن البيانات بنظام SMOTE مع XGBoost.
+6. [Eva-AI](https://github.com/IbrahimAbdelsattar/Eva-AI): مساعد ذكي متعدد الوكلاء (Autonomous AI Agent) بيعتمد على سلاسل التفكير المنطقي واستدعاء الأدوات الخارجية وحفظ السياق.
 
-تقدر تشوف كل الأكواد والمشاريع على حسابي: [GitHub: IbrahimAbdelsattar](https://github.com/IbrahimAbdelsattar).`;
+7. [Mesdaq AI](https://github.com/IbrahimAbdelsattar/Mesdaq_AI): منصة تحليل المستندات والتدقيق الذكي للوثائق القانونية والمؤسسية مع البحث الدلالي الموثق بالمصادر.
+
+بالإضافة لـ [MR-NLP Robust RAG Chatbot](https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot) ونماذج كشف الاحتيال المالي وتحليل اللهجة المصرية. تقدر تشوف كل الأكواد والمشاريع كاملة على صفحتي في [GitHub: IbrahimAbdelsattar](https://github.com/IbrahimAbdelsattar) وفي صفحة المشاريع بالموقع!`;
   }
 
   // Arabic Contact & Hire Query
@@ -512,25 +514,23 @@ Document intelligence platform with semantic search and automated text summariza
     normalized.includes("code") ||
     normalized.includes("repos")
   ) {
-    return `🚀 I have built over 50+ repositories on GitHub! Here are some of my flagship projects:
+    return `🚀 I have built all my open-source repositories on GitHub! Here are my pinned flagship projects:
 
-1. [SupplyMind AI](https://github.com/IbrahimAbdelsattar/SupplyMindAI), predictive demand forecasting and GenAI supply chain optimization (Python, Scikit-Learn, Streamlit, Docker).
+1. [Dawrly](https://github.com/IbrahimAbdelsattar/Dawrly): Intelligent AI-powered local services & places discovery engine with glassmorphic UI, live at [dawrly.space](https://dawrly.space) (FastAPI, React, TypeScript, Docker).
 
-2. [MR-NLP Robust RAG Chatbot](https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot), adaptive RAG with 2,000+ chunks, knowledge graphs and voice input (LangChain, Vector DB, Hugging Face).
+2. [Wajehni AI](https://github.com/IbrahimAbdelsattar/Nexus_Academy): AI-driven cognitive educational guidance and personalized career roadmap synthesis with AI mentor "Za'atar" (React, TypeScript, Recharts, Node.js).
 
-3. [Arabic Egyptian Dialect Sentiment Analysis](https://github.com/IbrahimAbdelsattar/Arabic-Sentiment-Analysis), deep learning for informal Egyptian Arabic slang (TensorFlow, NLP).
+3. [SupplyMind AI](https://github.com/IbrahimAbdelsattar/SupplyMindAI): Predictive demand forecasting and GenAI supply chain optimization minimizing holding costs by 25% (Python, Scikit-Learn, Streamlit, Docker).
 
-4. [RAG Knowledge Assistant for Teachers](https://github.com/IbrahimAbdelsattar/RAG-Powered-Knowledge-Assistantf-for-Teachers), automated curriculum retrieval and lesson planning (LangChain, FastAPI).
+4. [TeaTec](https://github.com/IbrahimAbdelsattar/tea-tec): Cross-platform technology e-learning ecosystem featuring a modern web client and a native Android app in Kotlin.
 
-5. [Audio Model Classification and Gender Detection](https://github.com/IbrahimAbdelsattar/Audio-Model-Classification-Gender), Mel-spectrogram signal analysis with 2D CNNs (Librosa, TensorFlow).
+5. [Trio-LMS](https://github.com/IbrahimAbdelsattar/trio-lms): Next-generation Learning Management System with interactive quiz engines, automated grading, and comprehensive analytics (Next.js, TypeScript, PostgreSQL).
 
-6. [Credit Card Fraud Detection](https://github.com/IbrahimAbdelsattar/Credit-card-Fraud-Detection), SMOTE oversampling with XGBoost on heavily imbalanced transactions (Scikit-Learn).
+6. [Eva-AI](https://github.com/IbrahimAbdelsattar/Eva-AI): Autonomous conversational AI assistant orchestrating complex workflows with persistent contextual memory (LangChain, FastAPI, Vector DB).
 
-7. [Content Moderation System](https://github.com/IbrahimAbdelsattar/Moderation_System), real-time multi-class toxic text classification (NLP, AI Safety).
+7. [Mesdaq AI](https://github.com/IbrahimAbdelsattar/Mesdaq_AI): Enterprise document intelligence, compliance verification, and semantic search platform with verifiable citations.
 
-8. [Employee Attrition and Performance Rating](https://github.com/IbrahimAbdelsattar/Employee-Performance-Rating-Prediction), predictive HR turnover models with Power BI analytics.
-
-Explore all my projects on the Projects page or check my [GitHub Profile](https://github.com/IbrahimAbdelsattar).`;
+Alongside [MR-NLP Robust RAG Chatbot](https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot), Egyptian Dialect Sentiment, Audio AI, and ML fraud detection. Explore all projects on the Projects page or check my [GitHub Profile](https://github.com/IbrahimAbdelsattar).`;
   }
 
   // English Work Experience

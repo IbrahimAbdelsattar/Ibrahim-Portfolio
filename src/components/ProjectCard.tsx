@@ -10,6 +10,9 @@ interface ProjectCardProps {
   image: string;
   githubUrl?: string;
   liveUrl?: string;
+  isPinned?: boolean;
+  featured?: boolean;
+  category?: string;
   index: number;
   onLiveClick?: () => void;
 }
@@ -21,6 +24,7 @@ const ProjectCard = ({
   image,
   githubUrl,
   liveUrl,
+  isPinned,
   index,
   onLiveClick,
 }: ProjectCardProps) => {
@@ -29,7 +33,7 @@ const ProjectCard = ({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.5) }}
       className="h-full"
     >
       <TiltCard3D
@@ -37,7 +41,9 @@ const ProjectCard = ({
         scale={1.03}
         className="h-full group rounded-3xl"
       >
-        <div className="h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col preserve-3d">
+        <div className={`h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col preserve-3d transition-all duration-300 ${
+          isPinned ? "border-primary/40 shadow-[0_0_20px_rgba(20,184,166,0.15)] ring-1 ring-primary/30" : ""
+        }`}>
           {/* Project Image with 3D Depth */}
           <div className="relative h-44 sm:h-48 overflow-hidden">
             <div 
@@ -45,13 +51,28 @@ const ProjectCard = ({
               style={{ backgroundImage: `url(${image})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/40 to-transparent" />
+
+            {/* Pinned Badge */}
+            {isPinned && (
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/25 backdrop-blur-xl border border-primary/50 text-primary-foreground text-xs font-semibold shadow-lg shadow-primary/20">
+                <span className="text-sm">📌</span>
+                <span className="text-white font-medium tracking-wide">Pinned</span>
+              </div>
+            )}
             
             {/* Overlay buttons — always visible on touch, hover-reveal on desktop */}
-            <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-within:opacity-100 transition-all duration-300 translate-z-30">
+            <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-within:opacity-100 transition-all duration-300 translate-z-30">
               {githubUrl && (
-                <a href={githubUrl} target="_blank" rel="noopener noreferrer">
+                <a href={githubUrl} target="_blank" rel="noopener noreferrer" title="View Source on GitHub">
                   <Button variant="glass" size="icon" className="rounded-full shadow-xl hover:scale-110">
                     <Github className="w-5 h-5" />
+                  </Button>
+                </a>
+              )}
+              {liveUrl && (
+                <a href={liveUrl} target="_blank" rel="noopener noreferrer" title="Live Preview">
+                  <Button variant="glass" size="icon" className="rounded-full shadow-xl hover:scale-110 text-primary">
+                    <Eye className="w-5 h-5" />
                   </Button>
                 </a>
               )}
@@ -61,6 +82,7 @@ const ProjectCard = ({
                   variant="glass" 
                   size="icon" 
                   className="rounded-full cursor-pointer shadow-xl hover:scale-110"
+                  title="View Full Details"
                   onClick={(e) => { e.preventDefault(); onLiveClick(); }}
                 >
                   <Eye className="w-5 h-5" />

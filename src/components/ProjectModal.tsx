@@ -95,10 +95,17 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
                 </div>
                 
                 {/* Links */}
-                <div className="flex gap-3 mb-6">
-                  {/* Live URL button removed */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  {project.liveUrl && (
+                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[140px]">
+                      <Button variant="default" className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                        <ExternalLink className="w-4 h-4" />
+                        Live Demo
+                      </Button>
+                    </a>
+                  )}
                   {project.githubUrl && (
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[140px]">
                       <Button variant="outline" className="w-full gap-2 border-primary/20 hover:bg-primary/10">
                         <Github className="w-4 h-4" />
                         Source Code

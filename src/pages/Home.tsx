@@ -27,17 +27,11 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Filter 3 featured projects
-  const featuredProjects = projects.filter(p => 
-    p.title.includes("Job Recommendation") || 
-    p.title.includes("Arabic Egyptian Sentiment Analysis") || 
-    p.title.includes("MR NLP Robust RAG Chatbot")
-  ).slice(0, 3);
-  
-  // If we don't have enough specific ones, fill with others (fallback)
+  // Filter 3 featured projects (prioritizing pinned flagship projects)
+  const featuredProjects = projects.filter((p) => p.isPinned).slice(0, 3);
   if (featuredProjects.length < 3) {
-      const others = projects.filter(p => !featuredProjects.includes(p)).slice(0, 3 - featuredProjects.length);
-      featuredProjects.push(...others);
+    const others = projects.filter((p) => !featuredProjects.includes(p)).slice(0, 3 - featuredProjects.length);
+    featuredProjects.push(...others);
   }
 
   const handleProjectClick = (project: typeof projects[0]) => {

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sparkles, FolderGit2 } from "lucide-react";
+import { Search, Sparkles, FolderGit2, Pin } from "lucide-react";
 import Layout from "@/components/Layout";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectModal from "@/components/ProjectModal";
@@ -8,6 +8,7 @@ import { projects, Project } from "@/data";
 
 const categories = [
   "All",
+  "📌 Pinned",
   "GenAI & Agents",
   "NLP & Speech",
   "Machine Learning & Analytics",
@@ -20,19 +21,37 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const pinnedCount = useMemo(() => projects.filter((p) => p.isPinned).length, []);
+
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
+    let result = projects.filter((project) => {
       const matchesCategory =
-        selectedCategory === "All" || project.category === selectedCategory;
+        selectedCategory === "All"
+          ? true
+          : selectedCategory === "📌 Pinned"
+          ? Boolean(project.isPinned)
+          : project.category === selectedCategory;
+
+      const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
-        searchQuery.trim() === "" ||
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.technologies.some((tech) =>
-          tech.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        q === "" ||
+        project.title.toLowerCase().includes(q) ||
+        project.description.toLowerCase().includes(q) ||
+        project.technologies.some((tech) => tech.toLowerCase().includes(q));
+
       return matchesCategory && matchesSearch;
     });
+
+    // In "All" view or category views without explicit order, ensure pinned projects appear first
+    if (selectedCategory === "All" && searchQuery.trim() === "") {
+      result = [...result].sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return 0;
+      });
+    }
+
+    return result;
   }, [selectedCategory, searchQuery]);
 
   const handleProjectClick = (project: Project) => {
@@ -51,15 +70,15 @@ const Projects = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-8 sm:mb-12"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium mb-4 shadow-sm">
               <Sparkles className="w-4 h-4" />
-              <span>Full Portfolio Showcase</span>
+              <span>Full GitHub Portfolio & Flagship Systems</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 text-balance">
               Featured <span className="gradient-text">Projects</span>
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore my latest work in Generative AI, RAG & LLM Agents, Dialectal NLP, Speech AI, and End-to-End Predictive Machine Learning.
+              Explore all my open-source repositories and flagship systems in Generative AI, RAG & LLM Agents, Dialectal NLP, Speech AI, and Predictive Machine Learning.
             </p>
           </motion.div>
 
@@ -99,12 +118,19 @@ const Projects = () => {
             </div>
           </div>
 
-          {/* Projects Counter */}
-          <div className="flex items-center justify-between mb-6 text-sm text-muted-foreground px-2">
+          {/* Projects Counter & Pinned Indicator */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 text-sm text-muted-foreground px-2">
             <div className="flex items-center gap-2">
               <FolderGit2 className="w-4 h-4 text-primary" />
               <span>
-                Showing <strong className="text-foreground">{filteredProjects.length}</strong> projects
+                Showing <strong className="text-foreground">{filteredProjects.length}</strong> of{" "}
+                <strong className="text-foreground">{projects.length}</strong> GitHub repositories
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary font-medium">
+                <Pin className="w-3.5 h-3.5" />
+                {pinnedCount} Flagship Pinned
               </span>
             </div>
           </div>
