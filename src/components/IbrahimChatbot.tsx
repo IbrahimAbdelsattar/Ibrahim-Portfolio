@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Bot, User, Sparkles, RefreshCw, ChevronRight, ShieldAlert, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sendChatMessage, ChatMessage } from "@/services/chatService";
-import { ChatMessageContent } from "@/components/chat/ChatMessageContent";
+import { ChatMessageContent, hasArabic } from "@/components/chat/ChatMessageContent";
 import profileImg from "@/assets/profile-main.jpg";
 
 const suggestedPrompts = [
@@ -193,58 +193,71 @@ const IbrahimChatbot = () => {
 
             {/* Messages Body */}
             <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-4 text-sm custom-scrollbar scroll-smooth-touch touch-pan-y bg-card/30 backdrop-blur-md overscroll-contain">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  {msg.sender === "bot" && (
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
-                        msg.isSecurityWarning
-                          ? "bg-red-500/20 border border-red-500/30"
-                          : "border border-primary/40 shadow-sm"
-                      }`}
-                    >
-                      {msg.isSecurityWarning ? (
-                        <ShieldAlert className="w-4 h-4 text-red-400" />
-                      ) : (
-                        <img
-                          src={profileImg}
-                          alt="Ibrahim"
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                  )}
-
+              {messages.map((msg) => {
+                const isMsgArabic = hasArabic(msg.text);
+                return (
                   <div
-                    className={`max-w-[85%] sm:max-w-[84%] p-3 sm:p-3.5 rounded-2xl break-words overflow-wrap-anywhere ${
-                      msg.sender === "user"
-                        ? "bg-primary text-primary-foreground rounded-tr-none shadow-md"
-                        : msg.isSecurityWarning
-                        ? "bg-red-500/10 border border-red-500/30 text-red-200 rounded-tl-none"
-                        : "bg-secondary/40 border border-border text-foreground rounded-tl-none shadow-sm"
-                    }`}
+                    key={msg.id}
+                    className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    {msg.sender === "user" ? (
-                      <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                    ) : (
-                      <ChatMessageContent text={msg.text} />
+                    {msg.sender === "bot" && (
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
+                          msg.isSecurityWarning
+                            ? "bg-red-500/20 border border-red-500/30"
+                            : "border border-primary/40 shadow-sm"
+                        }`}
+                      >
+                        {msg.isSecurityWarning ? (
+                          <ShieldAlert className="w-4 h-4 text-red-400" />
+                        ) : (
+                          <img
+                            src={profileImg}
+                            alt="Ibrahim"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
                     )}
 
-                    <span className="text-[10px] opacity-60 block text-right mt-1.5">
-                      {msg.timestamp}
-                    </span>
-                  </div>
+                    <div
+                      dir={isMsgArabic ? "rtl" : "ltr"}
+                      className={`max-w-[85%] sm:max-w-[84%] p-3 sm:p-3.5 rounded-2xl break-words overflow-wrap-anywhere bidi-text ${
+                        isMsgArabic ? "text-right" : "text-left"
+                      } ${
+                        msg.sender === "user"
+                          ? "bg-primary text-primary-foreground rounded-tr-none shadow-md"
+                          : msg.isSecurityWarning
+                          ? "bg-red-500/10 border border-red-500/30 text-red-200 rounded-tl-none"
+                          : "bg-secondary/40 border border-border text-foreground rounded-tl-none shadow-sm"
+                      }`}
+                    >
+                      {msg.sender === "user" ? (
+                        <p dir={isMsgArabic ? "rtl" : "ltr"} className="leading-relaxed whitespace-pre-wrap bidi-text">
+                          {msg.text}
+                        </p>
+                      ) : (
+                        <ChatMessageContent text={msg.text} />
+                      )}
 
-                  {msg.sender === "user" && (
-                    <div className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center shrink-0">
-                      <User className="w-4 h-4 text-foreground" />
+                      <span
+                        className={`text-[10px] opacity-60 block mt-1.5 ${
+                          isMsgArabic ? "text-left" : "text-right"
+                        }`}
+                        dir="ltr"
+                      >
+                        {msg.timestamp}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {msg.sender === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-foreground" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
               {isTyping && (
                 <div className="flex gap-3 justify-start items-center">
@@ -264,16 +277,22 @@ const IbrahimChatbot = () => {
 
             {/* Suggested Prompts Chips */}
             <div className="p-2 sm:p-2.5 bg-card/50 backdrop-blur-xl border-t border-white/10 dark:border-white/10 flex gap-1.5 overflow-x-auto no-scrollbar scroll-smooth-touch max-h-20 sm:max-h-24 shrink-0">
-              {suggestedPrompts.map((prompt, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSend(prompt)}
-                  className="px-2.5 py-2 min-h-[36px] shrink-0 text-[11px] font-medium rounded-full glass-card hover:border-primary/40 text-primary transition-all text-left flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                >
-                  <span>{prompt}</span>
-                  <ChevronRight className="w-3 h-3 opacity-60" />
-                </button>
-              ))}
+              {suggestedPrompts.map((prompt, i) => {
+                const isPromptArabic = hasArabic(prompt);
+                return (
+                  <button
+                    key={i}
+                    dir={isPromptArabic ? "rtl" : "ltr"}
+                    onClick={() => handleSend(prompt)}
+                    className="px-2.5 py-2 min-h-[36px] shrink-0 text-[11px] font-medium rounded-full glass-card hover:border-primary/40 text-primary transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap bidi-text"
+                  >
+                    <span dir={isPromptArabic ? "rtl" : "ltr"} className="bidi-text">
+                      {prompt}
+                    </span>
+                    <ChevronRight className={`w-3 h-3 opacity-60 shrink-0 ${isPromptArabic ? "rotate-180" : ""}`} />
+                  </button>
+                );
+              })}
             </div>
 
             {/* Input Footer */}
@@ -286,12 +305,13 @@ const IbrahimChatbot = () => {
             >
               <input
                 type="text"
+                dir="auto"
                 placeholder="ابعت رسالة لإبراهيم... Type a message..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 enterKeyHint="send"
                 autoComplete="off"
-                className="flex-1 min-w-0 px-4 py-3 min-h-[48px] rounded-full glass-input text-base sm:text-sm"
+                className="flex-1 min-w-0 px-4 py-3 min-h-[48px] rounded-full glass-input text-base sm:text-sm bidi-text"
               />
               <Button
                 type="submit"

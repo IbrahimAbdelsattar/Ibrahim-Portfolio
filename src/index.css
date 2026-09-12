@@ -611,3 +611,24 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.5);
 }
+
+/* Bidirectional & Mixed Language (Arabic + English) Typography */
+.bidi-text {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+[dir="rtl"] {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  text-align: left;
+  direction: ltr;
+}
+
+.bidi-isolate {
+  unicode-bidi: isolate;
+  display: inline;
+}
