@@ -24,7 +24,7 @@ const PageRoutes = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (canonical) canonical.href = `https://ibrahim-abdelsattar.netlify.app${location.pathname}`;
+    if (canonical) canonical.href = `https://ibrahim-ai-specialist.vercel.app${location.pathname}`;
     const title = location.pathname.split("/")[1];
     if (location.pathname.startsWith("/projects/")) return;
     document.title = title
