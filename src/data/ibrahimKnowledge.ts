@@ -24,7 +24,7 @@ export interface IbrahimProfile {
     period: string;
     location: string;
     summary: string;
-    achievements: string[];
+    achievements?: string[];
   }[];
   featuredProjects: {
     title: string;
@@ -337,7 +337,7 @@ export function getAssistantResponse(query: string): string {
 
   // Normalize query for flexible matching while accepting all punctuation
   const normalized = q
-    .replace(/[?؟!,،.:;؛"'\(\)\[\]\{\}\-_#*~`/\\]/g, " ")
+    .replace(/[?؟!,،.:;؛"'\-()[\]{}_#*~`/\\]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
