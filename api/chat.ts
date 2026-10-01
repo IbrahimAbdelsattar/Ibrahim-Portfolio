@@ -41,7 +41,10 @@ export default {
     // Credentials stay in the function. Vercel's short-lived OIDC token removes
     // the need to provision another permanent key for the deployed portfolio.
     const omniKey = process.env.OMNIROUTE_API_KEY || process.env.VITE_OMNIROUTE_API_KEY;
-    const gatewayKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+    // Vercel injects a refreshed token into each function's request headers;
+    // the environment token is for builds/local development, not live requests.
+    const runtimeOidc = process.env.VERCEL === "1" ? request.headers.get("x-vercel-oidc-token") : null;
+    const gatewayKey = process.env.AI_GATEWAY_API_KEY || runtimeOidc || process.env.VERCEL_OIDC_TOKEN;
     const providers = [
       ...(omniKey ? [{ name: "omniroute", url: "https://omniroute.dawrly.space/v1/chat/completions",
         key: omniKey, model: process.env.OMNIROUTE_MODEL || "gh/gpt-4o-mini" }] : []),

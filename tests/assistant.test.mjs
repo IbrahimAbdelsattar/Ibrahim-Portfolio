@@ -70,7 +70,7 @@ const post = (body, extra = {}) => new Request('https://portfolio.example/api/ch
 });
 
 const providerEnv = (values = {}) => {
-  const names = ['OMNIROUTE_API_KEY', 'VITE_OMNIROUTE_API_KEY', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN', 'AI_GATEWAY_MODEL'];
+  const names = ['OMNIROUTE_API_KEY', 'VITE_OMNIROUTE_API_KEY', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN', 'AI_GATEWAY_MODEL', 'VERCEL'];
   const saved = Object.fromEntries(names.map(name => [name, process.env[name]]));
   for (const name of names) {
     if (values[name] === undefined) delete process.env[name]; else process.env[name] = values[name];
@@ -148,6 +148,24 @@ test('Vercel OIDC authenticates generated answers and a gateway key takes preced
     await handler.fetch(post({ message: 'EFS' }));
     assert.equal(calls[1].options.headers.Authorization, 'Bearer test-gateway-key');
     assert.equal(calls[1].payload.model, 'configured-model');
+  } finally { globalThis.fetch = originalFetch; restore(); }
+});
+
+test('live Vercel requests use the rotated platform token instead of a stale build token', async () => {
+  const restore = providerEnv({ VERCEL: '1', VERCEL_OIDC_TOKEN: 'stale-build-token' });
+  const originalFetch = globalThis.fetch;
+  let authorization;
+  globalThis.fetch = async (_url, options) => {
+    authorization = options.headers.Authorization;
+    return Response.json({ choices: [{ message: { content: 'I work at EFS.' } }] });
+  };
+  try {
+    const data = await (await handler.fetch(post({ message: 'EFS' }, { 'x-vercel-oidc-token': 'fresh-platform-token' }))).json();
+    assert.equal(data.source, 'ai');
+    assert.equal(authorization, 'Bearer fresh-platform-token');
+    delete process.env.VERCEL;
+    await handler.fetch(post({ message: 'EFS' }, { 'x-vercel-oidc-token': 'untrusted-local-header' }));
+    assert.equal(authorization, 'Bearer stale-build-token');
   } finally { globalThis.fetch = originalFetch; restore(); }
 });
 

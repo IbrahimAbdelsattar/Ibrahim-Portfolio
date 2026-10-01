@@ -109,7 +109,7 @@ Open the local origin printed by the development server.
 
 Deploy the repository to Vercel to run `api/chat.ts` with the frontend, or use `vercel dev` locally. A plain Vite server or static preview uses the browser's grounded fallback.
 
-On Vercel, generated replies can authenticate to AI Gateway with the deployment's automatic `VERCEL_OIDC_TOKEN`, without a permanent API key. AI Gateway access and credits must be available on the linked team. The default model is `google/gemini-3.1-flash-lite`; set `AI_GATEWAY_MODEL` to override it. A server-only `AI_GATEWAY_API_KEY` takes precedence over OIDC when configured, and works for development outside Vercel.
+On Vercel, generated replies authenticate to AI Gateway with the refreshed `x-vercel-oidc-token` request header injected by the platform, without a permanent API key. The header is read only in the Vercel runtime; `VERCEL_OIDC_TOKEN` is used for local development. AI Gateway access and credits must be available on the linked team. The default model is `google/gemini-3.1-flash-lite`; set `AI_GATEWAY_MODEL` to override it. A server-only `AI_GATEWAY_API_KEY` takes precedence over OIDC when configured, and works for development outside Vercel.
 
 An existing `OMNIROUTE_API_KEY` connection is tried first, using `OMNIROUTE_MODEL` (default: `gh/gpt-4o-mini`), then Vercel AI Gateway if available. The function can reuse an existing `VITE_OMNIROUTE_API_KEY` on the server for migration; frontend code never reads it. Use the server-only name for new configuration. The entire generation attempt is bounded to 8.5 seconds, and verified profile answers require no provider key. Operational logs include only provider names and failure categories or HTTP status, never prompts, credentials, or provider error bodies.
 
