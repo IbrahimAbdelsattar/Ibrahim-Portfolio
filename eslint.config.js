@@ -5,7 +5,17 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  {
+    ignores: [
+      "dist",
+      "node_modules",
+      // Vite writes transient config stubs into the project root while the dev
+      // server is running; they are not source and must not be linted.
+      "*.timestamp-*.mjs",
+      "public",
+      "*.config.js.timestamp-*",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

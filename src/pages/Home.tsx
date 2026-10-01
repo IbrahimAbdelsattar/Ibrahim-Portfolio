@@ -19,14 +19,11 @@ import Layout from "@/components/Layout";
 import Reveal from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/ProjectCard";
-import ProjectModal from "@/components/ProjectModal";
 import TiltCard3D from "@/components/3d/TiltCard3D";
-import { projects } from "@/data";
+import { projects, projectStats } from "@/data/projects";
 import profileImg from "@/assets/profile-main.jpg";
 
 const Home = () => {
-  const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Subtle hero parallax (background drifts slower than scroll)
   const heroRef = useRef<HTMLElement>(null);
@@ -38,22 +35,14 @@ const Home = () => {
   const heroBgY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 90]);
   const heroFade = useTransform(heroProgress, [0, 0.85], [1, reduceMotion ? 1 : 0.25]);
 
-  // Filter 3 featured projects (prioritizing pinned flagship projects)
-  const featuredProjects = projects.filter((p) => p.isPinned).slice(0, 3);
-  if (featuredProjects.length < 3) {
-    const others = projects.filter((p) => !featuredProjects.includes(p)).slice(0, 3 - featuredProjects.length);
-    featuredProjects.push(...others);
-  }
-
-  const handleProjectClick = (project: typeof projects[0]) => {
-    setSelectedProject(project);
-    setIsModalOpen(true);
-  };
+  // Homepage shows a curated selection of flagship work; the full archive
+  // lives on /projects. Counts shown as stats are derived, never hardcoded.
+  const featuredProjects = projects.filter((p) => p.tier === "flagship").slice(0, 3);
 
   const stats = [
-    { label: "AI Projects", value: "25+" },
-    { label: "Industries", value: "5+" },
-    { label: "Deployment", value: "100%" },
+    { label: "Featured projects", value: String(projectStats.featured) },
+    { label: "Public repositories", value: String(projectStats.publicRepos) },
+    { label: "Technologies used", value: String(projectStats.technologies) },
   ];
 
   const skills = [
@@ -310,12 +299,7 @@ const Home = () => {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
                 {featuredProjects.map((project, index) => (
-                    <ProjectCard
-                        key={project.title}
-                        {...project}
-                        index={index}
-                        onLiveClick={() => handleProjectClick(project)}
-                    />
+                    <ProjectCard key={project.id} {...project} index={index} />
                 ))}
             </div>
 
@@ -440,11 +424,6 @@ const Home = () => {
           I have added them to Hero for now.
       */}
       
-      <ProjectModal 
-        project={selectedProject} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
     </Layout>
   );
 };

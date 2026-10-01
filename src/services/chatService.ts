@@ -9,7 +9,14 @@ export interface ChatMessage {
 }
 
 const OMNIROUTE_URL = "https://omniroute.dawrly.space/v1/chat/completions";
-const OMNIROUTE_API_KEY = "sdRghiYkisbEFfqWYFILzGngUEzUcKQJVrtoGgjVPTvQmZhifAoQNSTaLEtYdoki";
+
+/**
+ * Read from the build environment. A key must never be committed to source:
+ * anything pushed here is public, and git history retains it even if a later
+ * commit removes it. When unset, the request fails and `sendChatMessage`
+ * falls through to the local backend and then the offline engine.
+ */
+const OMNIROUTE_API_KEY: string = import.meta.env.VITE_OMNIROUTE_API_KEY ?? "";
 const MODEL_NAME = "gh/gpt-4o-mini";
 
 // Optional local backend URL (if user runs python chatbot_api.py locally on port 8000)
@@ -30,7 +37,7 @@ export function stripForbiddenCharacters(text: string): string {
 
   // 3. Protect URLs so hyphens inside URLs are not corrupted
   const urlPlaceholders: string[] = [];
-  cleaned = cleaned.replace(/https?:\/\/[^\s\)]+/g, (match) => {
+  cleaned = cleaned.replace(/https?:\/\/[^\s)]+/g, (match) => {
     urlPlaceholders.push(match);
     return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
   });

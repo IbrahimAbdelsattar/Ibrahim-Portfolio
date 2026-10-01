@@ -1,718 +1,1068 @@
-export interface Project {
-  title: string;
-  category: "GenAI & Agents" | "NLP & Speech" | "Machine Learning & Analytics" | "Full-Stack & Systems";
-  description: string;
-  technologies: string[];
-  image: string;
-  images?: string[];
-  githubUrl?: string;
-  liveUrl?: string;
-  featured?: boolean;
-  isPinned?: boolean;
-}
+import type { Project } from "./types";
 
+/**
+ * Evidence standard for this file
+ * ---------------------------------
+ * - `description` / `highlights` are derived from repository READMEs, repo trees,
+ *   GitHub language stats and live HTTP checks performed 2026-10-01.
+ * - `githubUrl` is set ONLY for publicly reachable repositories. A repository
+ *   that exists but is private is flagged via `sourcePrivate` instead, so the
+ *   UI never renders a link that 404s for a visitor.
+ * - `status` reflects documented deployment evidence, not optimism.
+ * - Forks of other people's projects are intentionally excluded (see EXCLUDED).
+ *
+ * Architecture: every entry here is one record. Adding a project means adding
+ * one object — see the "Adding a project" note at the bottom of this file.
+ */
 export const projects: Project[] = [
-  // ==========================================
-  // 📌 7 PINNED FLAGSHIP PROJECTS (Top Priority)
-  // ==========================================
+  // =====================================================================
+  // FLAGSHIP — AI products with real depth
+  // =====================================================================
   {
+    id: "dawrly",
     title: "Dawrly",
-    category: "GenAI & Agents",
-    description: `🔍 Intelligent AI-Powered Search & Discovery Engine! ⚡
-Dawrly is a modern local discovery platform designed for discovering nearby businesses, essential services, professional practices, and specialized venues. Featuring intelligent web crawlers, inverted indexing, dynamic geospatial filtering, and an ultra-modern glassmorphic interface.
-
-Key Highlights:
-	✅ High-Performance Search – Rapid semantic queries and real-time category filtering
-	✅ Intelligent Crawlers – Automated data aggregation and structured content parsing
-	✅ Glassmorphic Design System – Custom theme with fluid dark mode and responsive layout
-	✅ Scalable Architecture – Dockerized backend with PostgreSQL and caching layers`,
-    technologies: ["Python", "FastAPI", "React", "TypeScript", "Tailwind CSS", "Docker", "PostgreSQL", "Elasticsearch"],
-    image: "/project-images/dawrly-platform.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Dawrly",
-    liveUrl: "https://dawrly.space",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "Wajehni AI (Nexus Academy)",
-    category: "GenAI & Agents",
-    description: `🧭 AI-Powered Academic Discovery & Cognitive Career Mentorship! 🎓
-Wajehni is an intelligent guidance platform that evaluates student aptitudes and interests through dynamic cognitive assessments, recommending tailored university majors and personalized career roadmaps.
-
-Key Highlights:
-	✅ AI Mentor "Za'atar" – Interactive conversational mentor providing real-time personalized guidance
-	✅ Cognitive Radar Profiling – Dynamic 5-dimensional skill breakdown (Logic, Creativity, Architecture, Problem Solving, Tech Readiness)
-	✅ Adaptive Curriculum Synthesis – Synthesizes custom learning milestones and curated resources
-	✅ Interactive Tech & Career Insights – Rotating market trend forecasts and skill readiness checks`,
-    technologies: ["TypeScript", "React", "Node.js", "Generative AI", "Tailwind CSS", "Recharts", "PostgreSQL"],
-    image: "/project-images/wajehni-ai.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Nexus_Academy",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "SupplyMind AI",
-    category: "GenAI & Agents",
-    description: `🚚 Intelligent Supply Chain & Logistics Management Powered by AI! 📦
-SupplyMind AI combines predictive machine learning and generative AI to optimize inventory levels, forecast demand fluctuations, and automate supply chain decision-making.
-
-Key Highlights:
-	✅ Predictive Demand Forecasting models reducing inventory holding costs by up to 25%
-	✅ Integrated LLM Agents for automated supply chain anomaly detection and reporting
-	✅ Visualized Real-time Logistics Dashboards for operational transparency
-	✅ Built Automated Risk Alerts for vendor performance and shipment delays`,
-    technologies: ["Python", "Generative AI", "Predictive Analytics", "Pandas", "Scikit-Learn", "Streamlit", "Docker"],
-    image: "/project-images/supplymind-ai.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/SupplyMindAI",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "TeaTec (Web & Android)",
-    category: "Full-Stack & Systems",
-    description: `🍵 Modern Multi-Platform Technology & E-Learning Ecosystem! 📱
-TeaTec bridges educational gaps through an integrated web and native Android platform delivering interactive technology courses, real-time code challenges, and structured student progress tracking.
-
-Key Highlights:
-	✅ Native Android Application developed in Kotlin with modern Material & fluid UI
-	✅ Responsive Web Client offering seamless video lectures and interactive quizzes
-	✅ Instructor & Student Portals for tracking course completions and grading
-	✅ Cloud-Synced Architecture with offline lesson caching capabilities`,
-    technologies: ["Kotlin", "Android SDK", "TypeScript", "React", "Tailwind CSS", "Firebase", "REST API"],
-    image: "/project-images/teatec-platform.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/tea-tec",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "Trio-LMS (Trio Learn Hub)",
-    category: "Full-Stack & Systems",
-    description: `🏫 Next-Gen Enterprise Learning Management System! 🎓
-Trio-LMS is a full-featured educational platform designed for colleges and academies to manage courses, track student performance, automate evaluations, and facilitate real-time virtual classrooms.
-
-Key Highlights:
-	✅ Comprehensive Course Administration – Modular syllabus creation with multimedia support
-	✅ Student Analytics Dashboard – Visualized grade distributions, attendance, and progress metrics
-	✅ Automated Assessment Engine – Instant grading for quizzes, coding tasks, and written submissions
-	✅ Secure Multi-Role Authentication – Tailored permissions for Admins, Teachers, and Students`,
-    technologies: ["TypeScript", "React", "Next.js", "Tailwind CSS", "PostgreSQL", "Prisma", "Docker"],
-    image: "/project-images/trio-lms.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/trio-lms",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "Eva-AI",
-    category: "GenAI & Agents",
-    description: `🤖 Autonomous Conversational AI Assistant & Workflow Agent! 🧠
-Eva-AI is an intelligent multi-agent assistant equipped with persistent contextual memory, external tool usage, and prompt-reasoning chains to automate complex developer and enterprise workflows.
-
-Key Highlights:
-	✅ Advanced Agentic Reasoning – Deconstructs multi-step user prompts into actionable tool executions
-	✅ Long-Term Context Retention – Persistent conversational memory using vector embeddings
-	✅ High-Speed Streaming API – Real-time token streaming with sub-second response latency
-	✅ Extensible Tool Integrations – Supports search APIs, code interpreters, and file analyzers`,
-    technologies: ["Python", "Generative AI", "LangChain", "LLMs", "FastAPI", "Vector DB", "ChromaDB"],
-    image: "/project-images/eva-ai.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Eva-AI",
-    isPinned: true,
-    featured: true,
-  },
-  {
-    title: "Mesdaq AI",
-    category: "GenAI & Agents",
-    description: `🏛️ Enterprise Document Intelligence & Semantic Governance Platform! 💡
-Mesdaq AI empowers organizations with automated document intelligence, regulatory compliance auditing, and precise semantic information retrieval across thousands of technical and legal documents.
-
-Key Highlights:
-	✅ Precise Citation-Backed Answers – Zero-hallucination semantic retrieval with direct source references
-	✅ Automated Document Summarization – Synthesizes executive summaries from dense reports
-	✅ Compliance & Risk Flagging – Scans organizational documentation for regulatory adherence
-	✅ Modern Glassmorphic Web App – Built with React, TypeScript, and high-security API endpoints`,
-    technologies: ["TypeScript", "Python", "Generative AI", "React", "Tailwind CSS", "FastAPI", "Vector Search"],
-    image: "/project-images/mesdaq-ai.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Mesdaq_AI",
-    isPinned: true,
-    featured: true,
-  },
-
-  // ==========================================
-  // 🤖 GENERATIVE AI, RAG & LLM AGENTS
-  // ==========================================
-  {
-    title: "MR NLP Robust RAG Chatbot",
-    category: "GenAI & Agents",
-    description: `🤖 Next-Gen Conversations: Context-Aware RAG Chatbot! 🗣️
-Standard chatbots hallucinate; RAG (Retrieval-Augmented Generation) chatbots know the facts. This system combines the power of LLMs with a reliable vector knowledge base to provide accurate, context-rich answers.
-
-Key Highlights:
-	✅ Implemented RAG Architecture retrieving data from custom vector stores (ChromaDB/FAISS)
-	✅ Integrated Large Language Models (LLMs) for natural, human-like reasoning
-	✅ Built Semantic Search pipelines for precise information retrieval
-	✅ Ensured Robustness against prompt injection and irrelevant queries`,
-    technologies: ["Python", "NLP", "RAG", "LLM", "LangChain", "Vector DB", "ChromaDB"],
-    image: "/project-images/rag-chatbot.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot",
-    featured: true,
-  },
-  {
-    title: "RAG-Powered Knowledge Assistant for Teachers",
-    category: "GenAI & Agents",
-    description: `🎓 Empowering Educators with Smart AI Assistance! 📚
-A specialized Retrieval-Augmented Generation system designed for teachers to generate lesson plans, answer complex pedagogical questions, and search curriculum documents seamlessly.
-
-Key Highlights:
-	✅ Built Document Parsing Pipelines for educational textbooks and syllabi
-	✅ Fine-Tuned Vector Indexing for instant curriculum retrieval
-	✅ Integrated Custom Prompt Templates tailored for classroom and quiz creation
-	✅ Streamlined Teacher Workflow, reducing prep time by over 50%`,
-    technologies: ["Python", "RAG", "LLMs", "LangChain", "FastAPI", "Vector Search"],
-    image: "/project-images/job-recommendation-system.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/RAG-Powered-Knowledge-Assistantf-for-Teachers",
-    featured: true,
-  },
-  {
-    title: "Hermes Agent",
-    category: "GenAI & Agents",
-    description: `🦅 The Autonomous AI Agent That Grows With You! ⚡
-An advanced conversational and task-oriented agent platform capable of continuous learning, tool synthesis, and dynamic execution across coding and research workflows.
-
-Key Highlights:
-	✅ Self-improving prompt loops and reflexive task planning
-	✅ Multi-tool orchestration for terminal execution, web browsing, and code analysis
-	✅ High-concurrency async runtime with memory persistence`,
-    technologies: ["Python", "LLMs", "Autonomous Agents", "Tool Calling", "Prompt Engineering"],
-    image: "/project-images/hermes-agent.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/hermes-agent",
-    liveUrl: "https://hermes-agent.nousresearch.com",
-  },
-  {
-    title: "Mini RAG Engine",
-    category: "GenAI & Agents",
-    description: `⚡ Minimalist High-Speed Retrieval-Augmented Generation! 🔍
-A lean, dependency-light implementation of RAG engineered for rapid semantic document query execution and local embedding processing.
-
-Key Highlights:
-	✅ Clean chunking and tokenization algorithms
-	✅ Local vector similarity using cosine distance
-	✅ Easy integration with OpenAI, Claude, and local open-source LLMs`,
-    technologies: ["Python", "RAG", "Sentence Transformers", "Vector Search", "FastAPI"],
-    image: "/project-images/mini-rag.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/mini-rag",
-  },
-  {
-    title: "AI Chatbot Neural Engine",
-    category: "GenAI & Agents",
-    description: `💬 Context-Aware Neural Dialogue System! 🧠
-A sequence-based conversational model built to handle conversational context, slot filling, and intent classification with natural conversational fluency.
-
-Key Highlights:
-	✅ Deep neural architecture for dialogue state tracking
-	✅ Fast inference with optimized token embeddings
-	✅ Flexible API ready for web and messaging integration`,
-    technologies: ["Python", "Jupyter Notebook", "TensorFlow", "NLP", "NLTK"],
-    image: "/project-images/content-moderation.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/chatbot",
-  },
-  {
-    title: "Neuronix Job Recommendation System",
-    category: "GenAI & Agents",
-    description: `🎯 Finding the Perfect Job Match? Simplify Recruitment with AI! 🚀
-This intelligent job recommendation engine leverages NLP and collaborative filtering to connect candidates with their ideal roles—streamlining recruitment.
-
-Key Highlights:
-	✅ Implemented NLP Pipelines to process resumes and job descriptions efficiently
-	✅ Utilized Collaborative Filtering for personalized job suggestions
-	✅ Built Interactive UI with Streamlit & Flask for a seamless experience`,
-    technologies: ["Python", "NLP", "Scikit-learn", "Streamlit", "Flask", "SQL"],
-    image: "/project-images/job-recommendation-system.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Neuronix-Job-Recommendation",
-  },
-  {
-    title: "AI Agent Skills Catalog",
-    category: "GenAI & Agents",
-    description: `🛠️ Curated Capabilities & Execution Protocols for AI Agents! 📚
-A modular collection of executable skills and structured prompts enabling autonomous LLM agents to perform specialized multi-step technical workflows.
-
-Key Highlights:
-	✅ Domain-specific action schemas for web, data analysis, and automation
-	✅ Standardized interface for prompt chaining and deterministic tool calling`,
-    technologies: ["Python", "LLMs", "Agent Skills", "Automation", "JSON Schema"],
-    image: "/project-images/content-moderation.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/skills",
-  },
-  {
-    title: "Jarvis Autonomous Assistant",
-    category: "GenAI & Agents",
-    description: `🎙️ Intelligent Voice & Workflow Orchestration Assistant! ⚡
-Voice-activated intelligent agent handling desktop automation, system telemetry queries, natural speech input, and dynamic task scheduling.
-
-Key Highlights:
-	✅ Speech recognition and natural voice synthesis integration
-	✅ System-level execution hooks for automated task orchestration`,
-    technologies: ["Python", "Speech Recognition", "Automation", "PyAudio", "NLP"],
-    image: "/project-images/audio-classification.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/jarvis",
-  },
-
-  // ==========================================
-  // 🗣️ NLP & SPEECH PROCESSING
-  // ==========================================
-  {
-    title: "Arabic Egyptian Dialect Sentiment Analysis",
-    category: "NLP & Speech",
-    description: `🌍 Unlocking the Voice of Egypt: Advanced Sentiment Analysis for Dialectal Arabic! 🇪🇬
-Text analysis often struggles with regional dialects. This deep learning model detects positive, negative, and neutral sentiments in informal Egyptian Arabic using state-of-the-art NLP techniques.
-
-Key Highlights:
-	✅ Trained Deep Learning Models with TensorFlow for dialectal text prediction
-	✅ Preprocessed Dialectal Text using specialized Arabic NLP cleaning routines
-	✅ Analyzed Social Media Datasets to extract brand perception and market sentiment`,
-    technologies: ["Python", "Deep Learning", "NLP", "TensorFlow", "Pandas", "Matplotlib"],
-    image: "/project-images/arabic-sentiment.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Arabic-Sentiment-Analysis",
-    featured: true,
-  },
-  {
-    title: "Audio Model Classification & Gender Detection",
-    category: "NLP & Speech",
-    description: `🎵 Advanced Audio Signal Classification & Vocal Feature Extraction! 🔊
-Sound carries crucial data. This project analyzes raw audio signals using deep learning to classify environmental acoustics and detect vocal pitch metrics with high precision.
-
-Key Highlights:
-	✅ Extracted Audio Features (MFCCs, Chroma, Mel Spectrograms) using Librosa
-	✅ Designed CNN Architectures specifically tuned for audio signal matrix input
-	✅ Achieved High Accuracy in sound wave and vocal pattern recognition`,
-    technologies: ["Python", "Deep Learning", "CNN", "Librosa", "Audio Processing", "TensorFlow"],
-    image: "/project-images/audio-classification.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Audio-Model-Classification-Gender",
-    featured: true,
-  },
-  {
-    title: "Automated Content Moderation System",
-    category: "NLP & Speech",
-    description: `🛡️ Creating Safer Online Communities with Automated AI Moderation! 🚫
-An NLP-powered content moderation system that automatically detects toxic, harmful, or inappropriate comments to protect digital communities.
-
-Key Highlights:
-	✅ Developed Multi-Class Toxicity Classification models
-	✅ Integrated Context-Aware NLP Processing to catch subtle nuances
-	✅ Built Real-Time Filtering mechanisms for immediate threat mitigation`,
-    technologies: ["Python", "NLP", "Text Classification", "AI Safety", "Scikit-Learn"],
-    image: "/project-images/content-moderation.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Moderation_System",
-  },
-  {
-    title: "English Twitter Sentiment Analysis",
-    category: "NLP & Speech",
-    description: `📊 Real-Time Customer Emotion Analysis via Social Media Data! 🧠
-Analyzes English social media text to determine sentiment trends using advanced LSTM & BERT models.
-
-Key Highlights:
-	✅ Implemented LSTM & BERT models for sentiment classification
-	✅ Cleaned text data using NLTK & SpaCy
-	✅ Visualized Sentiment Trends with WordClouds & Seaborn`,
-    technologies: ["Python", "NLP", "BERT", "LSTM", "TensorFlow", "NLTK", "SpaCy"],
-    image: "/project-images/english-sentiment.png",
-    images: [
-      "/project-images/sentiment/1_pnXdH-2lTcV1clV_9FXqaA.jpg",
-      "/project-images/sentiment/newplot (2).png",
-      "/project-images/sentiment/newplot (3).png",
-      "/project-images/sentiment/newplot (4).png"
+    tagline: "AI job-matching and career-intelligence platform for the Egyptian and MENA market.",
+    category: "AI Products",
+    status: "Production",
+    tier: "flagship",
+    year: "2025",
+    role: "Full-Stack AI Engineer",
+    description:
+      "Dawrly is an enterprise job-matching platform that ingests job postings, structures them into a searchable index, and scores them against a user's profile to surface ranked recommendations. The backend is a layered FastAPI service running behind PostgreSQL with pgvector, with Redis-backed Celery workers handling scraping and enrichment off the request path. The frontend is a React 19 / TypeScript SPA. The repository ships full C4 architecture documentation, a database ER model, auth and job-recommendation sequence diagrams, and a CI/CD pipeline that deploys through Dokploy and Traefik.",
+    problem:
+      "Job discovery across the Egyptian and MENA market is fragmented across unnormalised listings, and candidates cannot reliably judge which roles actually fit their profile.",
+    highlights: [
+      "Layered FastAPI backend with PostgreSQL and pgvector-backed storage",
+      "Redis + Celery async workers for scraping and enrichment off the request path",
+      "React 19 + TypeScript frontend with Zustand state management",
+      "AI gateway routing layer for model calls (OmniRoute mesh)",
+      "Comprehensive C4, ER, sequence and activity diagram set in-repo",
+      "GitHub Actions CI/CD deploying to Dokploy behind Traefik",
+      "Clerk-based authentication with an auth-bridge sequence to Wajehni",
     ],
-    githubUrl: "https://github.com/IbrahimAbdelsattar/twitter-sentiment-analysis",
-  },
-
-  // ==========================================
-  // 📊 MACHINE LEARNING & PREDICTIVE ANALYTICS
-  // ==========================================
-  {
-    title: "Employee Attrition & Performance Analytics",
-    category: "Machine Learning & Analytics",
-    description: `👥 Retention Revolution: Predicting Employee Turnover & Performance! 🚪
-Predictive machine learning models helping HR teams identify employees at risk of leaving, enabling proactive retention strategies and performance optimization.
-
-Key Highlights:
-	✅ Built Predictive Models using Ensemble methods (Random Forest, XGBoost)
-	✅ Identified Key Drivers of attrition (salary, work-life balance, commute)
-	✅ Created Actionable HR Analytics Dashboards in Power BI`,
-    technologies: ["Python", "Machine Learning", "XGBoost", "Random Forest", "Power BI", "Scikit-Learn"],
-    image: "/project-images/employee-attrition.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Employee-Performance-Rating-Prediction",
-    featured: true,
-  },
-  {
-    title: "Credit Card Financial Fraud Detection",
-    category: "Machine Learning & Analytics",
-    description: `💳 Safeguarding Transactions with Highly Accurate Fraud Detection! 🔐
-Detects anomalous transactions in heavily imbalanced financial datasets using SMOTE and advanced ensemble classifiers.
-
-Key Highlights:
-	✅ Implemented SMOTE for handling severe class imbalance
-	✅ Evaluated Models using Precision-Recall AUC to minimize false negatives
-	✅ Optimized Real-time Inference latency for rapid transaction scoring`,
-    technologies: ["Python", "Machine Learning", "SMOTE", "XGBoost", "Scikit-Learn", "Imbalanced-Learn"],
-    image: "/project-images/fraud-detection.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Credit-card-Fraud-Detection",
+    technologies: [
+      "Python",
+      "FastAPI",
+      "React",
+      "TypeScript",
+      "PostgreSQL",
+      "pgvector",
+      "Redis",
+      "Celery",
+      "Docker",
+      "Dokploy",
+    ],
+    architecture: {
+      backend: ["FastAPI", "Celery workers"],
+      frontend: ["React 19", "TypeScript", "Zustand"],
+      ai: ["AI gateway routing", "pgvector embeddings"],
+      database: ["PostgreSQL", "pgvector"],
+      infrastructure: ["Docker", "Dokploy", "Traefik", "GitHub Actions"],
+      integrations: ["Clerk auth"],
+    },
+    sourcePrivate: true,
+    liveUrl: "https://dawrly.space",
+    relatedRepos: [
+      {
+        slug: "tea-tec",
+        isPrivate: true,
+        role: "Shared account/auth ecosystem",
+      },
+    ],
+    image: "/project-images/dawrly-platform.jpg",
   },
   {
-    title: "GTC Financial Fraud Detection Pipeline",
-    category: "Machine Learning & Analytics",
-    description: `🛡️ Enterprise Banking Fraud Prevention & Anomaly Scoring! 💰
-Developed during GTC fellowship, this pipeline audits transaction velocities and anomalous spending patterns to shield financial platforms from cyber-fraud.
-
-Key Highlights:
-	✅ Feature engineering on high-dimensional transaction telemetry
-	✅ Hyperparameter-tuned XGBoost & LightGBM ensemble models`,
-    technologies: ["Python", "Machine Learning", "Fraud Prevention", "Scikit-Learn", "EDA"],
-    image: "/project-images/fraud-detection.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/GTC-Fraud-Detection",
+    id: "wajehni",
+    title: "Wajehni (Nexus Academy)",
+    tagline: "AI career guidance and adaptive learning platform that turns aptitude into a study roadmap.",
+    category: "AI Products",
+    status: "Production",
+    tier: "flagship",
+    year: "2026",
+    role: "Full-Stack AI Engineer",
+    description:
+      "Wajehni is an adaptive learning and career-guidance product. It assesses a learner's aptitudes, then synthesises a personalised track of milestones and recommended resources instead of serving a fixed catalogue. The application is built on Next.js with React, TypeScript, Tailwind CSS and Vite, and is presented under the Neuronix product ecosystem as the career-guidance and adaptive-learning line.",
+    problem:
+      "Static course catalogues do not adapt to a learner's actual strengths, so students finish programmes without a clear route from assessment to employment.",
+    highlights: [
+      "Aptitude-driven assessment that produces a personalised learning roadmap",
+      "Adaptive curriculum synthesis with milestone and resource recommendations",
+      "Next.js + React + TypeScript + Tailwind CSS + Vite stack",
+      "Part of the Neuronix AI Solutions product ecosystem",
+    ],
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Vite"],
+    architecture: {
+      frontend: ["Next.js", "React", "Tailwind CSS"],
+      infrastructure: ["Vite"],
+    },
+    sourcePrivate: true,
+    image: "/project-images/wajehni-ai.jpg",
   },
   {
-    title: "Road & Traffic Accident Severity Prediction",
-    category: "Machine Learning & Analytics",
-    description: `🚦 AI for Road Safety: Predicting Traffic Accident Severity! 🛣️
-Leverages environmental, weather, and road conditions to predict accident severity levels and assist emergency response planning.
-
-Key Highlights:
-	✅ Processed Complex Spatial & Environmental Incident Records
-	✅ Trained Classification Models (Random Forest, LightGBM)
-	✅ Generated Feature Importance maps for urban traffic planners`,
-    technologies: ["Python", "Machine Learning", "Scikit-Learn", "LightGBM", "Pandas", "Seaborn"],
-    image: "/project-images/road-safety.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Road-Accident-Severity-Prediction",
+    id: "supplymind-ai",
+    title: "SupplyMind AI",
+    tagline: "Demand forecasting and inventory intelligence for supply-chain operations.",
+    category: "AI Products",
+    status: "Production",
+    tier: "flagship",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "SupplyMind AI is an enterprise supply-chain platform covering forecasting, inventory optimisation, explainability and MLOps with real-time alerting. It combines gradient-boosted demand forecasting with retrieval-augmented generation and multi-agent orchestration, and emits concrete inventory actions — economic order quantity, safety stock and reorder point — rather than raw forecasts. The stack spans FastAPI, React, PostgreSQL, LangGraph, ChromaDB and OpenRouter-hosted LLMs.",
+    problem:
+      "Inventory decisions are made on gut feel and spreadsheets, so teams either over-order and tie up capital or under-stock and lose service levels.",
+    highlights: [
+      "XGBoost demand-forecasting models feeding inventory policy outputs",
+      "Automated EOQ, safety-stock and reorder-point recommendations",
+      "RAG layer over ChromaDB with explainable-AI output for every recommendation",
+      "Multi-agent orchestration via LangGraph with executive insight summaries",
+      "Conversational decision support over the operational data",
+      "FastAPI service, React frontend and PostgreSQL persistence",
+    ],
+    technologies: [
+      "Python",
+      "FastAPI",
+      "React",
+      "PostgreSQL",
+      "LangGraph",
+      "ChromaDB",
+      "XGBoost",
+      "RAG",
+      "MLOps",
+      "Docker",
+    ],
+    architecture: {
+      backend: ["FastAPI"],
+      frontend: ["React"],
+      ai: ["XGBoost", "LangGraph agents", "RAG", "LLMs via OpenRouter"],
+      database: ["PostgreSQL", "ChromaDB"],
+      infrastructure: ["MLOps pipelines", "Docker"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/SupplyMindAI",
+    image: "/project-images/supplymind-ai.jpg",
   },
   {
-    title: "Urban Traffic Flow & Incident Modeling",
-    category: "Machine Learning & Analytics",
-    description: `🚗 Intelligent Urban Mobility & Incident Forecasts! 🗺️
-Predicts traffic density fluctuations and collision probabilities across congested metropolitan transit corridors.
-
-Key Highlights:
-	✅ Spatio-temporal incident clustering and road segment analysis
-	✅ Weather and peak-hour feature correlations for traffic dispatchers`,
-    technologies: ["Python", "Spatial Analytics", "Machine Learning", "Pandas", "Matplotlib"],
-    image: "/project-images/road-safety.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Traffic_Accident_Prediction",
+    id: "mesdaq-ai",
+    title: "Mesdaq AI",
+    tagline: "Arabic misinformation detection with credibility scoring and generated explanations.",
+    category: "AI Products",
+    status: "Production",
+    tier: "flagship",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "Mesdaq AI detects Arabic misinformation and scores the credibility of news claims. It combines a fine-tuned AraBERT classifier with four auxiliary linguistic feature modules — sentiment, clickbait, named-entity recognition and text statistics — then produces a human-readable explanation of its verdict through a generative verification service. A React frontend and FastAPI backend return a credibility score between 0 and 100 with the supporting linguistic analysis.",
+    problem:
+      "Arabic-language misinformation spreads without an accessible way to assess whether a claim is credible, and existing general-purpose classifiers do not handle Arabic linguistic structure well.",
+    highlights: [
+      "Fine-tuned AraBERT transformer for Arabic claim classification",
+      "Four auxiliary NLP feature modules: sentiment, clickbait, NER, text statistics",
+      "Generative verification service producing human-readable explanations",
+      "Credibility score from 0–100 returned per request",
+      "React frontend with FastAPI backend and database persistence",
+    ],
+    technologies: [
+      "TypeScript",
+      "React",
+      "Python",
+      "FastAPI",
+      "AraBERT",
+      "Transformers",
+      "NLP",
+      "Explainable AI",
+    ],
+    architecture: {
+      frontend: ["React", "TypeScript"],
+      backend: ["FastAPI"],
+      ai: ["AraBERT", "Transformer fine-tuning", "LLM explanation service"],
+      infrastructure: ["Microservices"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Mesdaq_AI",
+    image: "/project-images/mesdaq-ai.jpg",
   },
   {
-    title: "Mall Customer Segmentation",
-    category: "Machine Learning & Analytics",
-    description: `🛍️ Unsupervised Clustering for Retail Customer Insights! 🎯
-Groups retail customers into distinct personas based on spending score and annual income using K-Means and Hierarchical Clustering.
-
-Key Highlights:
-	✅ Applied K-Means Clustering & Elbow Method for optimal cluster determination
-	✅ Visualized 3D Customer Personas for targeted marketing campaigns`,
-    technologies: ["Python", "Clustering", "K-Means", "Scikit-Learn", "Matplotlib", "Seaborn"],
-    image: "/project-images/mall-customers.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Mall-Customer-Segmentation-",
+    id: "eva-ai",
+    title: "Eva AI",
+    tagline: "Retrieval-augmented clinical decision support for adrenal insufficiency.",
+    category: "AI Products",
+    status: "Active Development",
+    tier: "flagship",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "Eva AI is a clinical decision-support system for adrenal insufficiency. It retrieves relevant clinical context and surfaces decision support to clinicians rather than answering from model weights alone, which keeps the output grounded in retrievable sources. The repository carries a GitHub Actions CI/CD pipeline, so changes are validated automatically.",
+    problem:
+      "Adrenal insufficiency management is context-sensitive, and clinicians need decision support that cites retrievable evidence rather than free-form generation.",
+    highlights: [
+      "Retrieval-augmented generation grounding output in clinical context",
+      "Purpose-built for adrenal insufficiency decision support",
+      "GitHub Actions CI/CD pipeline in the repository",
+    ],
+    technologies: ["Python", "RAG", "LLMs", "GitHub Actions"],
+    architecture: {
+      ai: ["RAG", "Clinical decision support"],
+      infrastructure: ["GitHub Actions CI/CD"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Eva-AI",
+    image: "/project-images/eva-ai.jpg",
   },
   {
-    title: "Retail Sales & Demographics Analysis",
-    category: "Machine Learning & Analytics",
-    description: `🏪 Omnichannel Retail Analytics & Purchase Demographics! 📈
-Comprehensive exploratory data analysis examining purchase frequency, basket composition, and revenue drivers across disparate consumer segments.
-
-Key Highlights:
-	✅ Multi-store sales trend decomposition and seasonal seasonality mapping
-	✅ Consumer demographic profiling and basket size optimization`,
-    technologies: ["Python", "EDA", "Pandas", "NumPy", "Data Visualization", "Seaborn"],
-    image: "/project-images/retail-sales.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Retail_Sales_and_Customer_Demographics_Analysis",
+    id: "vox-mind",
+    title: "VoxMind",
+    tagline: "Multimodal speech platform for early Alzheimer's and MCI detection.",
+    category: "AI Products",
+    status: "Research",
+    tier: "flagship",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "VoxMind is a clinical decision-support and governance platform for early Alzheimer's disease and mild cognitive impairment detection from speech. It denoises recordings with DeepFilterNet3, segments voice activity with Silero VAD, transcribes with a speech-to-text model, and then fuses acoustic biomarkers with linguistic NLP features into a decision model built on a LoRA-tuned language model plus XGBoost. Access is governed through Clerk SSO and organisation join codes, with audit logging over a Supabase Postgres instance using row-level security.",
+    problem:
+      "Early cognitive decline is detectable in speech long before it is caught by standard cognitive screening, but clinicians lack tooling that fuses acoustic and linguistic signal under proper clinical governance.",
+    highlights: [
+      "Acoustic biomarkers extracted after DeepFilterNet3 denoising and Silero VAD segmentation",
+      "Speech-to-text transcription pipeline feeding linguistic NLP features",
+      "Multimodal fusion of acoustic and linguistic signal into a decision model",
+      "Decision model combining a LoRA-tuned LLM with XGBoost",
+      "Clerk SSO with organisation join codes and Supabase row-level security",
+      "HIPAA-oriented audit and governance layer",
+    ],
+    technologies: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "FastAPI",
+      "Python",
+      "Tailwind CSS",
+      "DeepFilterNet3",
+      "Silero VAD",
+      "XGBoost",
+      "LoRA",
+      "Clerk",
+      "Supabase",
+      "Audio DSP",
+    ],
+    architecture: {
+      frontend: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+      backend: ["FastAPI"],
+      ai: ["Acoustic biomarkers", "Linguistic NLP", "Multimodal fusion", "LoRA", "XGBoost"],
+      database: ["Supabase Postgres", "RLS"],
+      infrastructure: ["Clerk SSO", "Audit governance"],
+    },
+    sourcePrivate: true,
+    image: "/project-images/audio-classification.png",
   },
   {
-    title: "Customer Churn Analysis & Retention",
-    category: "Machine Learning & Analytics",
-    description: `📉 Proactive Churn Diagnosis & Customer Lifetime Protection! 🔄
-Identifies high-risk churn indicators in subscription customer bases, giving customer success teams early warning signals before accounts cancel.
-
-Key Highlights:
-	✅ Evaluated Logistic Regression, Decision Trees, and Gradient Boosting
-	✅ Calculated customer lifetime value (CLV) risk impact per cohort`,
-    technologies: ["Python", "Machine Learning", "Churn Prediction", "Scikit-Learn", "Pandas"],
+    id: "trio-lms",
+    title: "Trio Academy (Trio Learning Hub)",
+    tagline: "Enterprise corporate learning management system built for a catering organisation.",
+    category: "Full-Stack Systems",
+    status: "Production",
+    tier: "flagship",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "Trio Academy is an enterprise corporate LMS built for Trio Catering. It is a two-tier application: a Vite + React 18 + TypeScript frontend using Tailwind CSS, shadcn/ui, Framer Motion and TanStack Query, backed by an ASP.NET Core 8 Web API written to Clean Architecture with EF Core 8 and FluentValidation. Authentication uses short-lived JWT access tokens with rotating refresh tokens in Secure HttpOnly cookies. Video delivery is handled through Bunny Stream with signed playback URLs, file storage sits behind a pluggable abstraction, and the whole stack runs under Docker Compose with an Nginx reverse proxy and health checks. The API enforces a no-Supabase boundary that is verified in CI.",
+    problem:
+      "A large multi-site catering organisation needs structured corporate training with role-scoped access, durable video delivery and auditable progress tracking rather than ad-hoc document sharing.",
+    highlights: [
+      "ASP.NET Core 8 Web API structured with Clean Architecture and EF Core 8",
+      "JWT access tokens with rotating refresh tokens in Secure HttpOnly cookies",
+      "Bunny Stream video delivery with signed playback URLs",
+      "Pluggable file-storage abstraction: local Docker volume in dev, object-storage ready",
+      "MySQL 8.4 via the Pomelo EF Core provider",
+      "Docker Compose with Nginx reverse proxy and health checks",
+      "CI-enforced no-Supabase boundary across auth, data, APIs and storage",
+    ],
+    technologies: [
+      "ASP.NET Core 8",
+      "C#",
+      "React 18",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS",
+      "MySQL",
+      "EF Core",
+      "Docker",
+      "Nginx",
+      "JWT",
+    ],
+    architecture: {
+      frontend: ["React 18", "TypeScript", "Tailwind CSS", "shadcn/ui", "TanStack Query"],
+      backend: ["ASP.NET Core 8", "Clean Architecture", "FluentValidation"],
+      database: ["MySQL 8.4", "EF Core 8"],
+      infrastructure: ["Docker Compose", "Nginx", "Health checks"],
+      integrations: ["Bunny Stream", "ASP.NET Identity"],
+    },
+    sourcePrivate: true,
+    liveUrl: "https://trio-academy.tech",
+    relatedRepos: [
+      {
+        slug: "trio-learn-hub",
+        isPrivate: true,
+        role: "Earlier generation of the same LMS line",
+      },
+    ],
+    image: "/project-images/trio-lms.jpg",
+  },
+  {
+    id: "tea-tec",
+    title: "TeaTec",
+    tagline: "Bilingual Arabic-first e-learning SaaS built around condensed, practical sessions.",
+    category: "Full-Stack Systems",
+    status: "Active Development",
+    tier: "flagship",
+    year: "2026",
+    role: "Full-Stack AI Engineer",
+    description:
+      "TeaTec is a bilingual, Arabic-first e-learning SaaS platform built on a condensed-learning philosophy: each field is distilled into focused two-hour sessions paired with interactive assessments and automated certificates. The product pairs a web client with a native Android client so learners can move between desktop coursework and mobile study without losing progress.",
+    problem:
+      "Learners abandon long courses before completing them, and Arabic-language technical material is poorly served by platforms designed for English-first audiences.",
+    highlights: [
+      "Condensed two-hour sessions per topic instead of long course tracks",
+      "Interactive assessments paired with each session",
+      "Automated certificate issuance on completion",
+      "Bilingual Arabic-first interface",
+      "Matching native Android client for mobile study",
+    ],
+    technologies: ["TypeScript", "React", "Kotlin", "Android", "Tailwind CSS", "REST API"],
+    architecture: {
+      frontend: ["React", "TypeScript", "Tailwind CSS", "Kotlin / Android"],
+      integrations: ["REST API"],
+    },
+    sourcePrivate: true,
+    relatedRepos: [
+      {
+        slug: "TeaTec-Android",
+        isPrivate: true,
+        role: "Native Android client for the same product",
+      },
+    ],
+    image: "/project-images/teatec-platform.jpg",
+  },
+  {
+    id: "c-sat",
+    title: "Trio C-SaT",
+    tagline: "Customer-satisfaction platform for corporate and factory catering operations.",
+    category: "Full-Stack Systems",
+    status: "Active Development",
+    tier: "notable",
+    year: "2026",
+    role: "Full-Stack AI Engineer",
+    description:
+      "C-SaT is an enterprise customer-satisfaction platform built for corporate and factory catering operations. It combines a React 19 and TypeScript frontend styled with Tailwind CSS 4 on Vite 6, an Express 4 API and PostgreSQL 16 for persistence, with OmniRoute providing the AI layer. CI/CD runs through GitHub Actions.",
+    problem:
+      "Catering operations serving factory and corporate sites collect satisfaction feedback across disconnected channels, with no consolidated view to act on.",
+    highlights: [
+      "React 19 + TypeScript + Tailwind CSS 4 on Vite 6",
+      "Express 4 API with PostgreSQL 16 persistence",
+      "OmniRoute AI layer for feedback analysis",
+      "GitHub Actions CI/CD",
+    ],
+    technologies: [
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vite",
+      "Express",
+      "PostgreSQL",
+      "OmniRoute",
+      "GitHub Actions",
+    ],
+    architecture: {
+      frontend: ["React 19", "TypeScript", "Tailwind CSS", "Vite"],
+      backend: ["Express 4"],
+      database: ["PostgreSQL 16"],
+      ai: ["OmniRoute AI gateway"],
+      infrastructure: ["GitHub Actions CI/CD"],
+    },
+    sourcePrivate: true,
     image: "/project-images/customer-churn.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Customer-Churn-Analysis",
   },
   {
-    title: "Online Shoppers Purchase Intention",
-    category: "Machine Learning & Analytics",
-    description: `🛒 Session Behavioral Intelligence for E-Commerce Conversion! 🛍️
-Predicts whether an active online visitor will convert into a paying buyer based on real-time web session signals like page duration and exit rates.
-
-Key Highlights:
-	✅ Handled high-speed session telemetry and multi-page interaction data
-	✅ High-precision classification balancing conversion prediction thresholds`,
-    technologies: ["Python", "Machine Learning", "Scikit-Learn", "Pandas", "E-Commerce"],
-    image: "/project-images/ecommerce-analytics.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Online-Shoppers-Purchase-Intention-Prediction",
+    id: "jarvis",
+    title: "JARVIS",
+    tagline: "Holographic hands-free AI chief of staff for executive operations.",
+    category: "AI Products",
+    status: "Active Development",
+    tier: "notable",
+    year: "2026",
+    role: "Full-Stack AI Engineer",
+    description:
+      "JARVIS is a hands-free executive assistant interface: a React 19 and Three.js front end paired with MediaPipe hand tracking, driven by a FastAPI service on Python 3.13, with model calls routed through the OmniRoute AI gateway. The interface is designed to be operated without a keyboard — gesture and voice input drive a persistent view of current operations.",
+    problem:
+      "Executive workflows are fragmented across tools that all demand a keyboard and a mouse, which makes monitoring and acting on them during live operations impractical.",
+    highlights: [
+      "React 19 + Three.js front end with a holographic HUD presentation",
+      "MediaPipe hand tracking for keyboard-free operation",
+      "FastAPI service on Python 3.13",
+      "OmniRoute AI gateway for model routing",
+      "Persistent operations view for hands-free monitoring",
+    ],
+    technologies: [
+      "React 19",
+      "Three.js",
+      "MediaPipe",
+      "FastAPI",
+      "Python",
+      "OmniRoute",
+      "TypeScript",
+    ],
+    architecture: {
+      frontend: ["React 19", "Three.js", "MediaPipe"],
+      backend: ["FastAPI", "Python 3.13"],
+      ai: ["OmniRoute AI gateway"],
+    },
+    sourcePrivate: true,
+    image: "/project-images/jarvis-hud.jpg",
   },
   {
-    title: "Bank Term Deposit Subscription Prediction",
-    category: "Machine Learning & Analytics",
-    description: `🏦 Precision Banking: Direct Marketing Campaign Propensity! 📞
-Optimizes banking telemarketing resources by predicting which retail clients are most likely to subscribe to long-term deposit certificates.
-
-Key Highlights:
-	✅ Processed macroeconomic indicators, contact duration, and client profiles
-	✅ Increased marketing conversion efficiency by prioritizing high-propensity leads`,
-    technologies: ["Python", "Machine Learning", "Classification", "Scikit-Learn", "Pandas"],
-    image: "/project-images/bank-term-deposit.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Bank-Term-Deposit-Prediction-",
+    id: "neuronix",
+    title: "Neuronix AI Solutions",
+    tagline: "The product umbrella behind Dawrly, Wajehni, Eva AI, VoxMind and Mesdaq AI.",
+    category: "AI Products",
+    status: "Production",
+    tier: "notable",
+    year: "2026",
+    role: "Founder",
+    description:
+      "Neuronix AI Solutions is the parent brand and product registry for the AI product portfolio. Rather than applying AI to client problems as a consultancy, Neuronix builds and maintains its own products, each targeting a specific real-world problem: Dawrly for job discovery, Wajehni for career guidance and adaptive learning, Eva AI for clinical decision support, VoxMind for speech-based cognitive screening, and Mesdaq AI for Arabic misinformation detection. The registry is data-driven so a new product can be added without redesigning the site, which also keeps the portfolio here in sync with the product catalogue.",
+    problem:
+      "Independent AI products fragment into unrelated identities; Neuronix gives them one coherent home and a shared release process.",
+    highlights: [
+      "Single product registry driving the corporate site and this portfolio",
+      "Five distinct production AI products under one brand",
+      "Deployed to Cloud Run with a standalone Next.js build",
+      "Adding a product is a data change, not a redesign",
+    ],
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Cloud Run", "Docker"],
+    architecture: {
+      frontend: ["Next.js", "React", "Tailwind CSS"],
+      infrastructure: ["Cloud Run", "Docker", "Standalone build"],
+    },
+    sourcePrivate: true,
+    liveUrl: "https://neuronix-843213893012.europe-west1.run.app",
+    image: "/project-images/dawrly-platform.jpg",
   },
   {
-    title: "Student Final Grade Prediction",
-    category: "Machine Learning & Analytics",
-    description: `📚 Educational Analytics: Early Academic Intervention Systems! 🎓
-Forecasts student end-of-year grades using demographic, behavioral, and academic milestone metrics to prevent academic probation.
-
-Key Highlights:
-	✅ Regression models predicting numerical grade outcomes with high R² accuracy
-	✅ Feature ranking determining study time and attendance as top predictors`,
-    technologies: ["Python", "Machine Learning", "Regression", "Scikit-Learn", "Data Science"],
-    image: "/project-images/student-grade-prediction.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Student-Final-Grade-Prediction",
-  },
-  {
-    title: "Clinical Diabetes Risk Prediction & EDA",
-    category: "Machine Learning & Analytics",
-    description: `🩺 Early Health Intervention with Predictive Medical ML! 💉
-Predicts diabetes onset risk using clinical health diagnostics including glucose levels, insulin, BMI, age, and blood pressure measurements.
-
-Key Highlights:
-	✅ Rigorous exploratory data analysis on medical diagnostic parameters
-	✅ Trained Logistic Regression, SVM, and Random Forest Classifiers with high recall`,
-    technologies: ["Python", "Machine Learning", "Healthcare Analytics", "Scikit-Learn", "Pandas"],
-    image: "/project-images/diabetes-detection.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/diabetes",
-  },
-  {
-    title: "GTC Clinical Diabetes ML Model",
-    category: "Machine Learning & Analytics",
-    description: `🔬 Medical Machine Learning Diagnostic Assessment! 🏥
-Engineered during GTC ML Internship, contrasting parametric and non-parametric classifiers for non-invasive early diagnostic screening.
-
-Key Highlights:
-	✅ Cross-validated model evaluation with ROC-AUC optimization
-	✅ Clinical metric interpretations with SHAP feature explanations`,
-    technologies: ["Python", "Machine Learning", "Medical ML", "SVM", "Random Forest"],
-    image: "/project-images/diabetes-detection.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/GTC-ML-Internship-Diabetes-Prediction",
-  },
-  {
-    title: "Heart Attack Risk & Cardiovascular Detection",
-    category: "Machine Learning & Analytics",
-    description: `❤️ Cardiovascular Health AI: Predicting Acute Myocardial Infarction! 💓
-Analyzes chest pain types, resting blood pressure, cholesterol levels, and exercise-induced angina to assess cardiovascular risks.
-
-Key Highlights:
-	✅ High sensitivity classifier preventing fatal false negatives
-	✅ Clean feature transformation for clinical patient triage`,
-    technologies: ["Python", "Machine Learning", "Cardiology AI", "Scikit-Learn", "Seaborn"],
-    image: "/project-images/heart-attack-risk.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Heart-Attack-Detection",
-  },
-  {
-    title: "California House Price Prediction (GTC ML)",
-    category: "Machine Learning & Analytics",
-    description: `🏡 Spatial Real Estate Valuation & District Regression Modeling! 📍
-Predicts median housing values across California census blocks using geographical coordinates, median income, and room ratios.
-
-Key Highlights:
-	✅ Spatial feature engineering utilizing latitude and longitude clustering
-	✅ Gradient boosting regression delivering high predictive precision`,
-    technologies: ["Python", "Machine Learning", "Spatial ML", "Gradient Boosting", "Scikit-Learn"],
-    image: "/project-images/house-price.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/GTC-ML-Internship-California-House-Price-Prediction",
-  },
-  {
-    title: "Hotel Bookings & Cancellation Intelligence",
-    category: "Machine Learning & Analytics",
-    description: `🏨 Hospitality Analytics: Forecasting Reservation Cancellations! 🛎️
-Analyzes customer lead times, deposit structures, and booking channels to forecast hotel booking cancellations and optimize room revenue.
-
-Key Highlights:
-	✅ In-depth exploratory data analysis across city and resort hotels
-	✅ Machine learning classification modeling cancellation risk`,
-    technologies: ["Python", "Machine Learning", "Business Intelligence", "Scikit-Learn", "Pandas"],
-    image: "/project-images/hotel-analytics.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/gtc-ml-project1-hotel-bookings",
-  },
-  {
-    title: "Calorie Expenditure Prediction",
-    category: "Machine Learning & Analytics",
-    description: `🏃 Physical Physiology: Estimating Real-Time Caloric Burn! 🔥
-Calculates calories burned during physical exertion using workout duration, heart rate telemetry, body temperature, and athlete biometric markers.
-
-Key Highlights:
-	✅ Linear & non-linear regression models evaluating energy burn rates
-	✅ Rapid inference suitable for wearable fitness tracker integration`,
-    technologies: ["Python", "Regression", "Health Tech", "Scikit-Learn", "Pandas"],
-    image: "/project-images/calories-burnt.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Predict-Calorie-Expenditure",
-  },
-  {
-    title: "DEPI Data Science Capstone Projects",
-    category: "Machine Learning & Analytics",
-    description: `🇪🇬 National AI Fellowship: Comprehensive DEPI Projects Portfolio! 🏆
-Collection of advanced data science solutions developed during Egypt's prestigious Digital Egypt Pioneers Initiative (DEPI) by MCIT.
-
-Key Highlights:
-	✅ Production-grade data pipelines, feature engineering, and model validation
-	✅ Diverse implementations spanning predictive ML, NLP, and computer vision`,
-    technologies: ["Python", "Data Science", "Machine Learning", "Deep Learning", "DEPI"],
-    image: "/project-images/retail-sales.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Data-Science-Projects-.DEPI",
-  },
-  {
-    title: "DEPI Data Science Labs & Core Assignments",
-    category: "Machine Learning & Analytics",
-    description: `🔬 Advanced Statistical Modeling & Algorithmic Foundation Labs! 🧪
-Rigorous technical assignments demonstrating mastery in probability distributions, hypothesis testing, matrix operations, and classical ML algorithms.
-
-Key Highlights:
-	✅ Mathematical derivations of cost functions and gradient descent algorithms
-	✅ Comprehensive data wrangling across complex messy datasets`,
-    technologies: ["Python", "Jupyter Notebook", "Statistics", "Data Wrangling", "Pandas"],
-    image: "/project-images/student-grade.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Data-Science-Assignments.DEPI",
-  },
-  {
-    title: "Elevvo Machine Learning Engineering Portfolio",
-    category: "Machine Learning & Analytics",
-    description: `🚀 Professional Machine Learning Internship Artifacts! 💻
-Enterprise machine learning models and data preprocessing pipelines engineered during the Elevvo ML internship program.
-
-Key Highlights:
-	✅ Standardized scikit-learn custom transformers and model pipelines
-	✅ Rigorous metric evaluation using stratified k-fold validation`,
-    technologies: ["Python", "Machine Learning", "Pipeline Design", "Scikit-Learn"],
-    image: "/project-images/employee-attrition.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Elevvo-ML-Internship",
-  },
-
-  // ==========================================
-  // 🌐 FULL-STACK, SYSTEMS & INTERACTIVE TOOLS
-  // ==========================================
-  {
-    title: "Profile README Generator",
-    category: "Full-Stack & Systems",
-    description: `🎨 Interactive GitHub Profile README Builder! 🚀
-A modern web tool allowing developers to design personalized, visually stunning GitHub profile READMEs in minutes with live markdown preview.
-
-Key Highlights:
-	✅ Rich Interactive Form UI built with TypeScript & React
-	✅ Markdown Generator with live preview rendering
-	✅ Custom Badges, Shields, and Theme customization options`,
-    technologies: ["TypeScript", "React", "Tailwind CSS", "Vite", "Markdown Parser"],
-    image: "/project-images/readme-builder.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/profile-readme-generator",
-    liveUrl: "https://profile-readme-generator.com",
-    featured: true,
-  },
-  {
-    title: "Profile README Templates Suite",
-    category: "Full-Stack & Systems",
-    description: `✨ Curated Collection of High-Impact Developer Portfolios! 📄
-Ready-to-use markdown templates and visual components for showcasing projects, technical skills, and GitHub statistics in profile READMEs.
-
-Key Highlights:
-	✅ Dynamic SVG stat cards and visitor badges
-	✅ Clean responsive markdown layouts for developers of all seniority levels`,
-    technologies: ["Markdown", "GitHub Actions", "SVG", "Developer Tools"],
-    image: "/project-images/readme-builder.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/Profile-README-Templates",
-  },
-  {
-    title: "Numerix (Numerical Computing Platform)",
-    category: "Full-Stack & Systems",
-    description: `🧮 Interactive Numerical Computing & Educational Suite! 🔢
-An interactive platform solving complex numerical methods, linear algebra equations, and mathematical visualizer models.
-
-Key Highlights:
-	✅ Implemented numerical analysis algorithms (Newton-Raphson, Gauss-Elimination, Runge-Kutta)
-	✅ Interactive graph visualization for mathematical functions in real time`,
-    technologies: ["TypeScript", "Python", "React", "Chart.js", "Math.js"],
-    image: "/project-images/numerix-platform.jpg",
+    id: "numerix",
+    title: "Numerix",
+    tagline: "Interactive numerical-analysis platform with step-by-step algorithmic solvers.",
+    category: "Full-Stack Systems",
+    status: "Prototype",
+    tier: "notable",
+    year: "2026",
+    role: "Full-Stack AI Engineer",
+    description:
+      "Numerix is an interactive web platform for numerical analysis and mathematical computing. It walks through algorithms step by step, compares methods side by side in a race dashboard, visualises error topologies in 3D, and plots live convergence benchmarks so the behaviour of a method is visible rather than merely asserted.",
+    problem:
+      "Numerical methods are usually taught as formulas on paper, which hides the convergence behaviour that actually distinguishes one method from another.",
+    highlights: [
+      "Step-by-step algorithmic solvers rather than black-box results",
+      "Multi-method comparison race dashboard",
+      "3D error-topology visualisation",
+      "Real-time convergence benchmarking",
+      "Interactive pedagogical labs",
+    ],
+    technologies: ["TypeScript", "JavaScript", "Web", "Data Visualisation"],
     githubUrl: "https://github.com/IbrahimAbdelsattar/Numerix",
+    image: "/project-images/numerix-platform.jpg",
+  },
+
+  // =====================================================================
+  // NOTABLE — Generative AI, NLP, speech and production ML pipelines
+  // =====================================================================
+  {
+    id: "mr-nlp-rag",
+    title: "MR NLP Robust RAG",
+    tagline: "Multimodal voice and document RAG with adaptive embedding failover.",
+    category: "Generative AI & Agents",
+    status: "Production",
+    tier: "notable",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A multimodal retrieval-augmented generation platform that answers from both documents and speech. Audio is transcribed before indexing, retrieval runs against a high-fidelity vector store, and generation uses a quantized LLM. The distinguishing feature is adaptive embedding failover: when the primary embedding backend degrades, ingestion and retrieval fail over rather than erroring, which is what makes the ingestion pipeline resilient in practice.",
+    problem:
+      "RAG systems fail silently when a single embedding dependency degrades, corrupting the index without any visible error.",
+    highlights: [
+      "Speech-to-text transcription feeding the same index as documents",
+      "High-fidelity vector retrieval with a quantized LLM generation stage",
+      "Adaptive embedding failover for resilient ingestion",
+      "Multilingual speech synthesis on the response path",
+    ],
+    technologies: [
+      "Python",
+      "RAG",
+      "LLMs",
+      "LangChain",
+      "Vector Search",
+      "Speech-to-Text",
+      "Quantization",
+    ],
+    architecture: {
+      ai: ["RAG", "Speech-to-text", "Quantized LLM", "Embedding failover"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot",
+    image: "/project-images/rag-chatbot.png",
   },
   {
+    id: "moderation-system",
+    title: "Moderation System",
+    tagline: "Multi-label toxic-comment classification with batch and real-time scoring.",
+    category: "NLP & Speech",
+    status: "Completed",
+    tier: "notable",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A content-moderation engine that scores comments across five labels — toxic, obscene, threat, insult and hate speech — in a single multi-label pass rather than as five independent binary models. Results are exposed both as a real-time Streamlit interface and as batch CSV scoring for large backfills.",
+    problem:
+      "Comment moderation systems built as independent binary classifiers cannot represent comments that are several categories at once, which is the normal case.",
+    highlights: [
+      "Single multi-label pass across five toxicity categories",
+      "Real-time Streamlit scoring interface",
+      "Batch CSV scoring for backfilling large comment volumes",
+    ],
+    technologies: [
+      "Python",
+      "NLP",
+      "Multi-Label Classification",
+      "Streamlit",
+      "Scikit-Learn",
+      "Pandas",
+    ],
+    architecture: {
+      ai: ["Multi-label classification"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Moderation_System",
+    image: "/project-images/content-moderation.png",
+  },
+  {
+    id: "arabic-sentiment",
+    title: "Arabic & Egyptian Dialect Sentiment",
+    tagline: "Dual classical-ML and deep-learning sentiment analysis for Arabic dialect text.",
+    category: "NLP & Speech",
+    status: "Completed",
+    tier: "notable",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Sentiment analysis for Modern Standard Arabic and Egyptian dialect, implemented as two models on the same problem: a TF-IDF feature space with logistic regression, and a Keras dense network over the same corpus. The pair makes the trade-off between a small interpretable model and a higher-capacity one explicit rather than assumed. The TensorFlow Lite conversion allows the model to run on edge devices, and scoring is exposed through a Streamlit app.",
+    problem:
+      "Models trained on MSA degrade badly on Egyptian dialect text, and dialect data is where most social conversation actually happens.",
+    highlights: [
+      "Parallel TF-IDF + logistic regression and Keras deep-learning models",
+      "Covers Egyptian dialect alongside Modern Standard Arabic",
+      "Quantized TensorFlow Lite export for edge deployment",
+      "Interactive Streamlit scoring application",
+    ],
+    technologies: [
+      "Python",
+      "NLP",
+      "Scikit-Learn",
+      "TensorFlow",
+      "Keras",
+      "TFLite",
+      "Streamlit",
+      "Pandas",
+    ],
+    architecture: {
+      ai: ["TF-IDF", "Logistic Regression", "Keras DNN", "TensorFlow Lite"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Arabic-Sentiment-Analysis",
+    image: "/project-images/arabic-sentiment.png",
+  },
+  {
+    id: "audio-gender-classification",
+    title: "Audio Signal Classification",
+    tagline: "Deep-learning voice gender classification from spectral audio features.",
+    category: "NLP & Speech",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A deep-learning engine for classifying voice recordings by speaker gender. It extracts a multi-tier spectral profile with Librosa — MFCCs, Mel spectrograms, spectral centroid and zero-crossing rate — then trains a Keras network over that feature matrix. An interactive studio view renders the waveform and spectrogram alongside the model output.",
+    problem:
+      "Raw waveforms are a poor model input; the discriminative information lives in the time-frequency structure.",
+    highlights: [
+      "Librosa feature extraction across MFCC, Mel, centroid and zero-crossing rate",
+      "Keras deep neural network over the spectral feature matrix",
+      "Interactive waveform and spectrogram studio for inspecting inputs",
+    ],
+    technologies: [
+      "Python",
+      "Deep Learning",
+      "Keras",
+      "TensorFlow",
+      "Librosa",
+      "Audio DSP",
+      "Pandas",
+    ],
+    architecture: {
+      ai: ["Spectral feature extraction", "Keras DNN"],
+    },
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Audio-Model-Classification-Gender",
+    image: "/project-images/audio-classification.png",
+  },
+  {
+    id: "road-accident-severity",
+    title: "Road Accident Severity Prediction",
+    tagline: "XGBoost pipeline classifying accident severity from geospatial and weather data.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "notable",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A production-style machine-learning pipeline that classifies road-accident severity into four ordered levels. Gradient boosting with XGBoost is fed geospatial and meteorological feature pipelines, and the model is exposed through an interactive Streamlit diagnostic studio for inspecting individual predictions.",
+    problem:
+      "Severity assessment after an accident is manual and slow, and the factors that drive it — location, road conditions and weather — are spread across datasets.",
+    highlights: [
+      "XGBoost gradient-boosted classifier over four severity levels",
+      "Geospatial and meteorological feature pipelines",
+      "Interactive Streamlit diagnostic studio for prediction inspection",
+    ],
+    technologies: ["Python", "XGBoost", "Scikit-Learn", "Pandas", "NumPy", "Streamlit"],
+    architecture: {
+      ai: ["XGBoost", "Geospatial features", "Meteorological features"],
+    },
+    relatedRepos: [
+      {
+        slug: "traffic",
+        url: "https://github.com/IbrahimAbdelsattar/traffic",
+        isPrivate: false,
+        role: "Companion repo holding the serialised model and inference app",
+      },
+    ],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Road-Accident-Severity-Prediction",
+    notes: [
+      "`traffic` and `Traffic_Accident_Prediction` are the same project split across two repositories: this one holds the dataset and analysis, `traffic` holds the serialised model, encoders and inference app.",
+    ],
+    image: "/project-images/road-safety.png",
+  },
+  {
+    id: "hr-performance",
+    title: "Employee Performance Prediction",
+    tagline: "Performance-rating prediction for HR analytics using gradient-boosted models.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A supervised-learning project predicting employee performance ratings from HR feature sets, comparing tree-ensemble models across standard evaluation splits. The work covers preprocessing, feature treatment and model comparison rather than production serving.",
+    highlights: [
+      "Supervised regression on HR performance features",
+      "Comparative evaluation across tree-ensemble models",
+      "Full preprocessing and feature-treatment pipeline",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib", "Seaborn"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Employee-Performance-Rating-Prediction",
+    image: "/project-images/hr-performance.png",
+  },
+  {
+    id: "credit-card-fraud",
+    title: "Credit Card Fraud Detection",
+    tagline: "Class-imbalanced fraud classification with careful evaluation.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Fraud detection on transaction data, where the real difficulty is the extreme class imbalance: a model that predicts 'not fraud' for everything scores well and is worthless. The project focuses on resampling strategies and threshold selection rather than headline accuracy.",
+    highlights: [
+      "Handles severe class imbalance between fraud and legitimate transactions",
+      "Resampling and threshold selection as the primary levers",
+      "Evaluation metrics suited to imbalanced classification",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Credit-card-Fraud-Detection",
+    notes: [
+      "Same Kaggle credit-card fraud problem as `GTC-Fraud-Detection`, which carries the more substantial packaging (setup.py, Dockerfile and a src/ layout with config, models, utils and deployment modules).",
+    ],
+    image: "/project-images/fraud-detection.png",
+  },
+  {
+    id: "customer-churn",
+    title: "Customer Churn Analysis",
+    tagline: "Retention modelling with cohort and segmentation analysis.",
+    category: "Data Science",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Customer churn analysis combining exploratory segmentation with predictive retention modelling, identifying which customer attributes are associated with churn risk and where intervention is worth the cost.",
+    highlights: [
+      "Cohort and segmentation analysis ahead of modelling",
+      "Predictive churn-risk modelling",
+      "Cost-weighted focus on intervention-worthy segments",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "Matplotlib", "Seaborn"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Customer-Churn-Analysis",
+    image: "/project-images/customer-churn.png",
+  },
+  {
+    id: "purchase-intention",
+    title: "Online Shoppers Purchase Intention",
+    tagline: "Predicting purchase intent from session and marketing attributes.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Classification of purchase intent from online session behaviour and marketing channel attributes, with comparison of model families against a non-linear baseline to establish whether the added complexity is justified.",
+    highlights: [
+      "Session and channel feature modelling",
+      "Comparison of linear and tree-based model families",
+      "Baseline-versus-complexity justification",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "Matplotlib", "Seaborn"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Online-Shoppers-Purchase-Intention-Prediction",
+    image: "/project-images/ecommerce-analytics.png",
+  },
+  {
+    id: "mall-segmentation",
+    title: "Mall Customer Segmentation",
+    tagline: "Unsupervised customer grouping for targeted retail campaigns.",
+    category: "Data Science",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Unsupervised segmentation of retail customers into behavioural groups, giving marketing teams a small number of interpretable segments to target rather than treating the customer base as homogeneous.",
+    highlights: [
+      "Clustering into interpretable customer segments",
+      "Segment profiling for targeted campaigns",
+      "Cluster-quality diagnostics",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "Matplotlib", "Seaborn"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Mall-Customer-Segmentation-",
+    image: "/project-images/mall-customers.png",
+  },
+  {
+    id: "heart-attack-risk",
+    title: "Heart Attack Risk Detection",
+    tagline: "Cardiovascular risk classification from clinical indicators.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Classification of heart-attack risk from common clinical indicators, covering the full path from data inspection through feature preparation to model evaluation and risk-factor interpretation.",
+    highlights: [
+      "Clinical feature preparation and analysis",
+      "Comparative model evaluation",
+      "Risk-factor interpretation alongside predictions",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Heart-Attack-Detection",
+    image: "/project-images/heart-attack-risk.png",
+  },
+  {
+    id: "diabetes-risk",
+    title: "Diabetes Risk Prediction",
+    tagline: "Clinical diabetes risk classification with exploratory analysis.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2026",
+    role: "AI Engineer",
+    description:
+      "Diabetes risk classification from clinical measures, with exploratory analysis used to justify the feature treatment before modelling.",
+    highlights: [
+      "Exploratory analysis driving feature decisions",
+      "Supervised classification on clinical measures",
+      "Model comparison with documented evaluation",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/diabetes",
+    notes: [
+      "The repository's notebook is named after a third party (`alaa hamdy.ipynb`); treat attribution for this work as unconfirmed.",
+    ],
+    image: "/project-images/diabetes-detection.png",
+  },
+  {
+    id: "retail-sales",
+    title: "Retail Sales & Demographics",
+    tagline: "Sales performance analysis segmented by customer demographics.",
+    category: "Data Science",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Retail sales analysis breaking performance down across customer demographic segments, supporting assortment and campaign decisions with descriptive and visual analysis.",
+    highlights: [
+      "Demographic segmentation of sales performance",
+      "Descriptive statistics with visual reporting",
+      "Actionable segment-level findings",
+    ],
+    technologies: ["Python", "Pandas", "Matplotlib", "Seaborn"],
+    githubUrl:
+      "https://github.com/IbrahimAbdelsattar/Retail_Sales_and_Customer_Demographics_Analysis",
+    image: "/project-images/retail-sales.png",
+  },
+  {
+    id: "student-grade-prediction",
+    title: "Student Grade Prediction",
+    tagline: "Forecasting student performance from academic and attendance features.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Regression predicting final student grades from academic history and attendance features, evaluated on the question of whether early-warning intervention is feasible from the available signals.",
+    highlights: [
+      "Grade regression from academic and attendance features",
+      "Early-intervention feasibility analysis",
+      "Documented feature importance",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Student-Final-Grade-Prediction",
+    notes: [
+      "The README describes a Gradio interface that is not present in the repository tree.",
+    ],
+    image: "/project-images/student-grade-prediction.png",
+  },
+  {
+    id: "traffic-accident-prediction",
+    title: "Traffic Accident Prediction",
+    tagline: "Accident-count forecasting with XGBoost and Streamlit reporting.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "Traffic accident prediction built on pandas and NumPy preprocessing with XGBoost modelling and a Streamlit layer for presenting results to non-technical stakeholders.",
+    highlights: [
+      "XGBoost accident modelling",
+      "Streamlit reporting layer for stakeholders",
+      "Pandas/NumPy preprocessing pipeline",
+    ],
+    technologies: ["Python", "XGBoost", "Pandas", "NumPy", "Streamlit"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Traffic_Accident_Prediction",
+    image: "/project-images/road-safety.png",
+  },
+  {
+    id: "flight-reservation",
     title: "Flight Reservation Desktop App",
-    category: "Full-Stack & Systems",
-    description: `✈️ Comprehensive Airline Ticketing & Passenger Booking GUI! 🛫
-Desktop management application designed for airport ticketing offices, supporting flight searches, seating seatmaps, and database record keeping.
-
-Key Highlights:
-	✅ Clean desktop user interface built with Python GUI frameworks
-	✅ Relational SQLite database managing flights, passengers, and booking records`,
-    technologies: ["Python", "Tkinter", "SQLite", "GUI Architecture", "Database Design"],
-    image: "/project-images/flight-reservation.png",
+    tagline: "Desktop booking application built in Python.",
+    category: "Full-Stack Systems",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "A desktop flight-reservation application in Python covering the booking flow end to end, built to practise full application structure rather than isolated model work.",
+    highlights: ["Desktop booking flow", "Python application structure", "End-to-end reservation logic"],
+    technologies: ["Python", "Desktop Application"],
     githubUrl: "https://github.com/IbrahimAbdelsattar/Flight-Reservation-Desktop-App",
+    image: "/project-images/flight-reservation.png",
   },
   {
-    title: "SearXNG Custom Metasearch Engine",
-    category: "Full-Stack & Systems",
-    description: `🔎 Zero-Tracking Privacy-Centric Search Engine Deployment! 🛡️
-A customized deployment of SearXNG aggregating results across 70+ search services without logging user queries, cookies, or profiling identities.
+    id: "email-intelligence-agent",
+    title: "Email Intelligence & Excel Agent",
+    tagline: "Automated inbox harvesting that turns scattered email into structured Excel reporting.",
+    category: "Full-Stack Systems",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "AI Engineer",
+    description:
+      "An automation agent that bridges mail and operational spreadsheets. It connects to enterprise mail servers over IMAP (Gmail, Outlook, Office 365, Yahoo) or the Google Gmail API, then extracts, normalises, filters and formats messages into styled multi-sheet Excel workbooks. A Streamlit studio provides the operational interface, with attachment auditing, chronological filtering and per-workbook statistical summaries.",
+    highlights: [
+      "Dual-protocol ingestion: IMAP and the Gmail API",
+      "Field parsing, metadata sanitisation and attachment auditing",
+      "Styled multi-sheet Excel export with OpenPyXL and XlsxWriter",
+      "Interactive Streamlit operational studio",
+    ],
+    technologies: ["Python", "IMAP", "Gmail API", "Streamlit", "OpenPyXL", "XlsxWriter"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/chatbot",
+    image: "/project-images/sentiment-analysis.jpg",
+  },
 
-Key Highlights:
-	✅ Multi-engine asynchronous scraping and result deduplication
-	✅ Containerized production stack with Docker and Redis caching`,
-    technologies: ["Python", "SearXNG", "Docker", "Redis", "Search Infrastructure"],
-    image: "/project-images/searxng-metasearch.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/searxng",
-    liveUrl: "https://docs.searxng.org",
+  // =====================================================================
+  // RESEARCH & COURSEWORK — real work, kept discoverable but not inflated
+  // =====================================================================
+  {
+    id: "gtc-ml-labs",
+    title: "GTC ML Internship Labs",
+    tagline: "Machine-learning labs from a supervised training programme.",
+    category: "Research & Coursework",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "Student",
+    description:
+      "A set of supervised machine-learning labs completed during a training programme: fraud detection, diabetes prediction, California house-price regression and hotel-bookings cancellation modelling. Each lab follows the same structure — data inspection, preparation, model fitting and evaluation — which is what makes them useful as a record of applied practice.",
+    highlights: [
+      "Fraud-detection classification lab",
+      "Diabetes classification lab",
+      "California house-price regression lab",
+      "Hotel-bookings cancellation modelling lab",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib", "Jupyter Notebook"],
+    architecture: {},
+    notes: [
+      "`GTC-Fraud-Detection` is the most substantially packaged repo in this group (setup.py, Dockerfile, and a src/ layout covering config, models, utils and deployment), but its README reports 40% F1/accuracy, which is below a majority-class baseline and should not be treated as a validated result.",
+      "`GTC-Fraud-Detection` and `Credit-card-Fraud-Detection` address the same Kaggle fraud problem.",
+    ],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/GTC-ML-Internship-California-House-Price-Prediction",
+    relatedRepos: [
+      {
+        slug: "GTC-ML-Internship-California-House-Price-Prediction",
+        url: "https://github.com/IbrahimAbdelsattar/GTC-ML-Internship-California-House-Price-Prediction",
+        isPrivate: false,
+        role: "House-price regression lab",
+      },
+      {
+        slug: "GTC-ML-Internship-Diabetes-Prediction",
+        url: "https://github.com/IbrahimAbdelsattar/GTC-ML-Internship-Diabetes-Prediction",
+        isPrivate: false,
+        role: "Diabetes classification lab",
+      },
+      {
+        slug: "gtc-ml-project1-hotel-bookings",
+        url: "https://github.com/IbrahimAbdelsattar/gtc-ml-project1-hotel-bookings",
+        isPrivate: false,
+        role: "Hotel-bookings cancellation lab",
+      },
+      {
+        slug: "GTC-Fraud-Detection",
+        url: "https://github.com/IbrahimAbdelsattar/GTC-Fraud-Detection",
+        isPrivate: false,
+        role: "Fraud-detection lab",
+      },
+    ],
+    image: "/project-images/house-price.png",
   },
   {
-    title: "Soliman Group Enterprise Platform",
-    category: "Full-Stack & Systems",
-    description: `🏢 Corporate Business Operations & Client Portal! 🌐
-A modern, responsive digital corporate portal built for business inquiries, service showcasing, and enterprise client communications.
-
-Key Highlights:
-	✅ Ultra-fast Next.js architecture with server-side rendering
-	✅ Interactive inquiry forms and modern corporate brand presence`,
-    technologies: ["TypeScript", "React", "Next.js", "Tailwind CSS", "Vercel"],
-    image: "/project-images/hotel-analytics.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/soliman-group",
+    id: "depi-data-science",
+    title: "DEPI Data Science",
+    tagline: "Data-science coursework from the Digital Egypt Pioneers Initiative.",
+    category: "Research & Coursework",
+    status: "Completed",
+    tier: "archive",
+    year: "2024",
+    role: "Student",
+    description:
+      "Data-science coursework completed through the Digital Egypt Pioneers Initiative (DEPI), covering the core analysis and modelling sequence: exploratory analysis, preprocessing, model building and evaluation, across a set of separate assignment repositories.",
+    highlights: [
+      "Core data-science sequence across multiple assignment repositories",
+      "Exploratory analysis and preprocessing practice",
+      "DEPI national programme specialisation in AI and data engineering",
+    ],
+    technologies: ["Python", "Pandas", "NumPy", "Scikit-Learn", "Matplotlib", "Seaborn"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Data-Science-Projects-.DEPI",
+    relatedRepos: [
+      {
+        slug: "Data-Science-Projects-.DEPI",
+        url: "https://github.com/IbrahimAbdelsattar/Data-Science-Projects-.DEPI",
+        isPrivate: false,
+        role: "Project-track coursework",
+      },
+      {
+        slug: "Data-Science-Assignments.DEPI",
+        url: "https://github.com/IbrahimAbdelsattar/Data-Science-Assignments.DEPI",
+        isPrivate: false,
+        role: "Assignment-track coursework",
+      },
+    ],
+    image: "/project-images/sentiment-analysis.jpg",
   },
   {
-    title: "C-SAT Customer Satisfaction System",
-    category: "Full-Stack & Systems",
-    description: `⭐ Real-Time Customer Feedback & NPS Analytics Dashboard! 📊
-Interactive customer survey and satisfaction tracking application allowing businesses to collect, analyze, and visualize customer sentiment in real time.
-
-Key Highlights:
-	✅ Dynamic questionnaire generation with instant response logging
-	✅ Visual Net Promoter Score (NPS) and satisfaction rating charts`,
-    technologies: ["TypeScript", "React", "Tailwind CSS", "Recharts", "Vite"],
-    image: "/project-images/employee-attrition.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/c-sat",
-  },
-  {
-    title: "Alien AI Venture Web Experience",
-    category: "Full-Stack & Systems",
-    description: `🛸 Futuristic Interactive AI Venture Landing Platform! 🌌
-An avant-garde web experience combining 3D interactive graphics, fluid motion animations, and dark cyberpunk aesthetics to showcase next-gen AI products.
-
-Key Highlights:
-	✅ Three.js particle systems and responsive 3D scene rendering
-	✅ Fluid micro-interactions powered by Framer Motion`,
-    technologies: ["TypeScript", "React", "Three.js", "Framer Motion", "Tailwind CSS"],
-    image: "/project-images/alien-ai-venture.jpg",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/alien-ai-venture-main",
-  },
-  {
-    title: "BodyIQ Health & Fitness Platform",
-    category: "Full-Stack & Systems",
-    description: `💪 Body Composition & Health Analytics Web Application! 🥗
-Health tracking platform providing interactive BMI, body fat, caloric need calculators, and customized workout recommendation metrics.
-
-Key Highlights:
-	✅ Precision metabolic calculation formulas and nutritional breakdown
-	✅ Responsive interface with interactive data visualization charts`,
-    technologies: ["JavaScript", "HTML5", "CSS3", "Chart.js", "Responsive Design"],
-    image: "/project-images/calories-burnt.png",
-    githubUrl: "https://github.com/IbrahimAbdelsattar/bodyiq-mti-main",
+    id: "bank-term-deposit",
+    title: "Bank Term Deposit Prediction",
+    tagline: "Subscription propensity modelling for bank term deposits.",
+    category: "Machine Learning",
+    status: "Completed",
+    tier: "archive",
+    year: "2025",
+    role: "Student",
+    description:
+      "Binary classification predicting whether a client subscribes to a bank term deposit, a classic propensity problem where class imbalance and threshold choice matter more than raw accuracy.",
+    highlights: [
+      "Client propensity classification",
+      "Class-imbalance-aware evaluation",
+      "Threshold analysis for campaign targeting",
+    ],
+    technologies: ["Python", "Scikit-Learn", "Pandas", "NumPy", "Matplotlib"],
+    githubUrl: "https://github.com/IbrahimAbdelsattar/Bank-Term-Deposit-Prediction-",
+    image: "/project-images/bank-term-deposit.png",
   },
 ];
+
+/**
+ * Adding a project
+ * ----------------
+ * Append one object above. Nothing else needs to change: filters, the archive,
+ * search, the featured rail and the tech-stack counters all derive from this
+ * array. Keep `githubUrl` only for publicly reachable repositories.
+ */
+
+/**
+ * Repositories deliberately excluded from the portfolio.
+ *
+ * Forks of other people's projects are not presented as original work, and a
+ * link is only rendered when it resolves publicly.
+ */
+export const EXCLUDED_REPOS = [
+  { slug: "hermes-agent", reason: "Fork of an upstream project" },
+  { slug: "openclaw", reason: "Fork of an upstream project" },
+  { slug: "OmniRoute", reason: "Fork of an upstream project" },
+  { slug: "searxng", reason: "Fork of an upstream project" },
+  { slug: "skills", reason: "Fork of an upstream project" },
+  { slug: "profile-readme-generator", reason: "Fork of an upstream project" },
+  { slug: "Profile-README-Templates", reason: "Fork of an upstream project" },
+  { slug: "twitter-sentiment-analysis", reason: "Fork of an upstream project" },
+  {
+    slug: "RAG-Powered-Knowledge-Assistantf-for-Teachers",
+    reason: "Fork of an upstream project",
+  },
+  { slug: "Ibrahim-Portfolio", reason: "This portfolio repository" },
+  { slug: "IbrahimAbdelsattar", reason: "GitHub profile readme, not a project" },
+  { slug: "tea-tec", reason: "Represented once as the TeaTec product" },
+  { slug: "TeaTec-Android", reason: "Represented as a TeaTec related repo" },
+  { slug: "trio-learn-hub", reason: "Represented as a Trio Academy related repo" },
+  { slug: "traffic", reason: "Overlaps Traffic_Accident_Prediction; awaiting confirmation" },
+  { slug: "numerical", reason: "Experimental, no distinguishing README" },
+  { slug: "numerical-g2", reason: "Experimental, no distinguishing README" },
+  { slug: "numerix-labs", reason: "Experimental, no distinguishing README" },
+  { slug: "mini-rag", reason: "Experimental, private, no distinguishing README" },
+  { slug: "soliman-group", reason: "Template README only; description would be invented" },
+  { slug: "alien-ai-venture-main", reason: "Template README only; description would be invented" },
+  { slug: "bodyiq-mti-main", reason: "Template README only; description would be invented" },
+  { slug: "love", reason: "Personal page, not portfolio work" },
+] as const;
+
+/* ------------------------------------------------------------------ */
+/* Derived helpers — keep the UI free of filtering logic.              */
+/* ------------------------------------------------------------------ */
+
+export const featuredProjects = projects.filter((p) => p.tier === "flagship");
+
+export const getProjectBySlug = (slug: string): Project | undefined =>
+  projects.find((p) => p.id === slug);
+
+/** Every distinct technology actually referenced by a listed project. */
+export const allTechnologies = Array.from(
+  new Set(projects.flatMap((p) => p.technologies)),
+).sort((a, b) => a.localeCompare(b));
+
+/** Real counts derived from the data — never hardcoded. */
+export const projectStats = {
+  total: projects.length,
+  featured: featuredProjects.length,
+  publicRepos: projects.filter((p) => p.githubUrl).length,
+  technologies: allTechnologies.length,
+  categories: new Set(projects.map((p) => p.category)).size,
+};
