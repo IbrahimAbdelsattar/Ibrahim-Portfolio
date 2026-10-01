@@ -151,7 +151,7 @@ const About = () => {
                   </div>
                   <div className="text-muted-foreground leading-relaxed space-y-4 text-sm md:text-base translate-z-5">
                     <p>
-                      I specialize in building intelligent software solutions that combine cutting-edge **Generative AI**, **RAG Architecture**, **Dialectal NLP**, and **Predictive Machine Learning**.
+                      I specialize in building intelligent software solutions that combine cutting-edge <strong className="text-foreground">Generative AI</strong>, <strong className="text-foreground">RAG Architecture</strong>, <strong className="text-foreground">Dialectal NLP</strong>, and <strong className="text-foreground">Predictive Machine Learning</strong>.
                     </p>
                     
                     <h3 className="text-foreground font-semibold text-base mt-4 mb-2">📊 High-Impact Focus Areas:</h3>
