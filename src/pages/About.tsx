@@ -1,3 +1,4 @@
+import { ibrahimProfile } from "@/data/profile";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, GraduationCap, Target, Code2, Sparkles, Cpu, Layers, Terminal } from "lucide-react";
@@ -28,7 +29,7 @@ const About = () => {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium mb-4">
               <Sparkles className="w-4 h-4" />
-              <span>Data Scientist & AI Specialist</span>
+              <span>{ibrahimProfile.title}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 text-balance">
               About <span className="gradient-text">Ibrahim Abdelsattar</span>
@@ -53,52 +54,7 @@ const About = () => {
                 Work Experience
               </h2>
               <div className="space-y-6">
-                {[
-                  {
-                    role: "Machine Learning Instructor",
-                    company: "Minders",
-                    period: "Nov 2025 - Present",
-                    description: [
-                      "Delivering comprehensive AI coursework covering Machine Learning, Deep Learning, and Neural Networks.",
-                      "Mentoring students on hands-on AI projects, model tuning, and deployment best practices."
-                    ]
-                  },
-                  {
-                    role: "AI Engineer Intern",
-                    company: "HAMS.AI",
-                    period: "Sep 2025 - Nov 2025",
-                    description: [
-                      "Designed, trained, and fine-tuned ML & DL models with optimized dataset preprocessing for production scalability.",
-                      "Implemented model monitoring and retraining pipelines to maintain high accuracy in production environments."
-                    ]
-                  },
-                  {
-                    role: "AI Engineer Trainee",
-                    company: "Digital Egypt Pioneers Initiative (DEPI)",
-                    period: "Nov 2024 - May 2025",
-                    description: [
-                      "Hands-on intensive specialization in Artificial Intelligence, Machine Learning, and Data Engineering.",
-                      "Developed end-to-end ML solutions using Python, SQL, and interactive dashboards with MLOps principles."
-                    ]
-                  },
-                  {
-                    role: "Freelance Data Scientist & AI Consultant",
-                    company: "Self-Employed",
-                    period: "Jun 2024 - Present",
-                    description: [
-                      "Architecting custom Generative AI, RAG chatbots, dialectal Arabic NLP systems, and predictive ML models for international clients.",
-                      "Automating business workflows and deploying models to cloud/VPS infrastructure."
-                    ]
-                  },
-                  {
-                    role: "AI Instructor",
-                    company: "4Mind",
-                    period: "Feb 2025 – Jul 2025",
-                    description: [
-                      "Taught core computer science, machine learning algorithms, and AI fundamentals to emerging tech talent."
-                    ]
-                  }
-                ].map((job, index) => (
+                {ibrahimProfile.experiences.map((job, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}

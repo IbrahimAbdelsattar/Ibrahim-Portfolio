@@ -1,7 +1,9 @@
+import { ibrahimProfile } from "@/data/profile";
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 
 import { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { usePageVisible } from "@/hooks/use-page-visible";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   ArrowRight, 
@@ -28,6 +30,12 @@ const Home = () => {
   // Subtle hero parallax (background drifts slower than scroll)
   const heroRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotionPreference();
+  const pageVisible = usePageVisible();
+  const heroVisible = useInView(heroRef, { amount: 0.2 });
+  const techRef = useRef<HTMLElement>(null);
+  const techVisible = useInView(techRef, { amount: 0.1 });
+  const heroMotion = pageVisible && heroVisible && !reduceMotion;
+  const marqueeMotion = pageVisible && techVisible && !reduceMotion;
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -108,7 +116,7 @@ const Home = () => {
                 Hi, I'm Ibrahim Abdelsattar
               </h2>
               <div className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium mb-4 sm:mb-6 text-sm sm:text-base">
-                  AI & Data Scientist
+                  {ibrahimProfile.title}
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 leading-[1.15] sm:leading-tight text-balance">
                 Turning Data into <br className="hidden sm:block" />
@@ -154,9 +162,7 @@ const Home = () => {
               <div className="relative w-full max-w-[420px] mx-auto">
                 <TiltCard3D maxTilt={16} scale={1.03} glare={false} className="w-full">
                   <div className="relative w-full aspect-square preserve-3d">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[80px] animate-pulse" />
-                    <div className="absolute inset-0 bg-gradient-to-bl from-primary/30 to-secondary/30 rounded-full blur-[100px] animate-pulse delay-75" />
-                    <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px] animate-pulse [animation-duration:3000ms]" />
+                    <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px]" />
                     <img 
                       src={profileImg} 
                       alt="Ibrahim Abdelsattar" 
@@ -168,8 +174,8 @@ const Home = () => {
                     {/* Floating Achievement Cards with true 3D spatial depth */}
                     <motion.div 
                         style={{ z: 40 }}
-                        animate={reduceMotion ? { y: 0 } : { y: [0, -10, 0] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        animate={heroMotion ? { y: [0, -10, 0] } : { y: 0 }}
+                        transition={{ duration: heroMotion ? 4 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut" }}
                         className="absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
@@ -185,8 +191,8 @@ const Home = () => {
 
                     <motion.div 
                         style={{ z: 50 }}
-                        animate={reduceMotion ? { y: 0 } : { y: [0, 10, 0] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        animate={heroMotion ? { y: [0, 10, 0] } : { y: 0 }}
+                        transition={{ duration: heroMotion ? 5 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut", delay: 1 }}
                         className="absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
@@ -207,29 +213,19 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Tech Stack Strip (Marquee) */}
-      <section className="py-8 sm:py-10 border-y border-white/10 dark:border-white/10 bg-card/20 backdrop-blur-xl overflow-x-clip">
-         <div className={`flex relative w-full ${reduceMotion ? "overflow-x-auto" : "overflow-hidden"}`}>
-             <motion.div 
-                className="flex gap-10 sm:gap-16 items-center whitespace-nowrap "
-                animate={reduceMotion ? { x: 0 } : { x: ["0%", "-50%"] }}
-                transition={{ 
-                    repeat: Infinity, 
-                    ease: "linear", 
-                    duration: 30 
-                }}
-             >
-                {[...techStack, ...techStack].map((tech, index) => (
-                    <div 
-                        key={`${tech.name}-${index}`} 
-                        className="flex flex-col items-center gap-2 grayscale hover:grayscale-0 transition-all duration-300 transform hover:scale-110 shrink-0"
-                        title={tech.name}
-                    >
-                        <img src={tech.logo} alt={tech.name} loading="lazy" decoding="async" className="h-8 sm:h-12 w-auto object-contain" />
-                    </div>
-                ))}
-             </motion.div>
-         </div>
+      {/* Equal-width copies keep the marquee seamless at the loop boundary. */}
+      <section ref={techRef} className="py-8 sm:py-10 border-y border-border/40 bg-card/20 overflow-x-clip">
+        <div className={`flex relative w-full ${reduceMotion ? "overflow-x-auto" : "overflow-hidden"}`}>
+          <motion.div className="flex items-center w-max" animate={marqueeMotion ? { x: ["0%", "-50%"] } : { x: 0 }}
+            transition={{ repeat: marqueeMotion ? Infinity : 0, ease: "linear", duration: marqueeMotion ? 30 : 0 }}>
+            {(reduceMotion ? [0] : [0, 1]).map(copy => <div key={copy} aria-hidden={copy === 1 ? true : undefined}
+              className="flex gap-10 sm:gap-16 pr-10 sm:pr-16 items-center shrink-0">
+              {techStack.map(tech => <div key={tech.name} className="grayscale hover:grayscale-0 transition-[filter] duration-200 shrink-0" title={tech.name}>
+                <img src={tech.logo} alt={tech.name} loading="lazy" decoding="async" className="h-8 sm:h-12 w-auto max-w-[80px] object-contain" />
+              </div>)}
+            </div>)}
+          </motion.div>
+        </div>
       </section>
 
       {/* About Preview */}

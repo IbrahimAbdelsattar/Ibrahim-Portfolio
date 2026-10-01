@@ -1,14 +1,9 @@
 import React from "react";
-import { stripForbiddenCharacters } from "@/services/chatService";
+import { normalizeChatText, hasArabic } from "@/lib/chat-text";
 
 interface ChatMessageContentProps {
   text: string;
 }
-
-// Helper to detect if text contains Arabic characters
-export const hasArabic = (text: string): boolean => {
-  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
-};
 
 // Isolates embedded Latin/English phrases inside Arabic text to prevent BiDi reordering
 const isolateMixedLanguageTokens = (textPart: string, isArabicContext: boolean): React.ReactNode => {
@@ -37,14 +32,14 @@ const isolateMixedLanguageTokens = (textPart: string, isArabicContext: boolean):
 // Parses inline tokens (links, inline code, bold if any remains) with BiDi protection
 const renderInlineTokens = (content: string, isArabicContext: boolean): React.ReactNode[] => {
   // Regex to match markdown links [label](url), bold **bold**, or `code`
-  const tokenRegex = /([.*?](https?:\/\/[^\s)]+)|\*\*.*?\*\*|`.*?`)/g;
+  const tokenRegex = /(\[[^\]\n]+\]\((?:https?:\/\/|mailto:)[^\s)]+\)|\*\*.*?\*\*|`.*?`)/g;
   const parts = content.split(tokenRegex);
 
   return parts.map((part, index) => {
     if (!part) return null;
 
     // Link: [label](url)
-    const linkMatch = part.match(/^[(.*?)]((https?:\/\/[^\s)]+))$/);
+    const linkMatch = part.match(/^\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)$/);
     if (linkMatch) {
       return (
         <bdi key={index} className="inline">
@@ -88,7 +83,7 @@ const renderInlineTokens = (content: string, isArabicContext: boolean): React.Re
 };
 
 export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) => {
-  const sanitizedText = stripForbiddenCharacters(text);
+  const sanitizedText = normalizeChatText(text);
   const rootIsArabic = hasArabic(sanitizedText);
   const lines = sanitizedText.split("\n");
 

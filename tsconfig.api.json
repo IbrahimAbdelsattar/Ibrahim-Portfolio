@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "api/**/*.ts"
+  ]
+}

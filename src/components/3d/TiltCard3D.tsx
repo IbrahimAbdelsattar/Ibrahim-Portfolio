@@ -1,4 +1,5 @@
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
@@ -21,20 +22,9 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const isCoarsePointer = useMediaQuery("(hover: none), (pointer: coarse)");
   const reducedMotion = useReducedMotionPreference();
   const disableTilt = isCoarsePointer || reducedMotion;
-
-  // Disable expensive 3D tilt on touch devices — big mobile smoothness win
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
-    const update = () => setIsCoarsePointer(mq.matches);
-    update();
-    mq.addEventListener?.("change", update);
-    return () => {
-      mq.removeEventListener?.("change", update);
-    };
-  }, []);
 
   // Normalized mouse coordinates from -0.5 to 0.5
   const mouseX = useMotionValue(0);
@@ -44,6 +34,9 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   const springConfig = { stiffness: 220, damping: 26, mass: 0.8 };
   const mouseXSpring = useSpring(mouseX, springConfig);
   const mouseYSpring = useSpring(mouseY, springConfig);
+  useEffect(() => {
+    if (disableTilt) { mouseX.set(0); mouseY.set(0); mouseXSpring.jump(0); mouseYSpring.jump(0); setIsHovered(false); }
+  }, [disableTilt, mouseX, mouseY, mouseXSpring, mouseYSpring]);
 
   // 3D Rotations
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [maxTilt, -maxTilt]);

@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FloatingShapes from "./FloatingShapes";
 import Interactive3DScene from "./3d/Interactive3DScene";
-import IbrahimChatbot from "./IbrahimChatbot";
+import ChatWidget from "./ChatWidget";
 import ScrollProgress from "./ScrollProgress";
 import BackToTop from "./BackToTop";
 
@@ -24,7 +24,7 @@ const Layout = ({ children }: LayoutProps) => {
       </main>
       <Footer />
       <BackToTop />
-      <IbrahimChatbot />
+      <ChatWidget />
     </div>
   );
 };

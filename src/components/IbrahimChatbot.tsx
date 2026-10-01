@@ -3,33 +3,32 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Bot, User, Sparkles, RefreshCw, ChevronRight, ShieldAlert, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sendChatMessage, ChatMessage } from "@/services/chatService";
-import { ChatMessageContent, hasArabic } from "@/components/chat/ChatMessageContent";
+import { ChatMessageContent } from "@/components/chat/ChatMessageContent";
+import { hasArabic } from "@/lib/chat-text";
+import { ibrahimProfile } from "@/data/profile";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import profileImg from "@/assets/profile-main.jpg";
 
 const suggestedPrompts = [
   "👋 إنت مين وإيه خبرتك في الـ AI؟",
   "🚀 كلمني عن مشاريع الـ RAG والـ GenAI بتاعتك",
-  "💼 اشتغلت فين قبل كده (Minders & HAMS.AI)؟",
+  "💼 كلمني عن شغلك في EFS وخبراتك السابقة",
   "🛠️ إيه الـ Tech Stack وأهم المهارات اللي بتشتغل بيها؟",
   "🎓 دراستك في جامعة MTI وتقديرك كام؟",
   "📩 إزاي أقدر اتواصل معاك أو نشتغل سوا؟",
 ];
 
-const INITIAL_WELCOME_TEXT = `👋 أهلاً بيك يا غالي! أنا إبراهيم عبد الستار.
+const INITIAL_WELCOME_TEXT = `أهلاً! هنا تقدر تتكلم مع نسخة AI من بروفايلي، بترد بصوتي وبالمعلومات المنشورة عنّي.
 
-شغال Data Scientist و AI Specialist ومقيم في القاهرة. 
+أنا إبراهيم عبد الستار، ${ibrahimProfile.experiences[0].role} في ${ibrahimProfile.experiences[0].company} (${ibrahimProfile.experiences[0].periodAr})، ومقيم في القاهرة.
 
-اتفضل اسألني عن أي حاجة تخص:
-🚀 مشاريعي في الذكاء الاصطناعي: [SupplyMind AI](https://github.com/IbrahimAbdelsattar/SupplyMindAI)، و [MR-NLP RAG Chatbot](https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot)، وتحليل اللهجة المصرية، والصوتيات
-💼 خبرتي وشغلي: Machine Learning Instructor في Minders، وتدريبي في HAMS.AI و DEPI
-🎓 دراستي: هندسة وذكاء اصطناعي في جامعة MTI بتقدير 3.5 من 4.0
-🛠️ مهاراتي والـ Tech Stack: Python, PyTorch, LangChain, RAG, Docker, FastAPI
-📩 الشغل والتعاون سوا: تقدر تبعتلي في أي وقت ونتكلم!
+اسألني عن خبراتي في EFS وMinders وHAMS.AI وDEPI، أو عن أي مشروع من الكتالوج، دراستي، مهاراتي وشهاداتي.
 
-Or feel free to ask in English, I am happy to chat directly about my AI projects, background, and opportunities!`;
+You can also ask in English. My replies use my published profile; details I haven't shared are left unknown.`;
 
-const IbrahimChatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatProps { isOpen: boolean; onClose: () => void }
+const IbrahimChatbot = ({ isOpen, onClose }: ChatProps) => {
+  const reducedMotion = useReducedMotionPreference();
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -42,20 +41,23 @@ const IbrahimChatbot = () => {
   ]);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const messagePaneRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<AbortController | null>(null);
+  useEffect(() => () => requestRef.current?.abort(), []);
 
   useEffect(() => {
     if (isOpen) {
-      scrollToBottom();
+      const pane = messagePaneRef.current;
+      pane?.scrollTo({ top: pane.scrollHeight, behavior: reducedMotion || isTyping ? "auto" : "smooth" });
     }
-  }, [messages, isOpen, isTyping]);
+  }, [messages, isOpen, isTyping, reducedMotion]);
 
   const handleSend = async (textToSend?: string) => {
-    const messageText = textToSend || input;
-    if (!messageText.trim()) return;
+    if (isTyping || requestRef.current) return;
+    const messageText = (textToSend || input).trim().slice(0, 2000);
+    if (!messageText) return;
+    const controller = new AbortController();
+    requestRef.current = controller;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -64,36 +66,44 @@ const IbrahimChatbot = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev.slice(-39), userMsg]);
     if (!textToSend) setInput("");
     setIsTyping(true);
 
     try {
-      const response = await sendChatMessage(messageText, messages);
+      const response = await sendChatMessage(messageText, messages, controller.signal);
+      if (controller.signal.aborted) return;
 
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
         text: response.text,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        isSecurityWarning: response.isSecurityWarning,
+
       };
 
       setMessages((prev) => [...prev, botMsg]);
     } catch {
+      if (controller.signal.aborted) return;
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: "Something unexpected happened. Please feel free to reach out directly to Ibrahim via [ibrahimabdelsattar042@gmail.com](mailto:ibrahimabdelsattar042@gmail.com).",
+        text: "I couldn’t load an answer just now. You can reach me directly at [ibrahimabdelsattar042@gmail.com](mailto:ibrahimabdelsattar042@gmail.com).",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
-      setIsTyping(false);
+      if (requestRef.current === controller) {
+        requestRef.current = null;
+        setIsTyping(false);
+      }
     }
   };
 
   const handleReset = () => {
+    requestRef.current?.abort();
+    requestRef.current = null;
+    setIsTyping(false);
     setMessages([
       {
         id: "welcome",
@@ -106,35 +116,6 @@ const IbrahimChatbot = () => {
 
   return (
     <>
-      {/* Floating Action Button */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 pb-safe">
-        <AnimatePresence>
-          {!isOpen && (
-            <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsOpen(true)}
-              aria-label="Open AI assistant chat"
-              className="relative group flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-2xl hover:shadow-primary/50 transition-all cursor-pointer border border-white/20"
-            >
-              <div className="relative">
-                <img
-                  src={profileImg}
-                  alt="Ibrahim"
-                  className="w-7 h-7 rounded-full object-cover border border-white/50"
-                />
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-background animate-pulse" />
-              </div>
-              <span className="font-semibold text-sm hidden sm:inline-block">Chat with Ibrahim</span>
-              <Sparkles className="w-4 h-4 opacity-80 text-amber-300" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Chatbot Window Modal */}
       <AnimatePresence>
         {isOpen && (
@@ -160,14 +141,14 @@ const IbrahimChatbot = () => {
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-bold text-foreground text-sm">Ibrahim Abdelsattar</h3>
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-medium border border-primary/30">
-                      AI Specialist
+                      AI persona
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-                    <span className="text-emerald-500 font-medium">Online</span>
+                    <span className="text-primary font-medium">Portfolio voice</span>
                     <span className="opacity-40">•</span>
-                    <span>Data Scientist & AI</span>
+                    <span>{ibrahimProfile.title}</span>
                   </div>
                 </div>
               </div>
@@ -182,7 +163,7 @@ const IbrahimChatbot = () => {
                   <RefreshCw className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={onClose}
                   aria-label="Close chat"
                   className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg hover:bg-card/60 transition-colors"
                 >
@@ -192,7 +173,7 @@ const IbrahimChatbot = () => {
             </div>
 
             {/* Messages Body */}
-            <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-4 text-sm custom-scrollbar scroll-smooth-touch touch-pan-y bg-card/30 backdrop-blur-md overscroll-contain">
+            <div ref={messagePaneRef} aria-live="polite" aria-relevant="additions" role="log" aria-label="Conversation" className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-4 text-sm custom-scrollbar scroll-smooth-touch touch-pan-y bg-card/30 backdrop-blur-md overscroll-contain">
               {messages.map((msg) => {
                 const isMsgArabic = hasArabic(msg.text);
                 return (
@@ -284,7 +265,8 @@ const IbrahimChatbot = () => {
                     key={i}
                     dir={isPromptArabic ? "rtl" : "ltr"}
                     onClick={() => handleSend(prompt)}
-                    className="px-2.5 py-2 min-h-[36px] shrink-0 text-[11px] font-medium rounded-full glass-card hover:border-primary/40 text-primary transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap bidi-text"
+                    disabled={isTyping}
+                    className="px-2.5 py-2 min-h-[36px] shrink-0 text-[11px] font-medium rounded-full glass-card hover:border-primary/40 text-primary transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer whitespace-nowrap bidi-text"
                   >
                     <span dir={isPromptArabic ? "rtl" : "ltr"} className="bidi-text">
                       {prompt}
@@ -311,13 +293,15 @@ const IbrahimChatbot = () => {
                 onChange={(e) => setInput(e.target.value)}
                 enterKeyHint="send"
                 autoComplete="off"
+                maxLength={2000}
+                aria-label="Message Ibrahim’s AI persona"
                 className="flex-1 min-w-0 px-4 py-3 min-h-[48px] rounded-full glass-input text-base sm:text-sm bidi-text"
               />
               <Button
                 type="submit"
                 size="icon"
                 aria-label="Send message"
-                disabled={!input.trim()}
+                disabled={!input.trim() || isTyping}
                 className="rounded-full shrink-0 h-12 w-12 sm:h-10 sm:w-10 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
