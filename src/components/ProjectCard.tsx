@@ -1,205 +1,150 @@
 import { motion } from "framer-motion";
-import { Github, Eye, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Github, ExternalLink, ArrowUpRight, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import ProjectCover from "./project/ProjectCover";
+import TechBadge from "./project/TechBadge";
+import ProjectStatusBadge from "./project/ProjectStatusBadge";
+import type { Project } from "@/data/types";
 
-interface ProjectCardProps {
-  title: string;
-  description: string;
-  technologies: string[];
-  image: string;
-  githubUrl?: string;
-  liveUrl?: string;
-  isPinned?: boolean;
-  featured?: boolean;
-  category?: string;
+interface ProjectCardProps extends Project {
   index: number;
-  onLiveClick?: () => void;
 }
 
-const ProjectCard = ({
-  title,
-  description,
-  technologies,
-  image,
-  githubUrl,
-  liveUrl,
-  isPinned,
-  index,
-  onLiveClick,
-}: ProjectCardProps) => {
+/**
+ * One card for every project in the archive.
+ *
+ * The action bar only renders links that actually resolve: `githubUrl` is set
+ * exclusively for public repositories, so a private repo degrades to a plain
+ * "Source private" note instead of a button that 404s for a visitor.
+ */
+const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
+  const visibleTech = project.technologies.slice(0, 4);
+  const overflow = project.technologies.length - visibleTech.length;
+  const hasLive = Boolean(project.liveUrl);
+  const hasSource = Boolean(project.githubUrl);
+
   return (
-    <motion.div
+    <motion.article
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "40px" }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
       className="h-full"
     >
       <motion.div
         whileHover={{ y: -6 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="h-full group rounded-3xl cursor-pointer"
-        onClick={() => onLiveClick?.()}
+        className="h-full group rounded-3xl"
       >
         <div
-          className={`h-full glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 relative ${
-            isPinned
+          className={`glass-card rounded-3xl overflow-hidden flex flex-col justify-between h-full relative ${
+            project.tier === "flagship"
               ? "border-primary/50 shadow-[0_4px_30px_rgba(20,184,166,0.18)] hover:shadow-[0_12px_40px_rgba(20,184,166,0.3)] ring-1 ring-primary/40"
-              : "border-border/60 hover:border-primary/50 hover:shadow-[0_12px_35px_rgba(0,0,0,0.35)]"
+              : "border-border/60 hover:border-primary/50"
           }`}
         >
-          {/* Top Section: Image & Header */}
           <div>
             <div className="relative h-44 sm:h-48 overflow-hidden bg-card/40">
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 pointer-events-none"
-                style={{ backgroundImage: `url(${image})` }}
+              <ProjectCover
+                src={project.image}
+                alt={project.title}
+                interactive
+                className="absolute inset-0"
               />
               <div
                 aria-hidden="true"
                 className="absolute inset-0 bg-gradient-to-t from-card via-card/25 to-transparent pointer-events-none"
               />
 
-              {/* Pinned Badge */}
-              {isPinned && (
-                <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/25 backdrop-blur-xl border border-primary/50 text-primary-foreground text-xs font-semibold shadow-lg shadow-primary/20 pointer-events-none">
-                  <span className="text-sm">📌</span>
-                  <span className="text-white font-medium tracking-wide">Pinned</span>
-                </div>
-              )}
-
-              {/* Quick Image Action Overlay - Centered buttons */}
-              <div className="absolute inset-0 z-30 flex items-center justify-center gap-3 p-4 pointer-events-none opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200 bg-black/30 backdrop-blur-[2px]">
-                {githubUrl && (
-                  <a
-                    href={githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="View Source on GitHub"
-                    aria-label={`View ${title} source on GitHub`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-white shadow-xl hover:bg-primary hover:border-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <Github className="w-5 h-5 pointer-events-none" />
-                  </a>
+              <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between gap-2">
+                {project.tier === "flagship" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/25 backdrop-blur-xl border border-primary/50 px-2.5 py-1 text-[11px] font-semibold text-white">
+                    Featured
+                  </span>
+                ) : (
+                  <span />
                 )}
-                {liveUrl && (
-                  <a
-                    href={liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Live Preview"
-                    aria-label={`Open ${title} live preview`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-primary shadow-xl hover:bg-primary hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <ExternalLink className="w-5 h-5 pointer-events-none" />
-                  </a>
-                )}
-                {onLiveClick && (
-                  <button
-                    type="button"
-                    title="View Full Details"
-                    aria-label={`View ${title} full details`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onLiveClick();
-                    }}
-                    className="pointer-events-auto rounded-full h-11 w-11 inline-flex items-center justify-center backdrop-blur-xl bg-black/75 border border-white/30 text-white shadow-xl hover:bg-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                  >
-                    <Eye className="w-5 h-5 pointer-events-none" />
-                  </button>
-                )}
+                <ProjectStatusBadge status={project.status} className="backdrop-blur-xl" />
               </div>
             </div>
 
-            {/* Text Content */}
             <div className="p-5 sm:p-6 pb-2">
-              <h3 className="text-base sm:text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
-                {title}
-              </h3>
+              <div className="flex items-baseline justify-between gap-3 mb-2">
+                <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                  {project.title}
+                </h3>
+                <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                  {project.year}
+                </span>
+              </div>
+
+              <p className="text-xs font-medium text-primary/80 mb-2">{project.category}</p>
               <p className="text-muted-foreground text-sm mb-4 line-clamp-2 leading-relaxed">
-                {description}
+                {project.tagline}
               </p>
 
-              {/* Technologies */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {technologies.slice(0, 4).map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-2.5 py-0.5 text-xs font-medium rounded-lg glass-card text-primary/90 border border-primary/15"
-                  >
-                    {tech}
-                  </span>
+                {visibleTech.map((tech) => (
+                  <TechBadge key={tech} tech={tech} compact />
                 ))}
-                {technologies.length > 4 && (
+                {overflow > 0 && (
                   <span className="px-2 py-0.5 text-xs font-medium rounded-lg text-muted-foreground bg-muted/30">
-                    +{technologies.length - 4}
+                    +{overflow}
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Dedicated Bottom Action Bar - 100% Clickable & Stable */}
-          <div className="p-4 sm:p-5 pt-3 mt-3 border-t border-border/40 flex items-center justify-between gap-2.5 bg-card/25 backdrop-blur-sm z-20 relative">
-            <Button
-              variant="default"
-              size="sm"
-              className="flex-1 gap-2 rounded-xl text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all cursor-pointer min-h-[38px]"
-              onClick={(e) => {
-                e.stopPropagation();
-                onLiveClick?.();
-              }}
+          <div className="p-4 sm:p-5 pt-3 mt-3 border-t border-border/40 flex items-center gap-2.5 bg-card/25 backdrop-blur-sm relative">
+            <Link
+              to={`/projects/${project.id}`}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl min-h-[38px] px-3 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all"
             >
-              <Eye className="w-3.5 h-3.5 pointer-events-none" />
-              <span>Details</span>
-            </Button>
+              Case study
+              <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="sr-only"> for {project.title}</span>
+            </Link>
 
-            {liveUrl && (
+            {hasLive && (
               <a
-                href={liveUrl}
+                href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                title="Live Website"
-                className="shrink-0"
+                title={`Open ${project.title} live`}
+                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-primary/40 hover:border-primary text-primary hover:bg-primary/10 min-h-[38px] px-3 text-xs font-medium transition-all"
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl border-primary/40 hover:border-primary text-primary hover:bg-primary/10 gap-1.5 text-xs px-3 min-h-[38px] cursor-pointer"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 pointer-events-none" />
-                  <span>Live</span>
-                </Button>
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                Live
               </a>
             )}
 
-            {githubUrl && (
+            {hasSource ? (
               <a
-                href={githubUrl}
+                href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                title="Source Code"
-                className="shrink-0"
+                title={`View ${project.title} source on GitHub`}
+                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/80 hover:border-primary/50 hover:bg-primary/10 min-h-[38px] px-3 text-xs font-medium transition-all"
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl border-border/80 hover:border-primary/50 text-foreground hover:bg-primary/10 gap-1.5 text-xs px-3 min-h-[38px] cursor-pointer"
-                >
-                  <Github className="w-3.5 h-3.5 pointer-events-none" />
-                  <span>Code</span>
-                </Button>
+                <Github className="w-3.5 h-3.5" aria-hidden="true" />
+                Code
               </a>
+            ) : (
+              project.sourcePrivate && (
+                <span
+                  title="Source code is not publicly available"
+                  className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/60 min-h-[38px] px-3 text-xs text-muted-foreground"
+                >
+                  <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+                  Private
+                </span>
+              )
             )}
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.article>
   );
 };
 
