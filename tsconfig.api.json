@@ -2,6 +2,7 @@
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "strict": true,
+    "rewriteRelativeImportExtensions": true,
     "types": [
       "node"
     ]

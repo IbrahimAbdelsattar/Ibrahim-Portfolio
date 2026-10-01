@@ -4,6 +4,31 @@ import handler from '../api/chat.ts';
 import { getAssistantResponse, buildAssistantContext, selectRelevantProjects } from '../src/data/ibrahimKnowledge.ts';
 import { ibrahimProfile } from '../src/data/profile.ts';
 import { normalizeChatText } from '../src/lib/chat-text.ts';
+import ts from 'typescript';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+test('compiled ESM API resolves its shared TypeScript evidence at runtime', async () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const outDir = await mkdtemp(join(tmpdir(), 'portfolio-api-'));
+  const config = ts.readConfigFile(join(root, 'tsconfig.json'), ts.sys.readFile).config;
+  assert.equal(config.compilerOptions.rewriteRelativeImportExtensions, true);
+  try {
+    const program = ts.createProgram([join(root, 'api/chat.ts')], {
+      target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler, skipLibCheck: true,
+      rewriteRelativeImportExtensions: true, rootDir: root, outDir,
+    });
+    const result = program.emit();
+    assert.equal(result.emitSkipped, false);
+    const compiled = await import(pathToFileURL(join(outDir, 'api/chat.js')).href);
+    const response = await compiled.default.fetch(new Request('https://portfolio.example/api/chat'));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).persona, 'Ibrahim Abdelsattar');
+  } finally { await rm(outDir, { recursive: true, force: true }); }
+});
 
 test('current employment is shared and answers are accurate in both languages', () => {
   assert.equal(ibrahimProfile.experiences[0].company, 'EFS');
