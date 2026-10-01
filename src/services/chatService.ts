@@ -5,6 +5,7 @@ export interface ChatMessage {
   sender: "bot" | "user";
   text: string;
   timestamp: string;
+  answerSource?: "ai" | "profile";
   isSecurityWarning?: boolean;
 }
 

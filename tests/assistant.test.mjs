@@ -69,10 +69,19 @@ const post = (body, extra = {}) => new Request('https://portfolio.example/api/ch
   method: 'POST', headers: { 'Content-Type': 'application/json', ...extra }, body: JSON.stringify(body),
 });
 
+const providerEnv = (values = {}) => {
+  const names = ['OMNIROUTE_API_KEY', 'VITE_OMNIROUTE_API_KEY', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN', 'AI_GATEWAY_MODEL'];
+  const saved = Object.fromEntries(names.map(name => [name, process.env[name]]));
+  for (const name of names) {
+    if (values[name] === undefined) delete process.env[name]; else process.env[name] = values[name];
+  }
+  return () => { for (const name of names) {
+    if (saved[name] === undefined) delete process.env[name]; else process.env[name] = saved[name];
+  } };
+};
+
 test('API validates requests and provides grounded fallback without a provider', async () => {
-  const primary = process.env.OMNIROUTE_API_KEY;
-  const legacy = process.env.VITE_OMNIROUTE_API_KEY;
-  delete process.env.OMNIROUTE_API_KEY; delete process.env.VITE_OMNIROUTE_API_KEY;
+  const restore = providerEnv();
   try {
     assert.equal((await handler.fetch(new Request('https://portfolio.example/api/chat'))).status, 200);
     assert.equal((await handler.fetch(new Request('https://portfolio.example/api/chat', { method: 'DELETE' }))).status, 405);
@@ -87,15 +96,13 @@ test('API validates requests and provides grounded fallback without a provider',
     assert.equal(data.source, 'profile');
     assert.match(data.reply, /June 2026/);
   } finally {
-    if (primary === undefined) delete process.env.OMNIROUTE_API_KEY; else process.env.OMNIROUTE_API_KEY = primary;
-    if (legacy === undefined) delete process.env.VITE_OMNIROUTE_API_KEY; else process.env.VITE_OMNIROUTE_API_KEY = legacy;
+    restore();
   }
 });
 
 test('provider receives verified evidence and sanitized roles, with fallback on failure', async () => {
-  const previousKey = process.env.OMNIROUTE_API_KEY;
+  const restore = providerEnv({ OMNIROUTE_API_KEY: 'unit-test-placeholder' });
   const originalFetch = globalThis.fetch;
-  process.env.OMNIROUTE_API_KEY = 'unit-test-placeholder';
   let payload;
   globalThis.fetch = async (_url, options) => {
     payload = JSON.parse(options.body);
@@ -117,6 +124,53 @@ test('provider receives verified evidence and sanitized roles, with fallback on 
     assert.match(fallback.reply, /June 2026/);
   } finally {
     globalThis.fetch = originalFetch;
-    if (previousKey === undefined) delete process.env.OMNIROUTE_API_KEY; else process.env.OMNIROUTE_API_KEY = previousKey;
+    restore();
   }
+});
+
+test('Vercel OIDC authenticates generated answers and a gateway key takes precedence', async () => {
+  const originalFetch = globalThis.fetch;
+  const restore = providerEnv({ VERCEL_OIDC_TOKEN: 'test-oidc-not-a-real-token' });
+  const calls = [];
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url, options, payload: JSON.parse(options.body) });
+    return Response.json({ choices: [{ message: { content: 'أنا شغال Full Stack AI Engineer في EFS من يونيو 2026.' } }] });
+  };
+  try {
+    const data = await (await handler.fetch(post({ message: 'عرفني على خبرتك' }))).json();
+    assert.equal(data.source, 'ai');
+    assert.equal(calls[0].url, 'https://ai-gateway.vercel.sh/v1/chat/completions');
+    assert.equal(calls[0].options.headers.Authorization, 'Bearer test-oidc-not-a-real-token');
+    assert.equal(calls[0].payload.model, 'google/gemini-3.1-flash-lite');
+    assert.match(calls[0].payload.messages[0].content, /VERIFIED PUBLIC EVIDENCE/);
+    process.env.AI_GATEWAY_API_KEY = 'test-gateway-key';
+    process.env.AI_GATEWAY_MODEL = 'configured-model';
+    await handler.fetch(post({ message: 'EFS' }));
+    assert.equal(calls[1].options.headers.Authorization, 'Bearer test-gateway-key');
+    assert.equal(calls[1].payload.model, 'configured-model');
+  } finally { globalThis.fetch = originalFetch; restore(); }
+});
+
+test('unavailable OmniRoute fails over to Vercel and diagnostics never log conversation or secrets', async () => {
+  const restore = providerEnv({ OMNIROUTE_API_KEY: 'test-omni-secret', VERCEL_OIDC_TOKEN: 'test-oidc-secret' });
+  const originalFetch = globalThis.fetch;
+  const originalWarn = console.warn;
+  const warnings = [];
+  const calls = [];
+  console.warn = (...args) => warnings.push(args);
+  globalThis.fetch = async url => {
+    calls.push(url);
+    return calls.length === 1 ? Response.json({ error: 'provider error body' }, { status: 401 })
+      : Response.json({ choices: [{ message: { content: 'I work at EFS.' } }] });
+  };
+  try {
+    const data = await (await handler.fetch(post({ message: 'private-message-sentinel' }))).json();
+    assert.equal(data.source, 'ai');
+    assert.equal(calls.length, 2);
+    assert.match(calls[1], /ai-gateway.vercel.sh/);
+    assert.deepEqual(warnings, [['portfolio_chat_provider_unavailable', { provider: 'omniroute', status: 401 }]]);
+    assert.doesNotMatch(JSON.stringify(warnings), /secret|private-message-sentinel|provider error body/);
+    globalThis.fetch = async () => Response.json({ error: 'unavailable' }, { status: 402 });
+    assert.equal((await (await handler.fetch(post({ message: 'EFS' }))).json()).source, 'profile');
+  } finally { globalThis.fetch = originalFetch; console.warn = originalWarn; restore(); }
 });

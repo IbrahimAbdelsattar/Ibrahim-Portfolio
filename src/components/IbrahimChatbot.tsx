@@ -79,7 +79,7 @@ const IbrahimChatbot = ({ isOpen, onClose }: ChatProps) => {
         sender: "bot",
         text: response.text,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-
+        answerSource: response.isLive ? "ai" : "profile",
       };
 
       setMessages((prev) => [...prev, botMsg]);
@@ -227,6 +227,11 @@ const IbrahimChatbot = ({ isOpen, onClose }: ChatProps) => {
                         }`}
                         dir="ltr"
                       >
+                        {msg.answerSource && <span dir="auto">
+                          {msg.answerSource === "ai"
+                            ? (isMsgArabic ? "رد بالذكاء الاصطناعي" : "AI reply")
+                            : (isMsgArabic ? "من بيانات بروفايلي" : "From my profile")} · {" "}
+                        </span>}
                         {msg.timestamp}
                       </span>
                     </div>

@@ -38,15 +38,26 @@ export default {
       if (!turn || !["user", "assistant"].includes(turn.role) || typeof turn.content !== "string") return [];
       return [{ role: turn.role as ConversationTurn["role"], content: turn.content.slice(0, 1200) }];
     }) : [];
-    // Legacy build-prefixed keys are read ONLY on the server, never in the browser bundle.
-    const key = process.env.OMNIROUTE_API_KEY || process.env.VITE_OMNIROUTE_API_KEY;
-    if (key) {
+    // Credentials stay in the function. Vercel's short-lived OIDC token removes
+    // the need to provision another permanent key for the deployed portfolio.
+    const omniKey = process.env.OMNIROUTE_API_KEY || process.env.VITE_OMNIROUTE_API_KEY;
+    const gatewayKey = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+    const providers = [
+      ...(omniKey ? [{ name: "omniroute", url: "https://omniroute.dawrly.space/v1/chat/completions",
+        key: omniKey, model: process.env.OMNIROUTE_MODEL || "gh/gpt-4o-mini" }] : []),
+      ...(gatewayKey ? [{ name: "vercel", url: "https://ai-gateway.vercel.sh/v1/chat/completions",
+        key: gatewayKey, model: process.env.AI_GATEWAY_MODEL || "google/gemini-3.1-flash-lite" }] : []),
+    ];
+    const deadline = Date.now() + 8500;
+    for (const provider of providers) {
+      const remaining = deadline - Date.now();
+      if (remaining < 500 || request.signal.aborted) break;
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 7500);
+      const timer = setTimeout(() => controller.abort(), Math.min(remaining, providers.length > 1 ? 4000 : 8500));
       try {
-        const response = await fetch("https://omniroute.dawrly.space/v1/chat/completions", {
-          method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-          body: JSON.stringify({ model: process.env.OMNIROUTE_MODEL || "gh/gpt-4o-mini", temperature: 0.25, max_tokens: 700,
+        const response = await fetch(provider.url, {
+          method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.key}` },
+          body: JSON.stringify({ model: provider.model, temperature: 0.25, max_tokens: 700,
             messages: [{ role: "system", content: `${IBRAHIM_SYSTEM_PROMPT}\n\nVERIFIED PUBLIC EVIDENCE:\n${buildAssistantContext(message, history)}` },
               ...history, { role: "user", content: message }], stream: false }),
           signal: AbortSignal.any([request.signal, controller.signal]),
@@ -55,10 +66,19 @@ export default {
           const data = await response.json();
           const reply = data.choices?.[0]?.message?.content;
           if (typeof reply === "string" && reply.trim()) return json({ reply: reply.trim(), source: "ai" });
+          console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, reason: "empty_reply" });
+        } else {
+          // Log only operational categories, never prompts, credentials or provider bodies.
+          console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, status: response.status });
         }
-      } catch { /* Keep verified profile answers available when the provider cannot respond. */ }
+      } catch {
+        if (!request.signal.aborted) console.warn("portfolio_chat_provider_unavailable", {
+          provider: provider.name, reason: controller.signal.aborted ? "timeout" : "connection",
+        });
+      }
       finally { clearTimeout(timer); }
     }
+    if (!providers.length) console.warn("portfolio_chat_generation_unconfigured");
     return json({ reply: getAssistantResponse(message, history), source: "profile" });
   },
 };

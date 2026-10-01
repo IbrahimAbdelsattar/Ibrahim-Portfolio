@@ -56,14 +56,14 @@ flowchart TD
 
 ### Main workflow
 
-Portfolio navigation runs in React. Chat requests reach the same-origin Vercel function. The function uses verified profile and repository evidence with OmniRoute when configured, and returns local grounded answers otherwise. The browser also provides those answers when the function is unavailable.
+Portfolio navigation runs in React. Chat requests reach the same-origin Vercel function. The function uses verified profile and repository evidence with an optional OmniRoute connection or Vercel AI Gateway, and returns local grounded answers if generation is unavailable. The browser also provides those answers when the function is unavailable. Each answer identifies whether it was generated or came from the verified profile.
 
 ```mermaid
 sequenceDiagram
     actor Visitor
     participant UI as React portfolio
     participant API as Vercel chat function
-    participant Gateway as OmniRoute
+    participant Gateway as AI provider
     Visitor->>UI: Browse routes and project details
     UI-->>Visitor: Render local portfolio content
     opt Visitor opens lazy-loaded chat
@@ -109,6 +109,8 @@ Open the local origin printed by the development server.
 
 Deploy the repository to Vercel to run `api/chat.ts` with the frontend, or use `vercel dev` locally. A plain Vite server or static preview uses the browser's grounded fallback.
 
-For generated replies, configure `OMNIROUTE_API_KEY` in the server environment and optionally `OMNIROUTE_MODEL` (default: `gh/gpt-4o-mini`). The function can reuse an existing `VITE_OMNIROUTE_API_KEY` environment variable on the server for migration, but frontend code never reads it. Prefer the server-only name for new configuration. No provider key is required for the verified profile answers.
+On Vercel, generated replies can authenticate to AI Gateway with the deployment's automatic `VERCEL_OIDC_TOKEN`, without a permanent API key. AI Gateway access and credits must be available on the linked team. The default model is `google/gemini-3.1-flash-lite`; set `AI_GATEWAY_MODEL` to override it. A server-only `AI_GATEWAY_API_KEY` takes precedence over OIDC when configured, and works for development outside Vercel.
+
+An existing `OMNIROUTE_API_KEY` connection is tried first, using `OMNIROUTE_MODEL` (default: `gh/gpt-4o-mini`), then Vercel AI Gateway if available. The function can reuse an existing `VITE_OMNIROUTE_API_KEY` on the server for migration; frontend code never reads it. Use the server-only name for new configuration. The entire generation attempt is bounded to 8.5 seconds, and verified profile answers require no provider key. Operational logs include only provider names and failure categories or HTTP status, never prompts, credentials, or provider error bodies.
 
 `GET /api/chat` reports readiness; `POST /api/chat` accepts a message and up to eight conversation turns. Replies are not cached or persisted. Requests have bounded size, a provider timeout, and a best-effort per-instance IP rate limit; this limit is not a globally distributed quota.
