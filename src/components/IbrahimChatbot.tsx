@@ -118,7 +118,7 @@ const IbrahimChatbot = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
               aria-label="Open AI assistant chat"
-              className="relative group flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-full bg-gradient-to-r from-primary via-blue-600 to-secondary text-white shadow-2xl hover:shadow-primary/50 transition-all cursor-pointer border border-white/20"
+              className="relative group flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-2xl hover:shadow-primary/50 transition-all cursor-pointer border border-white/20"
             >
               <div className="relative">
                 <img

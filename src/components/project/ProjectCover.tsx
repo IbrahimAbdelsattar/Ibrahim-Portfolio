@@ -42,15 +42,15 @@ export const ProjectCover = ({
   }
 
   return (
-    <div
-      aria-hidden="true"
-      className={`bg-cover bg-center transition-transform duration-500 ${className} ${
+    <img
+      alt={alt}
+      src={src}
+      loading="lazy"
+      decoding="async"
+      className={`object-cover object-center transition-transform duration-500 ${className} ${
         interactive ? "group-hover:scale-105" : ""
       }`}
-      style={{ backgroundImage: `url(${src})` }}
       onError={() => setFailed(true)}
-      role="img"
-      aria-label={alt}
     />
   );
 };

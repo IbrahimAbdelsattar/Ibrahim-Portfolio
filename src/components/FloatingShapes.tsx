@@ -1,6 +1,8 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import { motion } from "framer-motion";
 
 const FloatingShapes = () => {
+  const reducedMotion = useReducedMotionPreference();
   const shapes = [
     { 
       size: 480, 
@@ -62,7 +64,7 @@ const FloatingShapes = () => {
             top: shape.y,
             background: shape.color,
           }}
-          animate={{
+          animate={reducedMotion ? undefined : {
             y: [-30, 30, -30],
             x: [-20, 20, -20],
             scale: [1, 1.15, 1],

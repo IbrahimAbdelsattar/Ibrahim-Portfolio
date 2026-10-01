@@ -1,10 +1,12 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import { motion } from "framer-motion";
-import { Github, ExternalLink, ArrowUpRight, Lock } from "lucide-react";
+import { Github, ExternalLink, ArrowUpRight, Lock, GitFork } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectCover from "./project/ProjectCover";
 import TechBadge from "./project/TechBadge";
 import ProjectStatusBadge from "./project/ProjectStatusBadge";
 import type { Project } from "@/data/types";
+import TiltCard3D from "./3d/TiltCard3D";
 
 interface ProjectCardProps extends Project {
   index: number;
@@ -18,6 +20,7 @@ interface ProjectCardProps extends Project {
  * "Source private" note instead of a button that 404s for a visitor.
  */
 const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
+  const reducedMotion = useReducedMotionPreference();
   const visibleTech = project.technologies.slice(0, 4);
   const overflow = project.technologies.length - visibleTech.length;
   const hasLive = Boolean(project.liveUrl);
@@ -25,21 +28,17 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 25 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "40px" }}
+      viewport={{ once: true, margin: "80px" }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
       className="h-full"
     >
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-        className="h-full group rounded-3xl"
-      >
+      <TiltCard3D maxTilt={5} scale={1.01} glare className="h-full group rounded-3xl">
         <div
           className={`glass-card rounded-3xl overflow-hidden flex flex-col justify-between h-full relative ${
             project.tier === "flagship"
-              ? "border-primary/50 shadow-[0_4px_30px_rgba(20,184,166,0.18)] hover:shadow-[0_12px_40px_rgba(20,184,166,0.3)] ring-1 ring-primary/40"
+              ? "border-primary/50 shadow-[0_4px_30px_rgba(46,94,153,0.18)] hover:shadow-[0_12px_40px_rgba(123,164,208,0.2)] ring-1 ring-primary/40"
               : "border-border/60 hover:border-primary/50"
           }`}
         >
@@ -49,7 +48,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
                 src={project.image}
                 alt={project.title}
                 interactive
-                className="absolute inset-0"
+                className="absolute inset-0 w-full h-full"
               />
               <div
                 aria-hidden="true"
@@ -60,6 +59,10 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
                 {project.tier === "flagship" ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary/25 backdrop-blur-xl border border-primary/50 px-2.5 py-1 text-[11px] font-semibold text-white">
                     Featured
+                  </span>
+                ) : project.sourceKind === "fork" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/90 border border-border px-2.5 py-1 text-[11px] font-medium text-foreground">
+                    <GitFork className="h-3 w-3" aria-hidden="true" /> Fork
                   </span>
                 ) : (
                   <span />
@@ -79,6 +82,9 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
               </div>
 
               <p className="text-xs font-medium text-primary/80 mb-2">{project.category}</p>
+              <p className="font-mono text-[10px] text-muted-foreground break-all mb-3" title={project.repository}>
+                {project.repository}
+              </p>
               <p className="text-muted-foreground text-sm mb-4 line-clamp-2 leading-relaxed">
                 {project.tagline}
               </p>
@@ -143,7 +149,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
             )}
           </div>
         </div>
-      </motion.div>
+      </TiltCard3D>
     </motion.article>
   );
 };

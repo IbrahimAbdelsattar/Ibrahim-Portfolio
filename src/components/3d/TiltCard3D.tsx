@@ -1,3 +1,4 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
@@ -21,17 +22,17 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const reducedMotion = useReducedMotionPreference();
+  const disableTilt = isCoarsePointer || reducedMotion;
 
   // Disable expensive 3D tilt on touch devices — big mobile smoothness win
   useEffect(() => {
     const mq = window.matchMedia("(hover: none), (pointer: coarse)");
-    const update = () => setIsCoarsePointer(mq.matches || window.innerWidth < 768);
+    const update = () => setIsCoarsePointer(mq.matches);
     update();
     mq.addEventListener?.("change", update);
-    window.addEventListener("resize", update);
     return () => {
       mq.removeEventListener?.("change", update);
-      window.removeEventListener("resize", update);
     };
   }, []);
 
@@ -55,11 +56,11 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   const glareBackground = useTransform(
     [glareX, glareY],
     ([x, y]) =>
-      `radial-gradient(circle 280px at ${x}% ${y}%, rgba(255, 255, 255, 0.35) 0%, rgba(54, 135, 227, 0.15) 30%, transparent 70%)`
+      `radial-gradient(circle 280px at ${x}% ${y}%, rgba(231, 240, 250, 0.22) 0%, rgba(123, 164, 208, 0.10) 30%, transparent 70%)`
   );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isCoarsePointer || !cardRef.current) return;
+    if (disableTilt || !cardRef.current) return;
 
     // If mouse button is pressed down, don't move card under cursor
     if (e.buttons > 0) return;
@@ -87,7 +88,7 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   };
 
   const handleMouseEnter = () => {
-    if (isCoarsePointer) return;
+    if (disableTilt) return;
     setIsHovered(true);
   };
 
@@ -105,18 +106,18 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={
-        isCoarsePointer
+        disableTilt
           ? undefined
           : {
               perspective: 1000,
               transformStyle: "preserve-3d",
             }
       }
-      className={`relative ${isCoarsePointer ? "" : "will-change-transform"} ${className}`}
+      className={`relative ${className}`}
     >
       <motion.div
         style={
-          isCoarsePointer
+          disableTilt
             ? undefined
             : {
                 rotateX,
@@ -124,15 +125,15 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
                 transformStyle: "preserve-3d",
               }
         }
-        whileHover={isCoarsePointer ? undefined : { scale }}
+        whileHover={disableTilt ? undefined : { scale }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className={`w-full h-full relative ${isCoarsePointer ? "" : "preserve-3d"}`}
+        className={`w-full h-full relative ${disableTilt ? "" : "preserve-3d"}`}
       >
         {/* Card Content with 3D child depth */}
         {children}
 
         {/* Dynamic 3D Glare Light Refraction */}
-        {glare && !isCoarsePointer && (
+        {glare && !disableTilt && (
           <motion.div
             className="pointer-events-none absolute inset-0 z-30 rounded-[inherit] overflow-hidden transition-opacity duration-300"
             style={{

@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, Github, Lock, Layers, Cpu, Database, Boxes, Plug, User } from "lucide-react";
-import Layout from "@/components/Layout";
 import ProjectCover from "@/components/project/ProjectCover";
 import TechBadge from "@/components/project/TechBadge";
 import ProjectStatusBadge from "@/components/project/ProjectStatusBadge";
-import { getProjectBySlug } from "@/data/projects";
+import { getProjectBySlug, projects } from "@/data/projects";
+import ProjectCard from "@/components/ProjectCard";
 import type { ProjectArchitecture } from "@/data/types";
 import Reveal from "@/components/Reveal";
 
@@ -34,7 +34,10 @@ const ProjectDetail = () => {
   // Per-project document metadata so each case study is independently
   // discoverable and linkable.
   useEffect(() => {
-    if (!project) return;
+    if (!project) {
+      document.title = "Project not found — Ibrahim Abdelsattar";
+      return;
+    }
     document.title = `${project.title} — Ibrahim Abdelsattar`;
     const meta = document.querySelector('meta[name="description"]');
     const previous = meta?.getAttribute("content") ?? null;
@@ -46,7 +49,7 @@ const ProjectDetail = () => {
 
   if (!project) {
     return (
-      <Layout>
+      <>
         <div className="container mx-auto px-4 lg:px-8 py-24 text-center">
           <h1 className="text-3xl font-bold text-foreground mb-4">Project not found</h1>
           <p className="text-muted-foreground mb-8">
@@ -59,14 +62,17 @@ const ProjectDetail = () => {
             <ArrowLeft className="w-4 h-4" /> Back to all projects
           </Link>
         </div>
-      </Layout>
+      </>
     );
   }
 
   const architecture = project.architecture ?? {};
+  const relatedProjects = projects.filter((candidate) => candidate.id !== project.id &&
+    (project.relatedRepos?.some((repo) => repo.slug === candidate.repository) ||
+      candidate.category === project.category)).slice(0, 3);
 
   return (
-    <Layout>
+    <>
       <article className="py-10 sm:py-16 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
           <Link
@@ -90,6 +96,7 @@ const ProjectDetail = () => {
             <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
               {project.tagline}
             </p>
+            <p className="font-mono text-xs text-muted-foreground mt-4 break-all">{project.repository}</p>
 
             <div className="flex flex-wrap gap-3 mt-6">
               {project.liveUrl && (
@@ -122,6 +129,16 @@ const ProjectDetail = () => {
               )}
             </div>
           </header>
+
+          {project.upstreamUrl && <Reveal>
+            <section className="glass-card rounded-2xl p-5 mb-8">
+              <h2 className="text-sm font-semibold mb-2">Upstream project</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-3">This repository is a fork. Original authorship belongs to the upstream project and its contributors.</p>
+              <a href={project.upstreamUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-primary hover:underline break-all">
+                {project.upstreamUrl.replace("https://github.com/", "")} <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              </a>
+            </section>
+          </Reveal>}
 
           <Reveal>
             <div className="glass-card rounded-3xl overflow-hidden mb-10">
@@ -279,9 +296,21 @@ const ProjectDetail = () => {
               Want something like this built? Get in touch
             </Link>
           </nav>
+
+          {project.notes?.length > 0 && <Reveal className="mt-10">
+            <section className="glass-card rounded-2xl p-5 sm:p-6">
+              <h2 className="text-lg font-semibold mb-3">Project notes</h2>
+              <ul className="space-y-3 text-sm text-muted-foreground leading-relaxed">{project.notes.map((note) => <li key={note}>{note}</li>)}</ul>
+            </section>
+          </Reveal>}
+
+          {relatedProjects.length > 0 && <section className="mt-16">
+            <h2 className="text-2xl font-semibold tracking-tight mb-6">Keep exploring</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{relatedProjects.map((related, index) => <ProjectCard key={related.id} {...related} index={index} />)}</div>
+          </section>}
         </div>
       </article>
-    </Layout>
+    </>
   );
 };
 

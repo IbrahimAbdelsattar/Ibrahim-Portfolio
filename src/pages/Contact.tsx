@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import Layout from "@/components/Layout";
 import { TiltCard3D } from "@/components/3d/TiltCard3D";
 
 const Contact = () => {
@@ -46,8 +45,8 @@ const Contact = () => {
       });
 
       toast({
-        title: "Message sent!",
-        description: "Thank you for reaching out. I'll get back to you soon.",
+        title: "Request submitted",
+        description: "Thank you for reaching out. You can also contact me directly by email.",
       });
 
       setFormData({ name: "", email: "", message: "" });
@@ -85,7 +84,7 @@ const Contact = () => {
   ];
 
   return (
-    <Layout>
+    <>
       <section className="py-12 sm:py-20 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
@@ -236,7 +235,7 @@ const Contact = () => {
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

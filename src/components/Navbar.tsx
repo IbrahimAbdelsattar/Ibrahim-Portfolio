@@ -35,6 +35,7 @@ const Navbar = () => {
       root.classList.add('dark');
     }
     localStorage.setItem('theme', theme);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#E7F0FA' : '#0D2440');
   }, [theme]);
 
   const toggleTheme = () => {
@@ -45,7 +46,7 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -93,13 +94,14 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
+                aria-current={(location.pathname === link.path || (link.path === "/projects" && location.pathname.startsWith("/projects/"))) ? "page" : undefined}
                 className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-lg ${
-                  location.pathname === link.path
+                  (location.pathname === link.path || (link.path === "/projects" && location.pathname.startsWith("/projects/")))
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {location.pathname === link.path && (
+                {(location.pathname === link.path || (link.path === "/projects" && location.pathname.startsWith("/projects/"))) && (
                   <motion.div
                     layoutId="navbar-indicator"
                     className="absolute inset-0 bg-primary/10 rounded-lg border border-primary/20"
@@ -115,6 +117,7 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
+              aria-label="Toggle theme"
               className="ml-2 relative overflow-hidden rounded-full hover:bg-primary/10 hover:text-primary transition-colors duration-300"
             >
               <AnimatePresence mode="wait">
@@ -188,7 +191,7 @@ const Navbar = () => {
                   <Link
                     to={link.path}
                     className={`block px-4 py-3.5 min-h-[48px] flex items-center rounded-xl text-[15px] font-medium transition-colors ${
-                      location.pathname === link.path
+                      (location.pathname === link.path || (link.path === "/projects" && location.pathname.startsWith("/projects/")))
                         ? "bg-primary/10 text-primary border border-primary/20"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}

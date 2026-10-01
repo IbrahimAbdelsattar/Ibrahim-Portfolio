@@ -18,7 +18,8 @@ const Layout = ({ children }: LayoutProps) => {
       <FloatingShapes />
       <Interactive3DScene />
       <Navbar />
-      <main className="relative z-10 pt-16 lg:pt-20 overflow-x-clip">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <main id="main-content" tabIndex={-1} className="relative z-10 pt-16 lg:pt-20 overflow-x-clip outline-none">
         {children}
       </main>
       <Footer />

@@ -1,3 +1,4 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import React, { useEffect, useRef } from "react";
 
 interface Node3D {
@@ -12,10 +13,15 @@ interface Node3D {
 
 export const Interactive3DScene: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const reducedMotion = useReducedMotionPreference();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (reducedMotion) {
+      canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -69,7 +75,7 @@ export const Interactive3DScene: React.FC = () => {
     const isSmallScreen = window.innerWidth < 480;
 
     // Generate 3D nodes clustered in a spherical cloud
-    const nodeCount = isSmallScreen ? 20 : isMobile ? 28 : 55;
+    const nodeCount = isSmallScreen ? 14 : isMobile ? 22 : 44;
     const sphereRadius = Math.min(width, height) * 0.42;
     const nodes: Node3D[] = [];
 
@@ -93,7 +99,7 @@ export const Interactive3DScene: React.FC = () => {
     const fov = 450; // Camera distance perspective
     let angle = 0;
     let lastFrameTime = 0;
-    const frameInterval = isMobile ? 1000 / 30 : 1000 / 60; // 30fps on mobile, 60fps desktop
+    const frameInterval = 1000 / 30; // Ambient motion is subtle; reserve GPU budget for interaction.
 
     const render = (now: number = 0) => {
       // Throttle mobile frame rate for smoothness + battery
@@ -103,8 +109,6 @@ export const Interactive3DScene: React.FC = () => {
       }
       lastFrameTime = now;
 
-      // Pause rendering when page is scrolled far beyond hero on mobile
-      // (canvas is fixed background; still skip heavy work when tab hidden handled above)
       ctx.clearRect(0, 0, width, height);
 
       // Smooth interpolation towards mouse-guided rotation
@@ -176,7 +180,7 @@ export const Interactive3DScene: React.FC = () => {
 
           if (dist < maxDistance) {
             const lineAlpha = (1 - dist / maxDistance) * 0.18 * ((p1.alpha + p2.alpha) / 2);
-            ctx.strokeStyle = `rgba(54, 135, 227, ${lineAlpha})`;
+            ctx.strokeStyle = `rgba(123, 164, 208, ${lineAlpha})`;
             ctx.beginPath();
             ctx.moveTo(p1.x2d, p1.y2d);
             ctx.lineTo(p2.x2d, p2.y2d);
@@ -188,14 +192,14 @@ export const Interactive3DScene: React.FC = () => {
       // Draw nodes
       for (let i = 0; i < projectedNodes.length; i++) {
         const p = projectedNodes[i];
-        ctx.fillStyle = `rgba(120, 162, 212, ${p.alpha * 0.75})`;
+        ctx.fillStyle = `rgba(123, 164, 208, ${p.alpha * 0.75})`;
         ctx.beginPath();
         ctx.arc(p.x2d, p.y2d, Math.max(0.8, p.radius), 0, Math.PI * 2);
         ctx.fill();
 
         // Node glow (desktop only — expensive on mobile GPUs)
         if (p.alpha > 0.6 && !isMobile) {
-          ctx.fillStyle = `rgba(54, 135, 227, ${p.alpha * 0.25})`;
+          ctx.fillStyle = `rgba(46, 94, 153, ${p.alpha * 0.25})`;
           ctx.beginPath();
           ctx.arc(p.x2d, p.y2d, p.radius * 2.4, 0, Math.PI * 2);
           ctx.fill();
@@ -213,7 +217,7 @@ export const Interactive3DScene: React.FC = () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <canvas

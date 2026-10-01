@@ -7,7 +7,11 @@ A React portfolio presenting AI and data science projects, professional backgrou
 ## Features
 
 - Navigate home, about, project catalog, project details, certifications, and contact pages.
-- Display project cards and supporting portfolio assets.
+- Explore all 60 owned GitHub repositories (42 public, 18 private), with upstream attribution for 9 forks.
+- Search repository names and technologies, filter categories and source type, and share filtered URLs.
+- Open a dedicated detail route for each entry; load the catalog in batches of 12.
+- Use the Sapphire Veil palette (`#E7F0FA`, `#7BA4D0`, `#2E5E99`, `#0D2440`) in light and dark themes.
+- Interact with spring-driven 3D cards, pointer-responsive particles, and route transitions. Motion adapts to touch devices and reduced-motion preferences.
 - Provide an interactive chatbot UI connected to the separate FastAPI service.
 - Include archived datasets and notebooks from selected portfolio projects.
 
@@ -24,7 +28,24 @@ A React portfolio presenting AI and data science projects, professional backgrou
 
 ## Requirements and current limitations
 
+The catalog is a reviewed snapshot of the account, not a live GitHub API feed. Update `src/data/projects.ts` and the inventory test fixture when repositories change. Private entries show portfolio summaries without public source links; forks identify their upstream authors.
+
 Portfolio project content is maintained in the frontend source; the presence of another project's notebook or dataset here does not make it part of the website's runtime. A separate `agent_server.py` exists, but it is not needed for the documented portfolio launch.
+
+## UI architecture
+
+```mermaid
+flowchart TD
+    App["Persistent app shell"] --> Routes["Lazy page routes"]
+    App --> Motion["Theme and motion preferences"]
+    Routes --> Catalog["Project catalog"]
+    Routes --> Detail["Project detail"]
+    Data["Reviewed repository inventory"] --> Catalog
+    Data --> Detail
+    Catalog --> Filters["URL search and filters"]
+    Filters --> Cards["Progressive 3D cards"]
+    Cards --> Detail
+```
 
 ## UML diagrams
 
@@ -64,7 +85,7 @@ cd Ibrahim-Portfolio
 ```
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -75,7 +96,9 @@ Open the local origin printed by the development server.
 | Command | Purpose |
 |---|---|
 | `npm run build` | Create a production build. |
-| `npm run lint` | Run the configured lint/type checks. |
+| `npm run lint` | Run ESLint. |
+| `npm run typecheck` | Check frontend TypeScript. |
+| `npm test` | Check inventory coverage, source attribution, privacy, and existing project URLs. |
 | `npm run preview` | Preview the Vite production build. |
 
 ## Optional chatbot API

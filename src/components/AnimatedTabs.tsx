@@ -1,5 +1,6 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import { useId, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface AnimatedTab {
   /** Unique tab value. */
@@ -22,7 +23,7 @@ interface AnimatedTabsProps {
  * horizontal scroll on mobile, full keyboard + screen-reader support.
  */
 const AnimatedTabs = ({ tabs, value, onChange, id = "tabs", ariaLabel = "Tabs" }: AnimatedTabsProps) => {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotionPreference();
   const baseId = useId().replace(/[^a-zA-Z0-9]/g, "");
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -105,7 +106,7 @@ interface AnimatedTabPanelProps {
 
 /** Content panel with a subtle fade+rise transition on tab switch. */
 export const AnimatedTabPanel = ({ tabValue, activeValue, children }: AnimatedTabPanelProps) => {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotionPreference();
   return (
     <AnimatePresence mode="wait" initial={false}>
       {tabValue === activeValue && (

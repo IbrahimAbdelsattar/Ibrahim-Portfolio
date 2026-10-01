@@ -1,6 +1,7 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 
 import { useState, useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   ArrowRight, 
@@ -15,7 +16,6 @@ import {
   LineChart,
   MessageSquareText
 } from "lucide-react";
-import Layout from "@/components/Layout";
 import Reveal from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/ProjectCard";
@@ -27,7 +27,7 @@ const Home = () => {
 
   // Subtle hero parallax (background drifts slower than scroll)
   const heroRef = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotionPreference();
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -40,18 +40,18 @@ const Home = () => {
   const featuredProjects = projects.filter((p) => p.tier === "flagship").slice(0, 3);
 
   const stats = [
-    { label: "Featured projects", value: String(projectStats.featured) },
+    { label: "Repositories explored", value: String(projectStats.total) },
     { label: "Public repositories", value: String(projectStats.publicRepos) },
     { label: "Technologies used", value: String(projectStats.technologies) },
   ];
 
   const skills = [
-    { name: "Data Analysis", icon: <BarChart className="w-8 h-8 text-green-400" />, desc: "Insights & Visualization" },
-    { name: "Data Science", icon: <LineChart className="w-8 h-8 text-blue-400" />, desc: "Statistical Analysis & Mining" },
+    { name: "Data Analysis", icon: <BarChart className="w-8 h-8 text-primary" />, desc: "Insights & Visualization" },
+    { name: "Data Science", icon: <LineChart className="w-8 h-8 text-primary" />, desc: "Statistical Analysis & Mining" },
     { name: "Machine Learning", icon: <Brain className="w-8 h-8 text-primary" />, desc: "Predictive Models & Algorithms" },
-    { name: "Deep Learning", icon: <Cpu className="w-8 h-8 text-secondary" />, desc: "Neural Networks & TF/PyTorch" },
-    { name: "NLP", icon: <MessageSquareText className="w-8 h-8 text-accent" />, desc: "Text Analysis & LLMs" },
-    { name: "AI System", icon: <Bot className="w-8 h-8 text-purple-400" />, desc: "End-to-End AI Solutions" },
+    { name: "Deep Learning", icon: <Cpu className="w-8 h-8 text-primary" />, desc: "Neural Networks & TF/PyTorch" },
+    { name: "NLP", icon: <MessageSquareText className="w-8 h-8 text-primary" />, desc: "Text Analysis & LLMs" },
+    { name: "AI System", icon: <Bot className="w-8 h-8 text-primary" />, desc: "End-to-End AI Solutions" },
   ];
 
   const techStack = [
@@ -73,7 +73,7 @@ const Home = () => {
   ];
 
   return (
-    <Layout>
+    <>
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-[92dvh] sm:min-h-[90vh] flex items-center pt-24 pb-10 sm:pt-20 sm:pb-0 overflow-x-clip">
         <motion.div style={{ y: heroBgY }} className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
@@ -167,9 +167,10 @@ const Home = () => {
                     
                     {/* Floating Achievement Cards with true 3D spatial depth */}
                     <motion.div 
-                        animate={{ y: [0, -10, 0] }}
+                        style={{ z: 40 }}
+                        animate={reduceMotion ? { y: 0 } : { y: [0, -10, 0] }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -left-8 top-20 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
+                        className="absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
@@ -177,18 +178,19 @@ const Home = () => {
                             </div>
                             <div>
                                 <p className="text-sm font-semibold text-foreground">AI Solutions</p>
-                                <p className="text-xs text-muted-foreground">Certified Expert</p>
+                                <p className="text-xs text-muted-foreground">Models & agents</p>
                             </div>
                         </div>
                     </motion.div>
 
                     <motion.div 
-                        animate={{ y: [0, 10, 0] }}
+                        style={{ z: 50 }}
+                        animate={reduceMotion ? { y: 0 } : { y: [0, 10, 0] }}
                         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                        className="absolute -right-8 bottom-32 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
+                        className="absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-secondary backdrop-blur-md">
+                            <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-primary backdrop-blur-md">
                                 <BarChart className="w-6 h-6" />
                             </div>
                             <div>
@@ -207,10 +209,10 @@ const Home = () => {
 
       {/* Tech Stack Strip (Marquee) */}
       <section className="py-8 sm:py-10 border-y border-white/10 dark:border-white/10 bg-card/20 backdrop-blur-xl overflow-x-clip">
-         <div className="flex overflow-hidden relative w-full">
+         <div className={`flex relative w-full ${reduceMotion ? "overflow-x-auto" : "overflow-hidden"}`}>
              <motion.div 
-                className="flex gap-10 sm:gap-16 items-center whitespace-nowrap will-change-transform"
-                animate={{ x: ["0%", "-50%"] }}
+                className="flex gap-10 sm:gap-16 items-center whitespace-nowrap "
+                animate={reduceMotion ? { x: 0 } : { x: ["0%", "-50%"] }}
                 transition={{ 
                     repeat: Infinity, 
                     ease: "linear", 
@@ -344,21 +346,21 @@ const Home = () => {
                       role: "Data Scientist",
                       text: "Ibrahim was a student in my AI and Machine Learning course, and his dedication and passion for the subject were evident from the start. He consistently went above and beyond the course requirements, demonstrating a strong grasp of complex concepts. Ibrahim's final project was a great example of his skills... I'm confident that his talent and work ethic will make him a valuable asset to any team.",
                       initials: "AW",
-                      color: "from-blue-400 to-blue-600"
+                      color: "from-primary to-primary-dark"
                     },
                     {
                       name: "Mohamed Osama",
                       role: "Co-Founder & CTO | PoC Solutions",
                       text: "I had the privilege of being Ibrahim’s instructor during the NLP scholarship. He showed excellent knowledge of NLP, strong commitment, and great teamwork skills. Ibrahim was always reliable, proactive, and added real value to the project. I highly recommend him for any opportunity in AI and NLP.",
                       initials: "MO",
-                      color: "from-purple-400 to-purple-600"
+                      color: "from-primary to-primary-dark"
                     },
                     {
                       name: "Ali Ehab",
                       role: "Data Scientist | ML Engineer",
                       text: "I spent the better part of a year working with Ibrahim Abdelsattar on various Projects, starting from Data Analysis to LLMs projects. A hardworking Data scientist who seeks innovation and always eager to learn and adapt to new techniques of AI.",
                       initials: "AE",
-                      color: "from-green-400 to-green-600"
+                      color: "from-primary to-primary-dark"
                     }
                   ].map((testimonial, index) => (
                     <motion.div 
@@ -424,7 +426,7 @@ const Home = () => {
           I have added them to Hero for now.
       */}
       
-    </Layout>
+    </>
   );
 };
 

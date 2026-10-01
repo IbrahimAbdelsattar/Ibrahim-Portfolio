@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, GraduationCap, Target, Code2, Sparkles, Cpu, Layers, Terminal } from "lucide-react";
-import Layout from "@/components/Layout";
 import SkillBadge from "@/components/SkillBadge";
 import AnimatedTabs, { AnimatedTabPanel } from "@/components/AnimatedTabs";
 import Reveal from "@/components/Reveal";
@@ -17,7 +16,7 @@ const skillGroups = [
 const About = () => {
   const [activeSkillTab, setActiveSkillTab] = useState(skillGroups[0].value);
   return (
-    <Layout>
+    <>
       <section className="py-12 sm:py-20 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
@@ -271,7 +270,7 @@ const About = () => {
           </Reveal>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

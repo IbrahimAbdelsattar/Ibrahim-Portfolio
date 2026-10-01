@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Data-Science-Assignments.DEPI",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Data-Science-Projects-.DEPI",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "IbrahimAbdelsattar",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "twitter-sentiment-analysis",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "Mall-Customer-Segmentation-",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Bank-Term-Deposit-Prediction-",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Heart-Attack-Detection",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Customer-Churn-Analysis",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Student-Final-Grade-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Predict-Calorie-Expenditure",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Retail_Sales_and_Customer_Demographics_Analysis",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Flight-Reservation-Desktop-App",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Arabic-Sentiment-Analysis",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "gtc-ml-project1-hotel-bookings",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Elevvo-ML-Internship",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Moderation_System",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "GTC-ML-Internship-California-House-Price-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "GTC-ML-Internship-Diabetes-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "GTC-Fraud-Detection",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Credit-card-Fraud-Detection",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Audio-Model-Classification-Gender",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "chatbot",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Employee-Performance-Rating-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "MR-NLP-Robust-RAG-Chatbot",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "love",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "profile-readme-generator",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "Profile-README-Templates",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "Online-Shoppers-Purchase-Intention-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Road-Accident-Severity-Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Traffic_Accident_Prediction",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "traffic",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Ibrahim-Portfolio",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "Dawrly",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "Nexus_Academy",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "Mesdaq_AI",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "mini-rag",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "diabetes",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "RAG-Powered-Knowledge-Assistantf-for-Teachers",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "SupplyMindAI",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "alien-ai-venture-main",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "bodyiq-mti-main",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "tea-tec",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "numerix-labs",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "Numerix",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "numerical",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "numerical-g2",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "trio-learn-hub",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "TeaTec-Android",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "trio-lms",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "skills",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "jarvis",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "soliman-group",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "searxng",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "Eva-AI",
+    "private": false,
+    "fork": false
+  },
+  {
+    "name": "c-sat",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "hermes-agent",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "vox-mind",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "OmniRoute",
+    "private": false,
+    "fork": true
+  },
+  {
+    "name": "neuronix",
+    "private": true,
+    "fork": false
+  },
+  {
+    "name": "openclaw",
+    "private": false,
+    "fork": true
+  }
+]

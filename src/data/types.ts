@@ -14,6 +14,7 @@ export type ProjectCategory =
   | "NLP & Speech"
   | "Data Science"
   | "Full-Stack Systems"
+  | "Developer Tools"
   | "Research & Coursework";
 
 export type ProjectStatus =
@@ -21,6 +22,8 @@ export type ProjectStatus =
   | "Active Development"
   | "Research"
   | "Prototype"
+  | "Scaffold"
+  | "Archived Submission"
   | "Completed";
 
 export type ProjectTier = "flagship" | "notable" | "archive";
@@ -49,6 +52,11 @@ export interface RelatedRepo {
 export interface Project {
   /** URL-safe slug, used for routing and as a stable React key. */
   id: string;
+  /** Exact owner-repository name, including private and companion repositories. */
+  repository: string;
+  sourceKind: "project" | "fork";
+  /** GitHub's verified upstream parent, only for forks. */
+  upstreamUrl?: string;
   title: string;
   /** One-line value proposition shown on cards. */
   tagline: string;
@@ -104,5 +112,6 @@ export const CATEGORY_ORDER: ProjectCategory[] = [
   "NLP & Speech",
   "Data Science",
   "Full-Stack Systems",
+  "Developer Tools",
   "Research & Coursework",
 ];
