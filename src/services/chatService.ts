@@ -16,6 +16,7 @@ export function stripForbiddenCharacters(text: string): string {
 export async function sendChatMessage(
   userQuery: string,
   history: ChatMessage[] = [],
+  signal?: AbortSignal,
 ): Promise<{ text: string; isLive: true; isSecurityWarning?: boolean }> {
   const message = userQuery.trim();
   if (!message || message.length > 2000) throw new Error("Message must contain 1 to 2000 characters");
@@ -30,7 +31,7 @@ export async function sendChatMessage(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message, history: recentHistory }),
-      signal: controller.signal,
+      signal: signal ? AbortSignal.any([signal, controller.signal]) : controller.signal,
     });
     if (!response.ok) throw new Error("The AI service is unavailable. Please try again later.");
     const data = await response.json();

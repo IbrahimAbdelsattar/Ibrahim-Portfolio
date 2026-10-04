@@ -1,16 +1,19 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, Bot, ChevronRight, MessageCircle, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
+import { ArrowUp, Bot, ChevronRight, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
 import { ChatMessageContent } from "@/components/chat/ChatMessageContent";
 import ResponsiveImage from "@/components/ResponsiveImage";
 import { chatLocaleForMessage, chatUi, hasRtlText, initialChatLocale } from "@/data/chatUi";
 import { sendChatMessage, type ChatMessage } from "@/services/chatService";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
+import type { ChatLocale } from "@/data/chatUi";
 
 const timestamp = (locale: string) => new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 
-const IbrahimChatbot = () => {
+interface ChatProps { isOpen: boolean; onClose: () => void; onLocaleChange?: (locale: ChatLocale) => void }
+const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
   const [locale, setLocale] = useState(initialChatLocale);
-  const [isOpen, setIsOpen] = useState(false);
+  const reducedMotion = useReducedMotionPreference();
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(() => [{
@@ -19,6 +22,8 @@ const IbrahimChatbot = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const requestPending = useRef(false);
+  const requestRef = useRef<AbortController | null>(null);
+  useEffect(() => () => requestRef.current?.abort(), []);
   const ui = chatUi[locale];
   const direction = locale === "ar" ? "rtl" : "ltr";
 
@@ -27,36 +32,42 @@ const IbrahimChatbot = () => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, isOpen, isTyping]);
+    if (isOpen) chatEndRef.current?.scrollIntoView({ behavior: reducedMotion || isTyping ? "instant" : "smooth", block: "end" });
+  }, [messages, isOpen, isTyping, reducedMotion]);
 
   const handleSend = async (textToSend?: string, retry = false) => {
     const messageText = (textToSend ?? input).trim();
     if (!messageText || messageText.length > 2000 || requestPending.current) return;
     requestPending.current = true;
+    const controller = new AbortController();
+    requestRef.current = controller;
     const nextLocale = chatLocaleForMessage(messageText, locale);
     setLocale(nextLocale);
+    onLocaleChange?.(nextLocale);
     const history = retry ? messages.slice(0, -2) : messages;
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(), sender: "user", text: messageText, timestamp: timestamp(nextLocale),
     };
     setMessages(prev => retry ? prev.slice(0, -1) : [
-      ...prev.map(m => m.id === "welcome" && prev.length === 1 ? { ...m, text: chatUi[nextLocale].welcome, timestamp: timestamp(nextLocale) } : m), userMsg,
+      ...prev.slice(-39).map(m => m.id === "welcome" && prev.length === 1 ? { ...m, text: chatUi[nextLocale].welcome, timestamp: timestamp(nextLocale) } : m), userMsg,
     ]);
     if (!textToSend) setInput("");
     setIsTyping(true);
     try {
-      const response = await sendChatMessage(messageText, history);
+      const response = await sendChatMessage(messageText, history, controller.signal);
+      if (controller.signal.aborted) return;
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(), sender: "bot", text: response.text, timestamp: timestamp(nextLocale),
       }]);
     } catch {
+      if (controller.signal.aborted) return;
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(), sender: "bot", text: chatUi[nextLocale].unavailable,
         timestamp: timestamp(nextLocale), isError: true,
       }]);
     } finally {
       requestPending.current = false;
+      requestRef.current = null;
       setIsTyping(false);
       inputRef.current?.focus();
     }
@@ -72,26 +83,12 @@ const IbrahimChatbot = () => {
   return (
     <>
       <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-            whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }}
-            onClick={() => setIsOpen(true)} aria-label={ui.launcher} aria-expanded={isOpen} aria-controls="portfolio-chat"
-            className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 flex min-h-14 items-center gap-3 rounded-full border border-primary/30 bg-primary px-5 py-3 text-primary-foreground shadow-xl shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span className="hidden sm:inline text-sm font-semibold" dir={direction}>{ui.launcher}</span>
-            <Sparkles className="hidden sm:block h-4 w-4 opacity-70" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
         {isOpen && (
           <motion.section
             id="portfolio-chat" role="dialog" aria-modal="false" aria-labelledby="portfolio-chat-title" dir={direction}
             initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }} transition={{ duration: 0.2 }}
-            onKeyDown={e => { if (e.key === "Escape") setIsOpen(false); }}
+            onKeyDown={e => { if (e.key === "Escape") onClose(); }}
             className="fixed z-50 inset-x-2 bottom-2 sm:inset-x-auto sm:bottom-6 sm:right-6 flex h-[min(720px,88dvh)] sm:h-[min(680px,85dvh)] w-auto sm:w-[420px] sm:max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-2xl shadow-black/25"
           >
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-gradient-to-br from-primary/10 to-transparent px-4 py-4">
@@ -107,7 +104,7 @@ const IbrahimChatbot = () => {
                   className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <RotateCcw className="h-4 w-4" />
                 </button>
-                <button onClick={() => setIsOpen(false)} aria-label={ui.close} title={ui.close}
+                <button onClick={onClose} aria-label={ui.close} title={ui.close}
                   className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <X className="h-5 w-5" />
                 </button>

@@ -1,37 +1,30 @@
-import { ReactNode, Suspense, lazy } from "react";
+import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import FloatingShapes from "./FloatingShapes";
+import Interactive3DScene from "./3d/Interactive3DScene";
+import ChatWidget from "./ChatWidget";
+import ScrollProgress from "./ScrollProgress";
 import BackToTop from "./BackToTop";
-
-// The chatbot pulls in ~25 KB of knowledge-base text (profile, experience, Q&A pairs).
-// It sits behind a floating button most visitors never open, so it should not block the
-// page it is embedded in. Deferred until the browser is idle.
-const IbrahimChatbot = lazy(() => import("./IbrahimChatbot"));
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-const ChatbotFallback = (
-  <div
-    aria-hidden="true"
-    className="fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-primary via-blue-600 to-secondary opacity-70 shadow-2xl"
-  />
-);
-
 const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-dvh bg-background relative overflow-x-clip">
-
+      <ScrollProgress />
+      <FloatingShapes />
+      <Interactive3DScene />
       <Navbar />
-      <main className="relative pt-16 lg:pt-20 overflow-x-clip">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <main id="main-content" tabIndex={-1} className="relative z-10 pt-16 lg:pt-20 overflow-x-clip outline-none">
         {children}
       </main>
       <Footer />
       <BackToTop />
-      <Suspense fallback={ChatbotFallback}>
-        <IbrahimChatbot />
-      </Suspense>
+      <ChatWidget />
     </div>
   );
 };

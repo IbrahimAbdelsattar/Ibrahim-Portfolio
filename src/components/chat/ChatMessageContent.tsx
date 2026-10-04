@@ -33,14 +33,14 @@ const isolateMixedLanguageTokens = (textPart: string, isRtlContext: boolean): Re
 // Parses inline tokens (links, inline code, bold if any remains) with BiDi protection
 const renderInlineTokens = (content: string, isRtlContext: boolean): React.ReactNode[] => {
   // Regex to match markdown links [label](url), bold **bold**, or `code`
-  const tokenRegex = /(\[.*?\]\(https?:\/\/[^\s)]+\)|\*\*.*?\*\*|`.*?`)/g;
+  const tokenRegex = /(\[.*?\]\((?:https?:\/\/|mailto:|\/)[^\s)]+\)|\*\*.*?\*\*|`.*?`)/g;
   const parts = content.split(tokenRegex);
 
   return parts.map((part, index) => {
     if (!part) return null;
 
     // Link: [label](url)
-    const linkMatch = part.match(/^\[(.*?)\]\((https?:\/\/[^\s)]+)\)$/);
+    const linkMatch = part.match(/^\[(.*?)\]\(((?:https?:\/\/|mailto:|\/)[^\s)]+)\)$/);
     if (linkMatch) {
       return (
         <bdi key={index} className="inline">

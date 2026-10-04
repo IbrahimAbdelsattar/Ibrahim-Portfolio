@@ -1,6 +1,13 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
+import { usePageVisible } from "@/hooks/use-page-visible";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { motion } from "framer-motion";
 
 const FloatingShapes = () => {
+  const reducedMotion = useReducedMotionPreference();
+  const visible = usePageVisible();
+  const touch = useMediaQuery("(hover: none), (pointer: coarse)");
+  const animateAmbient = visible && !reducedMotion && !touch;
   const shapes = [
     { 
       size: 480, 
@@ -54,7 +61,7 @@ const FloatingShapes = () => {
       {shapes.map((shape, index) => (
         <motion.div
           key={index}
-          className={`absolute rounded-full opacity-15 md:opacity-25 blur-[60px] md:blur-[130px] will-change-transform ${shape.hideOnMobile ? "hidden md:block" : ""}`}
+          className={`absolute rounded-full opacity-15 md:opacity-25 blur-[40px] md:blur-[80px] ${shape.hideOnMobile ? "hidden md:block" : ""}`}
           style={{
             width: `min(${shape.size}px, 70vw)`,
             height: `min(${shape.size}px, 70vw)`,
@@ -62,14 +69,14 @@ const FloatingShapes = () => {
             top: shape.y,
             background: shape.color,
           }}
-          animate={{
+          animate={animateAmbient ? {
             y: [-30, 30, -30],
             x: [-20, 20, -20],
-            scale: [1, 1.15, 1],
-          }}
+            scale: [1, 1.06, 1],
+          } : { x: 0, y: 0, scale: 1 }}
           transition={{
-            duration: shape.duration,
-            repeat: Infinity,
+            duration: animateAmbient ? shape.duration : 0,
+            repeat: animateAmbient ? Infinity : 0,
             ease: "easeInOut",
             delay: shape.delay,
           }}

@@ -27,10 +27,10 @@ test('development serves the real API with server credentials and JSON errors, n
     const response = await originalFetch(endpoint, { method: 'POST',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'Hello' }) });
     assert.equal(response.status, 200);
-    assert.deepEqual(await response.json(), { reply: 'Live test response', isLive: true });
+    assert.deepEqual(await response.json(), { reply: 'Live test response', isLive: true, source: 'ai' });
     assert.equal(providerCalls, 1);
-    assert.equal((await originalFetch(endpoint)).status, 405);
-    const malformed = await originalFetch(endpoint, { method: 'POST', body: '{' });
+    assert.equal((await originalFetch(endpoint)).status, 200);
+    const malformed = await originalFetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{' });
     assert.equal(malformed.status, 400);
     assert.equal((await malformed.json()).reply, undefined);
   } finally {

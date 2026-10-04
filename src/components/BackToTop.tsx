@@ -1,11 +1,12 @@
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
 /** Floating back-to-top button (bottom-left so it never collides with the chatbot). */
 const BackToTop = () => {
   const [visible, setVisible] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotionPreference();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 600);

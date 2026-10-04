@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 interface RevealProps {
@@ -14,7 +15,7 @@ interface RevealProps {
 
 /** Subtle fade+rise scroll reveal used consistently across the whole site. */
 const Reveal = ({ children, y = 18, delay = 0, className, once = true }: RevealProps) => {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotionPreference();
 
   if (reduceMotion) {
     return <div className={className}>{children}</div>;

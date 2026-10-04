@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Layout from "@/components/Layout";
 import CertificationCard from "@/components/CertificationCard";
 import CertificationModal from "@/components/CertificationModal";
 
@@ -16,7 +15,7 @@ const Certifications = () => {
   };
 
   return (
-    <Layout>
+    <>
       <section className="py-12 sm:py-20 overflow-x-clip">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
@@ -54,7 +53,7 @@ const Certifications = () => {
           />
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

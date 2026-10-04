@@ -1,242 +1,120 @@
-<br/><br/>
+# Ibrahim Abdelsattar — Portfolio
 
-<!-- Animated Title -->
-<a href="#">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=36&pause=1000&color=7C3AED&center=true&vCenter=true&width=800&lines=Ibrahim Portfolio+%F0%9F%9A%80;Enterprise+Data+Science+%26+AI;Interactive+Analytics+%26+ML;Built+by+Ibrahim+Abdelsattar" alt="Typing SVG"/>
-</a>
+A React portfolio presenting AI and data science projects, professional background, certifications, and an AI assistant grounded in Ibrahim's published profile.
 
-<br/>
+**Technology:** React 18 · TypeScript · Vite · Tailwind CSS · Framer Motion · Vercel Functions
 
-<p align="center">
-  <b>Enterprise-Grade Data Science & Software Engineering Solution</b><br/>
-  <i>Next.js · React · Tailwind CSS · TypeScript · Vite</i>
-</p>
+## Features
 
-<br/>
+- Navigate home, about, project catalog, project details, certifications, and contact pages.
+- Explore all 60 owned GitHub repositories (42 public, 18 private), with upstream attribution for 9 forks.
+- Search repository names and technologies, filter categories and source type, and share filtered URLs.
+- Open a dedicated detail route for each entry; load the catalog in batches of 12.
+- Use the Sapphire Veil palette (`#E7F0FA`, `#7BA4D0`, `#2E5E99`, `#0D2440`) in light and dark themes.
+- Interact with spring-driven 3D cards, pointer-responsive particles, and route transitions. Motion adapts to touch devices and live reduced-motion preferences, pauses background work in hidden tabs, and gives scrolling priority over decorative canvas updates.
+- Load the chat UI on demand and ask in any language. Replies follow the latest question's language without repeating translations. The Arabic and English UI uses the same profile as About and the full repository catalog, including fork attribution and private-source summaries.
+- Present the current Full Stack AI Engineer role at EFS, June 2026 to present, alongside the earlier professional experience.
 
-<!-- Badges Row -->
-<p align="center">
-  <img src="https://img.shields.io/badge/Next.js-7C3AED?style=for-the-badge&logoColor=white"/>
-  <img src="https://img.shields.io/badge/React-7C3AED?style=for-the-badge&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Tailwind%20CSS-7C3AED?style=for-the-badge&logoColor=white"/>
-  <img src="https://img.shields.io/badge/TypeScript-7C3AED?style=for-the-badge&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Vite-7C3AED?style=for-the-badge&logoColor=white"/>
-  <img src="https://img.shields.io/badge/License-Academic-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge"/>
-</p>
+## Repository guide
 
-<br/>
+| Path | Purpose |
+|---|---|
+| [src/App.tsx](src/App.tsx) | Portfolio routes. |
+| [src/pages](src/pages) | Portfolio pages. |
+| [src/components](src/components) | UI and chatbot components. |
+| [public](public) | Public assets and resume. |
+| [src/data/profile.ts](src/data/profile.ts) | Shared public employment, education, contact details, and skills. |
+| [src/data/ibrahimKnowledge.ts](src/data/ibrahimKnowledge.ts) | Grounding, repository retrieval, and bilingual local answers. |
+| [api/chat.ts](api/chat.ts) | Same-origin Vercel conversational endpoint. |
+| [package.json](package.json) | Frontend scripts and dependencies. |
 
-<!-- Quick Links -->
-<p align="center">
-  <a href="#-overview"><img src="https://img.shields.io/badge/📌-Overview-7C3AED?style=flat-square"/></a>
-  &nbsp;
-  <a href="#-core-features"><img src="https://img.shields.io/badge/🔥-Features-E11D48?style=flat-square"/></a>
-  &nbsp;
-  <a href="#%EF%B8%8F-system-architecture"><img src="https://img.shields.io/badge/🏗️-Architecture-0891B2?style=flat-square"/></a>
-  &nbsp;
-  <a href="#-technical-stack"><img src="https://img.shields.io/badge/⚙️-Tech%20Stack-16A34A?style=flat-square"/></a>
-  &nbsp;
-  <a href="#-getting-started"><img src="https://img.shields.io/badge/🚀-Getting%20Started-F59E0B?style=flat-square"/></a>
-</p>
+## Requirements and current limitations
 
-<br/>
+The catalog is a reviewed snapshot of the account, not a live GitHub API feed. Update `src/data/projects.ts` and the inventory test fixture when repositories change. Private entries show portfolio summaries without public source links; forks identify their upstream authors.
 
----
+Portfolio project content is maintained in the source; the presence of another project's notebook or dataset here does not make it part of the website's runtime. Legacy Python services remain independent and are not required by this website.
 
-## 📌 Overview
+The persona represents published facts rather than all private knowledge about Ibrahim. It identifies itself as AI, keeps unpublished EFS responsibilities unknown, and does not infer salaries, client details, availability, or performance claims. Update the shared profile when those public facts change.
 
-**Ibrahim Portfolio** is an advanced software and data science repository engineered by **Ibrahim Abdelsattar**. It implements end-to-end data processing pipelines, predictive machine learning models, and production-ready code structures tailored for analytical precision and operational reliability.
-
-> Designed for seamless integration, high scalability, and robust computational performance.
-
----
-
-## 🎯 Problem & Solution Architecture
-
-<table>
-<tr>
-<td width="50%">
-
-### ❌ The Challenge
-
-Traditional analytical approaches face critical operational limitations:
-
-- 📉 Manual data wrangling and non-standardized preprocessing
-- 🔮 Lack of feature attribution and model explainability
-- ⚠️ Unoptimized hyperparameters leading to sub-optimal accuracy
-- 🔄 Inefficient deployment workflows and missing pipeline automation
-
-</td>
-<td width="50%">
-
-### ✅ Our Solution
-
-| Challenge | Implemented Solution |
-|-----------|----------------------|
-| Raw Data Noise | Automated cleaning & feature encoding |
-| Low Accuracy | Tuned ML ensembles & robust evaluation |
-| Deployment Gaps | Modular CLI/Web interfaces & reproducible scripts |
-| Missing Insights | Visual metric plots & structured reporting |
-
-</td>
-</tr>
-</table>
-
----
-
-## 🔥 Core Features
-
-<table>
-<tr>
-
-<td align="center" width="33%">
-<br/>
-<b>⚡ High Performance Architecture</b><br/><br/>
-Modular Code Structure<br/>
-Scalable Design Patterns<br/>
-Robust Error Handling<br/>
-Clean Interface Abstractions<br/><br/>
-</td>
-<td align="center" width="33%">
-<br/>
-<b>📊 Data Preprocessing & EDA</b><br/><br/>
-Automated Missing Value Imputation<br/>
-Feature Engineering & Scaling<br/>
-Outlier Detection & Removal<br/>
-Exploratory Data Analysis Plots<br/><br/>
-</td>
-<td align="center" width="33%">
-<br/>
-<b>🎯 Production Guardrails</b><br/><br/>
-Strict Input Validation<br/>
-Reproducible Seed Setting<br/>
-Model Artifact Persistence<br/>
-Comprehensive Logging<br/><br/>
-</td>
-</tr>
-</table>
-
----
-
-## 🏗️ System Architecture & Data Flow
-
-<br/>
+## UI architecture
 
 ```mermaid
-flowchart LR
-    A["📥 Data Ingestion
-Raw Datasets / Inputs"] --> B["🧹 Preprocessing & Cleaning
-Feature Scaling & Encoding"]
-    B --> C["⚙️ Feature Engineering
-Domain Transformation"]
-    C --> D["🤖 Machine Learning Pipeline
-Model Training & Evaluation"]
-    D --> E["📊 Predictive Output & Metrics
-Interactive Dashboard / Reports"]
-    style A fill:#1e1b4b,color:#a5b4fc
-    style B fill:#312e81,color:#c7d2fe
-    style D fill:#1e3a5f,color:#93c5fd
-    style E fill:#14532d,color:#86efac
+flowchart TD
+    App["Persistent app shell"] --> Routes["Lazy page routes"]
+    App --> Motion["Theme and motion preferences"]
+    Routes --> Catalog["Project catalog"]
+    Routes --> Detail["Project detail"]
+    Data["Reviewed repository inventory"] --> Catalog
+    Data --> Detail
+    Catalog --> Filters["URL search and filters"]
+    Filters --> Cards["Progressive 3D cards"]
+    Cards --> Detail
 ```
 
----
+## UML diagrams
 
-## ⚙️ Technical Stack
+### Main workflow
 
-<div align="center">
+Portfolio navigation runs in React. Chat requests reach the same-origin Vercel function. The function uses verified profile and repository evidence with OmniRoute or Vercel AI Gateway. If live generation fails, the UI shows a localized error and retry action. Neither the function nor the browser substitutes a canned answer.
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Next.js** | Core Framework / Library | Primary computing and analytical engine |
-| **React** | Core Framework / Library | Primary computing and analytical engine |
-| **Tailwind CSS** | Core Framework / Library | Primary computing and analytical engine |
-| **TypeScript** | Core Framework / Library | Primary computing and analytical engine |
-| **Vite** | Core Framework / Library | Primary computing and analytical engine |
-
-</div>
-
----
-
-
-
-## 📁 Directory Structure
-
-<details>
-<summary><b>📂 Click to expand repository tree</b></summary>
-
-```
-Ibrahim-Portfolio/
-├── .gitignore
-│   ├── launch.json
-│   ├── settings.json
-│   ├── ChatGPT Image 11 أبريل 2025، 11_54_43 م.png
-│   ├── Screenshot 2025-04-11 233645.png
-│   ├── Screenshot 2025-04-11 233700.png
-│   ├── Screenshot 2025-04-11 233719.png
-│   ├── Screenshot 2025-04-11 233800.png
-│   ├── Screenshot 2025-04-11 233814.png
-│   ├── Screenshot 2025-04-11 233833.png
-│   ├── Screenshot 2025-04-11 233847.png
-│   ├── Screenshot 2025-04-11 233905.png
-│   ├── Screenshot 2025-04-11 233926.png
-│   ├── Screenshot 2025-04-11 233943.png
-│   ├── Screenshot 2025-04-11 234000.png
-│   ├── Screenshot 2025-04-11 234015.png
-│   ├── Screenshot 2025-04-11 234041.png
-│   ├── Screenshot 2025-04-11 234056.png
-│   ├── Screenshot 2025-04-11 234122.png
-│   ├── Screenshot 2025-04-11 234145.png
-│   ├── Screenshot 2025-04-11 234204.png
-│   ├── Screenshot 2025-04-11 234239.png
-│   ├── Screenshot 2025-04-11 234257.png
-│   ├── bank-term-deposit-prediction1928e8bbb6 (1).ipynb
-│   ├── test.csv
+```mermaid
+sequenceDiagram
+    actor Visitor
+    participant UI as React portfolio
+    participant API as Vercel chat function
+    participant Gateway as AI provider
+    Visitor->>UI: Browse routes and project details
+    UI-->>Visitor: Render local portfolio content
+    opt Visitor opens lazy-loaded chat
+        Visitor->>UI: Ask a portfolio question
+        UI->>API: POST /api/chat
+        API->>API: Validate request and retrieve verified facts
+        alt Provider configured and reachable
+            API->>Gateway: Evidence-grounded completion
+            Gateway-->>API: Generated answer
+        else Provider absent or unavailable
+            API-->>UI: Service error
+            UI-->>Visitor: Localized error with retry
+        end
+        opt Live generation succeeded
+            API-->>UI: JSON live reply
+            UI-->>Visitor: Display answer
+        end
+    end
 ```
 
-</details>
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Python 3.10+ (or Node.js 18+ for web apps)
-- Git & Virtualenv
-
-### Installation & Execution
+## Getting started
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/IbrahimAbdelsattar/Ibrahim-Portfolio.git
 cd Ibrahim-Portfolio
+```
 
-# 2. Set up virtual environment (Python)
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# 3. Install dependencies
-npm install
-
-# 4. Launch project execution
+```bash
+npm ci
 npm run dev
 ```
 
----
+Open the local origin printed by the development server.
 
-## 👤 Author & Contact
+### Available scripts
 
-<div align="center">
+| Command | Purpose |
+|---|---|
+| `npm run build` | Create a production build. |
+| `npm run lint` | Run ESLint. |
+| `npm run typecheck` | Check frontend and API TypeScript. |
+| `npm test` | Check catalog coverage, attribution, privacy, persona grounding, follow-ups, and API failure handling. Requires Node 22.18+ or 24. |
+| `npm run preview` | Preview the Vite production build. |
 
-**Ibrahim Abdelsattar**  
-*Data Scientist & AI Specialist · MTI University (CS & AI, GPA 3.5)*
+## Chat runtime
 
-[Email](mailto:ibrahimabdelsattar042@gmail.com) · [GitHub](https://github.com/IbrahimAbdelsattar) · [LinkedIn](https://linkedin.com/in/ibrahim-abdelsattar)
+Deploy the repository to Vercel to run `api/chat.ts` with the frontend. `npm run dev` also serves the same handler through Vite middleware, loading server-only OmniRoute settings from `.env.vercel.local`. A static preview requires an API server to generate answers.
 
-<br/>
+On Vercel, generated replies authenticate to AI Gateway with the refreshed `x-vercel-oidc-token` request header injected by the platform, without a permanent API key. The header is read only in the Vercel runtime; `VERCEL_OIDC_TOKEN` is used for local development. AI Gateway access and credits must be available on the linked team. The default model is `google/gemini-3.1-flash-lite`; set `AI_GATEWAY_MODEL` to override it. A server-only `AI_GATEWAY_API_KEY` takes precedence over OIDC when configured, and works for development outside Vercel.
 
-<img src="https://img.shields.io/badge/Made%20with-Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
-<img src="https://img.shields.io/badge/Maintained%20by-Ibrahim%20Abdelsattar-7C3AED?style=for-the-badge"/>
+OmniRoute is tried first using `OMNIROUTE_API_KEY`, `OMNIROUTE_MODEL`, and the full HTTPS completion endpoint in `OMNIROUTE_API_URL`. These three variables must be configured on the server. Client-exposed `VITE_` credentials are never accepted. Vercel AI Gateway is tried next when configured. The entire generation attempt is bounded to 40 seconds; when both providers are available, OmniRoute gets up to eight seconds before trying Gateway. Operational logs include only provider names and failure categories or HTTP status, never prompts, credentials, or provider error bodies.
 
-</div>
+Use `npm run check:chat` to verify live OmniRoute responses against `.env.vercel.local`; automated tests use controlled provider responses and do not prove that a real key works.
+
+`GET /api/chat` reports readiness; `POST /api/chat` accepts a message and up to eight conversation turns. Replies are not cached or persisted. Requests have bounded size, a provider timeout, and a best-effort per-instance IP rate limit; this limit is not a globally distributed quota.

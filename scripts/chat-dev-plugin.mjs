@@ -1,5 +1,5 @@
 import { loadEnv } from 'vite';
-import { handleChat } from '../api/chat.js';
+import { handleChat } from '../api/chat.ts';
 
 export function chatDevPlugin() {
   const names = ['OMNIROUTE_API_URL', 'OMNIROUTE_API_KEY', 'OMNIROUTE_MODEL'];

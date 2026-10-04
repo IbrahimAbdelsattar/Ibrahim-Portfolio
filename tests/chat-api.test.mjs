@@ -1,6 +1,6 @@
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { handleChat } from '../api/chat.js';
+import { handleChat } from '../api/chat.ts';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = { ...process.env };
@@ -14,7 +14,7 @@ async function call(body, method = 'POST', config) {
     json(data) { result.body = data; return this; },
   };
   if (config) await handleChat({ method, body }, res, config);
-  else await handler({ method, body }, res);
+  else await handleChat({ method, body }, res);
   return result;
 }
 function configure() {
@@ -25,7 +25,8 @@ function configure() {
 
 test('rejects unsupported methods, malformed JSON, empty messages, and injected system history', async () => {
   globalThis.fetch = () => { throw new Error('Should not call provider'); };
-  assert.equal((await call({}, 'GET')).status, 405);
+  assert.equal((await call({}, 'GET')).status, 200);
+  assert.equal((await call({}, 'DELETE')).status, 405);
   assert.equal((await call('{')).status, 400);
   assert.equal((await call({ message: ' ' })).status, 400);
   assert.equal((await call({ message: 'a'.repeat(2001) })).status, 400);
@@ -33,6 +34,8 @@ test('rejects unsupported methods, malformed JSON, empty messages, and injected 
 });
 test('missing configuration returns an error without a fabricated reply', async () => {
   delete process.env.OMNIROUTE_API_KEY;
+  process.env.VITE_OMNIROUTE_API_KEY = 'client-exposed-key-must-not-be-used';
+  globalThis.fetch = () => { throw new Error('Client-exposed key must not reach a provider'); };
   const result = await call({ message: 'Hi' });
   assert.equal(result.status, 503);
   assert.equal(result.body.reply, undefined);
@@ -56,8 +59,8 @@ test('sends server-owned portfolio context, configured credentials, and conversa
   const result = await call({ message: 'What degree?', history: [
     { role: 'user', content: 'What university?' }, { role: 'assistant', content: 'MTI' },
   ] });
-  assert.deepEqual(result.body, { reply: 'Computer Science and AI', isLive: true });
-  assert.equal(result.headers['Cache-Control'], 'no-store');
+  assert.deepEqual(result.body, { reply: 'Computer Science and AI', isLive: true, source: 'ai' });
+  assert.equal(result.headers['cache-control'], 'no-store');
 });
 test('provider failures and malformed or empty replies never become offline answers', async () => {
   configure();

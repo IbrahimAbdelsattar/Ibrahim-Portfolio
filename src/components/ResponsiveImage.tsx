@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactEventHandler } from "react";
 import manifestJson from "@/generated/images-manifest.json";
 
 /**
@@ -39,6 +39,7 @@ interface ResponsiveImageProps {
   draggable?: boolean;
   /** Escape hatch when the intrinsic size must not drive layout. */
   intrinsic?: boolean;
+  onError?: ReactEventHandler<HTMLImageElement>;
 }
 
 const ResponsiveImage = ({
@@ -52,6 +53,7 @@ const ResponsiveImage = ({
   style,
   draggable,
   intrinsic = true,
+  onError,
 }: ResponsiveImageProps) => {
   const entry = getImageVariant(src);
   const avifWidths = entry?.widths ?? [];
@@ -81,6 +83,7 @@ const ResponsiveImage = ({
         draggable={draggable}
         className={className}
         style={style}
+        onError={onError}
       />
     </picture>
   );

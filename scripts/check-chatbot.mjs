@@ -1,7 +1,7 @@
 ﻿import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
-import handler from '../api/chat.js';
+import { handleChat } from '../api/chat.ts';
 
 const local = parseEnv(readFileSync(new URL('../.env.vercel.local', import.meta.url), 'utf8'));
 for (const name of ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL']) {
@@ -35,7 +35,7 @@ async function ask(message, history = []) {
       status(code) { status = code; return this; },
       json(data) { result = data; return this; },
     };
-    await handler({ method: 'POST', body: { message, history } }, res);
+    await handleChat({ method: 'POST', body: { message, history } }, res);
   }
   console.log(JSON.stringify({ message, status, providerStatus, ...result }, null, 2));
   assert.ok(status === 200 && result.isLive === true && result.reply?.trim(),
