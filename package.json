@@ -5,8 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "images": "node scripts/optimize-images.mjs",
+    "images:force": "node scripts/optimize-images.mjs --force",
+    "predev": "npm run images",
+    "prebuild": "npm run images",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
+    "test:chat": "node --test tests/chat-api.test.mjs tests/chat-service.test.mjs tests/chat-dev.test.mjs",
+    "check:chat": "node --env-file=.env.vercel.local scripts/check-chatbot.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
