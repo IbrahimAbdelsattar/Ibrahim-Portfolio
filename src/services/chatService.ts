@@ -1,164 +1,44 @@
-import { IBRAHIM_SYSTEM_PROMPT, getAssistantResponse } from "@/data/ibrahimKnowledge";
-
-export interface ChatMessage {
+﻿export interface ChatMessage {
   id: string;
   sender: "bot" | "user";
   text: string;
   timestamp: string;
   isSecurityWarning?: boolean;
+  isError?: boolean;
 }
 
-const OMNIROUTE_URL = "https://omniroute.dawrly.space/v1/chat/completions";
-const OMNIROUTE_API_KEY = "sdRghiYkisbEFfqWYFILzGngUEzUcKQJVrtoGgjVPTvQmZhifAoQNSTaLEtYdoki";
-const MODEL_NAME = "gh/gpt-4o-mini";
-
-// Optional local backend URL (if user runs python chatbot_api.py locally on port 8000)
-const LOCAL_BACKEND_URL = import.meta.env.VITE_CHATBOT_API_URL || "http://127.0.0.1:8000/api/chat";
-
-/**
- * Removes dashes (-), asterisks (*), and hashtags (#) from chatbot responses
- * while preserving valid URLs, punctuation, and links.
- */
+// Preserve Markdown, Arabic, and URL punctuation; remove only control characters.
 export function stripForbiddenCharacters(text: string): string {
-  if (!text) return "";
-
-  // 1. Remove all hashtags '#'
-  let cleaned = text.replace(/#/g, "");
-
-  // 2. Remove all asterisks '*'
-  cleaned = cleaned.replace(/\*/g, "");
-
-  // 3. Protect URLs so hyphens inside URLs are not corrupted
-  const urlPlaceholders: string[] = [];
-  cleaned = cleaned.replace(/https?:\/\/[^\s\)]+/g, (match) => {
-    urlPlaceholders.push(match);
-    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
-  });
-
-  // Remove horizontal divider rules: '---', '–—–', etc.
-  cleaned = cleaned.replace(/^[-–—]{2,}\s*$/gm, "");
-
-  // Remove bullet dashes at start of lines: '- item', '– item', '— item'
-  cleaned = cleaned.replace(/^(\s*)[-–—]\s+/gm, "$1");
-
-  // Replace standalone dashes between words: ' - ', ' – ', ' — ' with clean punctuation
-  cleaned = cleaned.replace(/\s+[-–—]+\s+/g, ", ");
-
-  // Remove trailing or standalone dashes at line endings
-  cleaned = cleaned.replace(/\s+[-–—]+$/gm, "");
-
-  // Remove leading dashes on any line
-  cleaned = cleaned.replace(/^(\s*)[-–—]+/gm, "$1");
-
-  // Restore protected URLs
-  cleaned = cleaned.replace(/__URL_PLACEHOLDER_(\d+)__/g, (_, idx) => {
-    return urlPlaceholders[parseInt(idx, 10)] || "";
-  });
-
-  return cleaned.trim();
+  // eslint-disable-next-line no-control-regex -- Intentionally removes non-printing ASCII controls.
+  return text.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").trim();
 }
 
 export async function sendChatMessage(
   userQuery: string,
-  history: ChatMessage[] = []
-): Promise<{ text: string; isLive: boolean; isSecurityWarning?: boolean }> {
-  // 1. First, try OmniRoute Cloud LLM (GPT-4o-mini)
+  history: ChatMessage[] = [],
+): Promise<{ text: string; isLive: true; isSecurityWarning?: boolean }> {
+  const message = userQuery.trim();
+  if (!message || message.length > 2000) throw new Error("Message must contain 1 to 2000 characters");
+  const recentHistory = history
+    .filter(m => m.id !== "welcome" && !m.isError && !m.isSecurityWarning)
+    .slice(-8)
+    .map(m => ({ role: m.sender === "user" ? "user" : "assistant", content: m.text }));
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
   try {
-    // Build context with system prompt and last 8 conversational turns
-    const recentHistory = history.slice(-8).map((m) => ({
-      role: m.sender === "user" ? ("user" as const) : ("assistant" as const),
-      content: m.text,
-    }));
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
-
-    const res = await fetch(OMNIROUTE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OMNIROUTE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL_NAME,
-        messages: [
-          { role: "system", content: IBRAHIM_SYSTEM_PROMPT },
-          ...recentHistory,
-          { role: "user", content: userQuery },
-        ],
-        temperature: 0.5,
-        max_tokens: 500,
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const rawText = await res.text();
-      let reply = "";
-
-      if (rawText.includes("data: ")) {
-        const lines = rawText.split("\n");
-        const parts: string[] = [];
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith("data: ") && trimmed !== "data: [DONE]") {
-            try {
-              const chunkJson = JSON.parse(trimmed.slice(6));
-              const delta = chunkJson.choices?.[0]?.delta?.content;
-              const msgContent = chunkJson.choices?.[0]?.message?.content;
-              if (delta) parts.push(delta);
-              else if (msgContent) parts.push(msgContent);
-            } catch {
-              // skip unparseable chunk
-            }
-          }
-        }
-        reply = parts.join("");
-      } else {
-        try {
-          const data = JSON.parse(rawText);
-          reply = data.choices?.[0]?.message?.content || "";
-        } catch {
-          // ignore
-        }
-      }
-
-      if (reply && typeof reply === "string" && reply.trim()) {
-        return { text: stripForbiddenCharacters(reply.trim()), isLive: true };
-      }
-    }
-  } catch (cloudErr) {
-    console.warn("OmniRoute cloud API request failed or timed out:", cloudErr);
-  }
-
-  // 2. Second, attempt local backend if running
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s quick check
-
-    const res = await fetch(LOCAL_BACKEND_URL, {
+    const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userQuery }),
+      body: JSON.stringify({ message, history: recentHistory }),
       signal: controller.signal,
     });
-
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.reply) {
-        return { text: stripForbiddenCharacters(data.reply.trim()), isLive: true };
-      }
-    }
-  } catch {
-    // Local backend is not running or unreachable
+    if (!response.ok) throw new Error("The AI service is unavailable. Please try again later.");
+    const data = await response.json();
+    if (data.isLive !== true || typeof data.reply !== "string") throw new Error("No live AI answer received");
+    const text = stripForbiddenCharacters(data.reply);
+    if (!text) throw new Error("Empty AI answer received");
+    return { text, isLive: true };
+  } finally {
+    clearTimeout(timeout);
   }
-
-  // 3. Fallback: Full-coverage local intelligent knowledge engine
-  const offlineReply = getAssistantResponse(userQuery);
-  return { text: stripForbiddenCharacters(offlineReply), isLive: false };
 }
