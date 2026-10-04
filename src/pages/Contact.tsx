@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
-import { TiltCard3D } from "@/components/3d/TiltCard3D";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -111,71 +110,69 @@ const Contact = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <TiltCard3D maxTilt={4} scale={1.01} glare={false}>
-                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6 translate-z-10">Send a Message</h2>
-                  <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 translate-z-5">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                        Your Name
-                      </label>
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
-                        className="glass-input"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                        Your Email
-                      </label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                        className="glass-input"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                        Message
-                      </label>
-                      <Textarea
-                        id="message"
-                        placeholder="Tell me about your project..."
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        required
-                        rows={5}
-                        className="glass-input resize-none"
-                      />
-                    </div>
-                    <Button 
-                      type="submit" 
-                      variant="hero" 
-                      size="lg" 
-                      className="w-full min-h-[52px] text-base"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        "Sending..."
-                      ) : (
-                        <>
-                          Send Message
-                          <Send className="w-5 h-5" />
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </div>
-              </TiltCard3D>
+              <div className="glass-card rounded-2xl p-5 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6">Send a Message</h2>
+                <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                      Your Name
+                    </label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      className="glass-input"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                      Your Email
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                      className="glass-input"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
+                      Message
+                    </label>
+                    <Textarea
+                      id="message"
+                      placeholder="Tell me about your project..."
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      required
+                      rows={5}
+                      className="glass-input resize-none"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    variant="hero" 
+                    size="lg" 
+                    className="w-full min-h-[52px] text-base"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      "Sending..."
+                    ) : (
+                      <>
+                        Send Message
+                        <Send className="w-5 h-5" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </div>
             </motion.div>
 
             {/* Contact Info */}
@@ -186,52 +183,48 @@ const Contact = () => {
               transition={{ duration: 0.6 }}
               className="space-y-6"
             >
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6 translate-z-10">Contact Information</h2>
-                  <div className="space-y-4 translate-z-5">
-                    {contactInfo.map((item, index) => (
-                      <motion.a
-                        key={item.label}
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 rounded-2xl glass-card hover-glow group min-h-[72px]"
-                      >
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
-                          <item.icon className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm text-muted-foreground">{item.label}</div>
-                          <div className="font-medium text-foreground text-sm sm:text-base truncate">{item.value}</div>
-                        </div>
-                      </motion.a>
-                    ))}
-                  </div>
+              <div className="glass-card rounded-2xl p-5 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-5 sm:mb-6">Contact Information</h2>
+                <div className="space-y-4">
+                  {contactInfo.map((item, index) => (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "0px 0px 60px 0px" }}
+                      transition={{ duration: 0.25, delay: index * 0.04 }}
+                      className="flex items-center gap-4 p-4 rounded-2xl glass-card hover-glow group min-h-[72px]"
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300">
+                        <item.icon className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm text-muted-foreground">{item.label}</div>
+                        <div className="font-medium text-foreground text-sm sm:text-base truncate">{item.value}</div>
+                      </div>
+                    </motion.a>
+                  ))}
                 </div>
-              </TiltCard3D>
+              </div>
 
               {/* Location Card */}
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
-                  <div className="flex items-center gap-4 mb-4 translate-z-10">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Location</div>
-                      <div className="font-medium text-foreground">Egypt</div>
-                    </div>
+              <div className="glass-card rounded-2xl p-5 sm:p-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-primary" />
                   </div>
-                  <p className="text-muted-foreground text-sm translate-z-5">
-                    Available for remote work and collaborations worldwide.
-                  </p>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Location</div>
+                    <div className="font-medium text-foreground">Egypt</div>
+                  </div>
                 </div>
-              </TiltCard3D>
+                <p className="text-muted-foreground text-sm">
+                  Available for remote work and collaborations worldwide.
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>

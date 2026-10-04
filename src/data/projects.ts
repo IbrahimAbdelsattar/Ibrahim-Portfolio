@@ -574,7 +574,7 @@ Key Highlights:
 	✅ Mathematical derivations of cost functions and gradient descent algorithms
 	✅ Comprehensive data wrangling across complex messy datasets`,
     technologies: ["Python", "Jupyter Notebook", "Statistics", "Data Wrangling", "Pandas"],
-    image: "/project-images/student-grade.png",
+    image: "/project-images/student-grades.png",
     githubUrl: "https://github.com/IbrahimAbdelsattar/Data-Science-Assignments.DEPI",
   },
   {

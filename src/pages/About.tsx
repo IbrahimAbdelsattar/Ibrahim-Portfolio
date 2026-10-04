@@ -5,7 +5,6 @@ import Layout from "@/components/Layout";
 import SkillBadge from "@/components/SkillBadge";
 import AnimatedTabs, { AnimatedTabPanel } from "@/components/AnimatedTabs";
 import Reveal from "@/components/Reveal";
-import { TiltCard3D } from "@/components/3d/TiltCard3D";
 
 const skillGroups = [
   { value: "languages", label: "Languages", icon: Code2, items: ["Python", "SQL", "TypeScript", "JavaScript", "C++", "Java", "R"] },
@@ -102,29 +101,27 @@ const About = () => {
                 ].map((job, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true, margin: "0px 0px 60px 0px" }}
+                    transition={{ duration: 0.25, delay: index * 0.04 }}
                   >
-                    <TiltCard3D maxTilt={6} scale={1.01} className="h-full">
-                      <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow h-full preserve-3d">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between mb-2 translate-z-10">
-                          <div className="min-w-0">
-                            <h3 className="font-semibold text-foreground text-base sm:text-lg leading-snug">{job.role}</h3>
-                            <p className="text-primary font-medium text-sm sm:text-base">{job.company}</p>
-                          </div>
-                          <span className="text-xs text-muted-foreground self-start sm:self-auto shrink-0 bg-secondary/50 px-3 py-1.5 rounded-full border border-border">
-                            {job.period}
-                          </span>
+                    <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow h-full">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between mb-2">
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-foreground text-base sm:text-lg leading-snug">{job.role}</h3>
+                          <p className="text-primary font-medium text-sm sm:text-base">{job.company}</p>
                         </div>
-                        <ul className="list-disc list-outside pl-5 space-y-1 text-sm text-muted-foreground mt-3 translate-z-5">
-                          {job.description.map((point, i) => (
-                            <li key={i}>{point}</li>
-                          ))}
-                        </ul>
+                        <span className="text-xs text-muted-foreground self-start sm:self-auto shrink-0 bg-secondary/50 px-3 py-1.5 rounded-full border border-border">
+                          {job.period}
+                        </span>
                       </div>
-                    </TiltCard3D>
+                      <ul className="list-disc list-outside pl-5 space-y-1 text-sm text-muted-foreground mt-3">
+                        {job.description.map((point, i) => (
+                          <li key={i}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -139,70 +136,66 @@ const About = () => {
               className="space-y-6"
             >
               {/* Bio / Overview */}
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
-                  <div className="flex items-center gap-4 mb-6 translate-z-10">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
-                      <Cpu className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground">Core Competencies</h2>
-                      <p className="text-primary text-sm font-medium">Applied AI & Data Science</p>
-                    </div>
+              <div className="glass-card rounded-2xl p-5 sm:p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <Cpu className="w-6 h-6 text-primary" />
                   </div>
-                  <div className="text-muted-foreground leading-relaxed space-y-4 text-sm md:text-base translate-z-5">
-                    <p>
-                      I specialize in building intelligent software solutions that combine cutting-edge **Generative AI**, **RAG Architecture**, **Dialectal NLP**, and **Predictive Machine Learning**.
-                    </p>
-                    
-                    <h3 className="text-foreground font-semibold text-base mt-4 mb-2">📊 High-Impact Focus Areas:</h3>
-                    <ul className="space-y-2">
-                      <li className="flex gap-2">
-                        <span className="text-primary font-bold">🔹</span>
-                        <div>
-                          <strong className="text-foreground">GenAI & Agentic Systems:</strong> Multi-document RAG, custom vector indexing, LLM fine-tuning, and task automation.
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-primary font-bold">🔹</span>
-                        <div>
-                          <strong className="text-foreground">Dialectal Arabic & Audio Speech AI:</strong> Sentiment analysis tuned for Egyptian Arabic slang, toxicity moderation, and Mel-spectrogram audio classification.
-                        </div>
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-primary font-bold">🔹</span>
-                        <div>
-                          <strong className="text-foreground">Predictive Analytics & MLOps:</strong> Churn prediction, fraud detection, demand forecasting, containerized Docker deployments, and REST API serving.
-                        </div>
-                      </li>
-                    </ul>
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground">Core Competencies</h2>
+                    <p className="text-primary text-sm font-medium">Applied AI & Data Science</p>
                   </div>
                 </div>
-              </TiltCard3D>
+                <div className="text-muted-foreground leading-relaxed space-y-4 text-sm md:text-base">
+                  <p>
+                    I specialize in building intelligent software solutions that combine cutting-edge <strong className="text-foreground font-semibold">Generative AI</strong>, <strong className="text-foreground font-semibold">RAG Architecture</strong>, <strong className="text-foreground font-semibold">Dialectal NLP</strong>, and <strong className="text-foreground font-semibold">Predictive Machine Learning</strong>.
+                  </p>
+                  
+                  <h3 className="text-foreground font-semibold text-base mt-4 mb-2">📊 High-Impact Focus Areas:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex gap-2">
+                      <span className="text-primary font-bold">🔹</span>
+                      <div>
+                        <strong className="text-foreground">GenAI & Agentic Systems:</strong> Multi-document RAG, custom vector indexing, LLM fine-tuning, and task automation.
+                      </div>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-primary font-bold">🔹</span>
+                      <div>
+                        <strong className="text-foreground">Dialectal Arabic & Audio Speech AI:</strong> Sentiment analysis tuned for Egyptian Arabic slang, toxicity moderation, and Mel-spectrogram audio classification.
+                      </div>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-primary font-bold">🔹</span>
+                      <div>
+                        <strong className="text-foreground">Predictive Analytics & MLOps:</strong> Churn prediction, fraud detection, demand forecasting, containerized Docker deployments, and REST API serving.
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
 
               {/* Why Work With Me */}
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow preserve-3d">
-                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 translate-z-10">
-                    <Target className="w-6 h-6 text-primary" />
-                    Why Work With Me?
-                  </h3>
-                  <div className="space-y-3 text-sm translate-z-5">
-                    <div className="flex gap-3">
-                      <span className="text-primary">✔️</span>
-                      <p className="text-muted-foreground"><strong className="text-foreground">Production-Ready Code:</strong> Modular, reproducible, and containerized AI pipelines.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="text-primary">✔️</span>
-                      <p className="text-muted-foreground"><strong className="text-foreground">Business ROI Focus:</strong> Models engineered to directly impact metrics and user experience.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="text-primary">✔️</span>
-                      <p className="text-muted-foreground"><strong className="text-foreground">End-to-End Delivery:</strong> From raw dataset cleaning to VPS/Cloud deployment and API integration.</p>
-                    </div>
+              <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow">
+                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <Target className="w-6 h-6 text-primary" />
+                  Why Work With Me?
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex gap-3">
+                    <span className="text-primary">✔️</span>
+                    <p className="text-muted-foreground"><strong className="text-foreground">Production-Ready Code:</strong> Modular, reproducible, and containerized AI pipelines.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-primary">✔️</span>
+                    <p className="text-muted-foreground"><strong className="text-foreground">Business ROI Focus:</strong> Models engineered to directly impact metrics and user experience.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-primary">✔️</span>
+                    <p className="text-muted-foreground"><strong className="text-foreground">End-to-End Delivery:</strong> From raw dataset cleaning to VPS/Cloud deployment and API integration.</p>
                   </div>
                 </div>
-              </TiltCard3D>
+              </div>
             </motion.div>
           </div>
 
@@ -216,12 +209,12 @@ const About = () => {
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">
               Education
             </h2>
-            <TiltCard3D maxTilt={5} scale={1.01} className="max-w-3xl mx-auto">
-              <div className="glass-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover-glow preserve-3d">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 translate-z-10">
+            <div className="max-w-3xl mx-auto">
+              <div className="glass-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover-glow">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
                   <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div className="translate-z-5 min-w-0">
+                <div className="min-w-0">
                   <h3 className="text-lg sm:text-xl font-bold text-foreground">MTI University</h3>
                   <p className="text-primary font-medium text-sm sm:text-base">Bachelor of Computer Science & Artificial Intelligence</p>
                   <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-muted-foreground">
@@ -231,7 +224,7 @@ const About = () => {
                   </div>
                 </div>
               </div>
-            </TiltCard3D>
+            </div>
           </motion.div>
 
           {/* Skills Section */}
