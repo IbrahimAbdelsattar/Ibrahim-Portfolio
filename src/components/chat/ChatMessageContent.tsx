@@ -1,21 +1,17 @@
 import React from "react";
+import { hasRtlText } from "@/data/chatUi";
 import { stripForbiddenCharacters } from "@/services/chatService";
 
 interface ChatMessageContentProps {
   text: string;
 }
 
-// Helper to detect if text contains Arabic characters
-export const hasArabic = (text: string): boolean => {
-  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
-};
-
-// Isolates embedded Latin/English phrases inside Arabic text to prevent BiDi reordering
-const isolateMixedLanguageTokens = (textPart: string, isArabicContext: boolean): React.ReactNode => {
-  if (!isArabicContext || !textPart) return textPart;
+// Isolates embedded Latin/English phrases inside RTL text to prevent BiDi reordering
+const isolateMixedLanguageTokens = (textPart: string, isRtlContext: boolean): React.ReactNode => {
+  if (!isRtlContext || !textPart) return textPart;
 
   // Match English words/phrases (including technical acronyms, versions like GPT-4o, RAG, etc.)
-  const englishPhraseRegex = /([A-Za-z0-9][A-Za-z0-9\s&.+/'-]*[A-Za-z0-9]|[A-Za-z0-9]+)/g;
+  const englishPhraseRegex = /([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|https?:\/\/[^\s]+|[A-Za-z0-9][A-Za-z0-9\s&.+/'-]*[A-Za-z0-9]|[A-Za-z0-9]+)/g;
   const segments = textPart.split(englishPhraseRegex);
 
   if (segments.length <= 1) return textPart;
@@ -35,16 +31,16 @@ const isolateMixedLanguageTokens = (textPart: string, isArabicContext: boolean):
 };
 
 // Parses inline tokens (links, inline code, bold if any remains) with BiDi protection
-const renderInlineTokens = (content: string, isArabicContext: boolean): React.ReactNode[] => {
+const renderInlineTokens = (content: string, isRtlContext: boolean): React.ReactNode[] => {
   // Regex to match markdown links [label](url), bold **bold**, or `code`
-  const tokenRegex = /(\[.*?\]\(https?:\/\/[^\s\)]+\)|\*\*.*?\*\*|`.*?`)/g;
+  const tokenRegex = /(\[.*?\]\(https?:\/\/[^\s)]+\)|\*\*.*?\*\*|`.*?`)/g;
   const parts = content.split(tokenRegex);
 
   return parts.map((part, index) => {
     if (!part) return null;
 
     // Link: [label](url)
-    const linkMatch = part.match(/^\[(.*?)\]\((https?:\/\/[^\s\)]+)\)$/);
+    const linkMatch = part.match(/^\[(.*?)\]\((https?:\/\/[^\s)]+)\)$/);
     if (linkMatch) {
       return (
         <bdi key={index} className="inline">
@@ -52,7 +48,7 @@ const renderInlineTokens = (content: string, isArabicContext: boolean): React.Re
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            dir={hasArabic(linkMatch[1]) ? "rtl" : "ltr"}
+            dir={hasRtlText(linkMatch[1]) ? "rtl" : "ltr"}
             className="text-primary hover:underline font-semibold inline-flex items-center gap-0.5 break-all bidi-isolate"
           >
             {linkMatch[1]}
@@ -66,7 +62,7 @@ const renderInlineTokens = (content: string, isArabicContext: boolean): React.Re
     if (boldMatch) {
       return (
         <strong key={index} className="font-semibold text-foreground">
-          {isolateMixedLanguageTokens(boldMatch[1], isArabicContext)}
+          {isolateMixedLanguageTokens(boldMatch[1], isRtlContext)}
         </strong>
       );
     }
@@ -83,31 +79,31 @@ const renderInlineTokens = (content: string, isArabicContext: boolean): React.Re
       );
     }
 
-    return <React.Fragment key={index}>{isolateMixedLanguageTokens(part, isArabicContext)}</React.Fragment>;
+    return <React.Fragment key={index}>{isolateMixedLanguageTokens(part, isRtlContext)}</React.Fragment>;
   });
 };
 
 export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) => {
   const sanitizedText = stripForbiddenCharacters(text);
-  const rootIsArabic = hasArabic(sanitizedText);
+  const rootIsRtl = hasRtlText(sanitizedText);
   const lines = sanitizedText.split("\n");
 
   const elements: React.ReactNode[] = [];
   let currentList: React.ReactNode[] = [];
   let isNumberedList = false;
-  let listIsArabic = false;
+  let listIsRtl = false;
 
   const flushList = () => {
     if (currentList.length > 0) {
-      const listDir = listIsArabic ? "rtl" : "ltr";
-      const listAlignClass = listIsArabic ? "pr-5 text-right" : "pl-5 text-left";
+      const listDir = listIsRtl ? "rtl" : "ltr";
+      const listAlignClass = listIsRtl ? "pr-5 text-right" : "pl-5 text-left";
 
       if (isNumberedList) {
         elements.push(
           <ol
             key={`ol-${elements.length}`}
             dir={listDir}
-            className={`list-decimal list-outside ${listAlignClass} space-y-1.5 my-2 text-xs sm:text-sm bidi-text`}
+            className={`list-decimal list-outside ${listAlignClass} space-y-1.5 my-2 text-sm bidi-text`}
           >
             {currentList}
           </ol>
@@ -117,7 +113,7 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
           <ul
             key={`ul-${elements.length}`}
             dir={listDir}
-            className={`list-disc list-outside ${listAlignClass} space-y-1.5 my-2 text-xs sm:text-sm bidi-text`}
+            className={`list-disc list-outside ${listAlignClass} space-y-1.5 my-2 text-sm bidi-text`}
           >
             {currentList}
           </ul>
@@ -136,9 +132,9 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
       return;
     }
 
-    const isLineArabic = hasArabic(trimmed);
-    const lineDir = isLineArabic ? "rtl" : "ltr";
-    const textAlignClass = isLineArabic ? "text-right" : "text-left";
+    const isLineRtl = hasRtlText(trimmed);
+    const lineDir = isLineRtl ? "rtl" : "ltr";
+    const textAlignClass = isLineRtl ? "text-right" : "text-left";
 
     // Headings: ### Heading, ## Heading
     if (trimmed.startsWith("### ")) {
@@ -149,7 +145,7 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
           dir={lineDir}
           className={`font-bold text-sm sm:text-base text-foreground mt-2 mb-1 bidi-text ${textAlignClass}`}
         >
-          {renderInlineTokens(trimmed.slice(4), isLineArabic)}
+          {renderInlineTokens(trimmed.slice(4), isLineRtl)}
         </h4>
       );
       return;
@@ -163,7 +159,7 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
           dir={lineDir}
           className={`font-bold text-sm sm:text-base text-primary mt-3 mb-1 bidi-text ${textAlignClass}`}
         >
-          {renderInlineTokens(trimmed.slice(3), isLineArabic)}
+          {renderInlineTokens(trimmed.slice(3), isLineRtl)}
         </h3>
       );
       return;
@@ -174,16 +170,16 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
     if (bulletMatch) {
       if (isNumberedList) flushList();
       isNumberedList = false;
-      listIsArabic = hasArabic(bulletMatch[1]);
-      const itemDir = listIsArabic ? "rtl" : "ltr";
+      listIsRtl = hasRtlText(bulletMatch[1]);
+      const itemDir = listIsRtl ? "rtl" : "ltr";
 
       currentList.push(
         <li
           key={`li-${lineIdx}`}
           dir={itemDir}
-          className={`leading-relaxed bidi-text ${listIsArabic ? "text-right" : "text-left"}`}
+          className={`leading-relaxed bidi-text ${listIsRtl ? "text-right" : "text-left"}`}
         >
-          {renderInlineTokens(bulletMatch[1], listIsArabic)}
+          {renderInlineTokens(bulletMatch[1], listIsRtl)}
         </li>
       );
       return;
@@ -194,16 +190,16 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
     if (numberMatch) {
       if (!isNumberedList) flushList();
       isNumberedList = true;
-      listIsArabic = hasArabic(numberMatch[2]);
-      const itemDir = listIsArabic ? "rtl" : "ltr";
+      listIsRtl = hasRtlText(numberMatch[2]);
+      const itemDir = listIsRtl ? "rtl" : "ltr";
 
       currentList.push(
         <li
           key={`li-${lineIdx}`}
           dir={itemDir}
-          className={`leading-relaxed bidi-text ${listIsArabic ? "text-right" : "text-left"}`}
+          className={`leading-relaxed bidi-text ${listIsRtl ? "text-right" : "text-left"}`}
         >
-          {renderInlineTokens(numberMatch[2], listIsArabic)}
+          {renderInlineTokens(numberMatch[2], listIsRtl)}
         </li>
       );
       return;
@@ -217,7 +213,7 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
         dir={lineDir}
         className={`leading-relaxed my-1.5 bidi-text ${textAlignClass}`}
       >
-        {renderInlineTokens(trimmed, isLineArabic)}
+        {renderInlineTokens(trimmed, isLineRtl)}
       </p>
     );
   });
@@ -226,9 +222,9 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
 
   return (
     <div
-      dir={rootIsArabic ? "rtl" : "ltr"}
-      className={`space-y-1 text-xs sm:text-sm leading-relaxed bidi-text ${
-        rootIsArabic ? "text-right" : "text-left"
+      dir={rootIsRtl ? "rtl" : "ltr"}
+      className={`space-y-1 text-sm leading-relaxed bidi-text ${
+        rootIsRtl ? "text-right" : "text-left"
       }`}
     >
       {elements}

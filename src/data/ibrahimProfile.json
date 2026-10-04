@@ -1,0 +1,365 @@
+{
+  "name": "Ibrahim Abdelsattar",
+  "fullName": "Ibrahim Abdelsattar Abdelsattar",
+  "title": "Data Scientist & AI Specialist",
+  "subtitle": "Specializing in Generative AI, RAG Systems, Dialectal Arabic NLP, Audio AI, and Production MLOps",
+  "location": "Cairo, Egypt",
+  "email": "ibrahimabdelsattar042@gmail.com",
+  "github": "https://github.com/IbrahimAbdelsattar",
+  "linkedin": "https://www.linkedin.com/in/ibrahim-abdelsattar/",
+  "kaggle": "https://www.kaggle.com/ibrahimabdelsattar10",
+  "portfolio": "https://sites.google.com/view/ibrahimabdelsattar",
+  "education": {
+    "institution": "MTI University (Modern University for Technology and Information)",
+    "degree": "Bachelor of Computer Science & Artificial Intelligence",
+    "gpa": "3.5 / 4.0",
+    "period": "Oct 2023 - Expected 2027",
+    "details": "Specialized in Artificial Intelligence, Deep Learning, Algorithms, and Data Engineering."
+  },
+  "experiences": [
+    {
+      "role": "Machine Learning Instructor",
+      "company": "Minders",
+      "period": "Nov 2025 - Present",
+      "location": "Cairo, Egypt",
+      "summary": "Instructing emerging developers and university students in advanced AI, Machine Learning, and Deep Learning.",
+      "achievements": [
+        "Delivering comprehensive curricula on Neural Networks, CNNs, RNNs, and Transformers.",
+        "Mentoring students on real-world model deployment, hyperparameter optimization, and cloud serving.",
+        "Conducting practical code labs in Python, PyTorch, Scikit-Learn, and FastAPI."
+      ]
+    },
+    {
+      "role": "AI Engineer Intern",
+      "company": "HAMS.AI",
+      "period": "Sep 2025 - Nov 2025",
+      "location": "Cairo, Egypt",
+      "summary": "Trained, fine-tuned, and deployed production machine learning and deep learning models for high-scale enterprise applications.",
+      "achievements": [
+        "Architected and optimized data preprocessing pipelines for high-throughput model inference.",
+        "Implemented model monitoring and automated retraining triggers to combat data drift.",
+        "Containerized AI pipelines with Docker, reducing deployment cycle times."
+      ]
+    },
+    {
+      "role": "AI Engineer Trainee",
+      "company": "Digital Egypt Pioneers Initiative (DEPI) - MCIT",
+      "period": "Nov 2024 - May 2025",
+      "location": "Cairo, Egypt",
+      "summary": "Completed rigorous national specialization in Artificial Intelligence, Machine Learning, and Big Data Engineering.",
+      "achievements": [
+        "Developed end-to-end predictive models with integrated MLOps pipelines and Docker.",
+        "Built interactive analytics dashboards with Streamlit and Power BI for stakeholder reporting.",
+        "Mastered state-of-the-art architectures in NLP, Computer Vision, and Predictive Analytics."
+      ]
+    },
+    {
+      "role": "Freelance Data Scientist & AI Consultant",
+      "company": "Self-Employed",
+      "period": "Jun 2024 - Present",
+      "location": "Remote / Worldwide",
+      "summary": "Delivering bespoke Generative AI systems, RAG document search engines, dialectal NLP, and predictive ML models for international clients.",
+      "achievements": [
+        "Built enterprise multi-document RAG chatbots using LangChain, ChromaDB, and FAISS.",
+        "Developed Arabic NLP models specifically adapted to informal Egyptian dialect sentiment.",
+        "Containerized and deployed scalable APIs on VPS/Cloud infrastructure using Dokploy and Docker."
+      ]
+    },
+    {
+      "role": "AI Instructor",
+      "company": "4Mind",
+      "period": "Feb 2025 - Jul 2025",
+      "location": "Cairo, Egypt",
+      "summary": "Taught core computer science algorithms and machine learning fundamentals."
+    }
+  ],
+  "featuredProjects": [
+    {
+      "title": "SupplyMind AI",
+      "category": "GenAI & Agents",
+      "description": "Intelligent supply chain & logistics intelligence combining predictive demand forecasting and Generative AI agents to minimize inventory waste and automate procurement.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/SupplyMindAI",
+      "technologies": [
+        "Python",
+        "Generative AI",
+        "Predictive Analytics",
+        "Scikit-Learn",
+        "Streamlit",
+        "Docker"
+      ],
+      "highlights": [
+        "Predictive Demand Forecasting reduces inventory holding costs by up to 25%",
+        "LLM Agents for autonomous supply chain anomaly detection and reporting",
+        "Interactive real-time logistics analytics dashboard built with Streamlit"
+      ]
+    },
+    {
+      "title": "MR-NLP Robust RAG Chatbot",
+      "category": "GenAI & Agents",
+      "description": "Context-aware enterprise RAG chatbot connecting vector stores and knowledge graphs with LLMs for accurate, hallucination-free document Q&A.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/MR-NLP-Robust-RAG-Chatbot",
+      "technologies": [
+        "Python",
+        "RAG",
+        "LangChain",
+        "Vector DB (FAISS/Chroma)",
+        "Hugging Face LLMs",
+        "Knowledge Graphs"
+      ],
+      "highlights": [
+        "Indexed 3 NLP textbooks (vector index) + 1 textbook (knowledge graph) across 2,000+ chunks",
+        "Achieved 90%+ response relevance with rigorous prompt-injection defense",
+        "4 interactive modules: chat, automated quiz, progress tracking, and voice input"
+      ]
+    },
+    {
+      "title": "Arabic Egyptian Dialect Sentiment Analysis",
+      "category": "NLP & Speech",
+      "description": "Deep learning classification model specialized in understanding informal Egyptian Arabic slang, colloquial expressions, and social media text.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Arabic-Sentiment-Analysis",
+      "technologies": [
+        "Python",
+        "Deep Learning",
+        "TensorFlow",
+        "NLP",
+        "Pandas",
+        "Seaborn"
+      ],
+      "highlights": [
+        "Custom morphological tokenization and normalization for Egyptian Arabic",
+        "Accurately detects positive, negative, and neutral sentiment in dialectal text",
+        "Trained and evaluated on extensive social media brand opinion datasets"
+      ]
+    },
+    {
+      "title": "RAG-Powered Knowledge Assistant for Teachers",
+      "category": "GenAI & Education",
+      "description": "Curriculum intelligence and automated lesson planner for educators, searching textbook corpuses to generate lesson guides and quizzes.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/RAG-Powered-Knowledge-Assistantf-for-Teachers",
+      "technologies": [
+        "Python",
+        "RAG",
+        "LLMs",
+        "LangChain",
+        "FastAPI",
+        "Vector Search"
+      ],
+      "highlights": [
+        "Cuts teacher preparation time by over 50%",
+        "Grounded generation ensures responses strictly align with approved curriculum textbooks",
+        "FastAPI backend serving real-time semantic query results"
+      ]
+    },
+    {
+      "title": "Audio Model Classification & Gender Detection",
+      "category": "Audio AI & Deep Learning",
+      "description": "Acoustic signal classification analyzing audio waves and Mel-spectrograms using 2D Convolutional Neural Networks.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Audio-Model-Classification-Gender",
+      "technologies": [
+        "Python",
+        "Librosa",
+        "CNN",
+        "Deep Learning",
+        "TensorFlow"
+      ],
+      "highlights": [
+        "Feature extraction utilizing MFCCs, Chroma, and Mel-spectrograms",
+        "CNN architecture tuned for 2D acoustic matrix inputs",
+        "High precision on voice gender identification and audio event tagging"
+      ]
+    },
+    {
+      "title": "Mesdaq AI",
+      "category": "GenAI & Governance",
+      "description": "Document governance assistant providing semantic search, automated summaries, and verification over legal and technical documents.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Mesdaq_AI",
+      "technologies": [
+        "TypeScript",
+        "Python",
+        "Generative AI",
+        "React",
+        "Tailwind CSS"
+      ],
+      "highlights": [
+        "High-accuracy semantic search and instant document synthesis",
+        "Modern glassmorphic interface with full-stack TypeScript integration"
+      ]
+    },
+    {
+      "title": "Content Moderation System",
+      "category": "NLP & AI Safety",
+      "description": "Automated multi-class toxicity detector designed to identify abusive, toxic, or threatening comments in online communities.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Moderation_System",
+      "technologies": [
+        "Python",
+        "NLP",
+        "Text Classification",
+        "Scikit-Learn",
+        "AI Safety"
+      ],
+      "highlights": [
+        "Multi-label classification of toxic content in real time",
+        "Tuned to catch subtle offensive nuances and obfuscated words"
+      ]
+    },
+    {
+      "title": "Credit Card & Financial Fraud Detection",
+      "category": "Machine Learning & Analytics",
+      "description": "Real-time financial anomaly detector built on heavily imbalanced transactions using SMOTE and ensemble classifiers.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Credit-card-Fraud-Detection",
+      "technologies": [
+        "Python",
+        "Machine Learning",
+        "SMOTE",
+        "XGBoost",
+        "Scikit-Learn",
+        "Imbalanced-Learn"
+      ],
+      "highlights": [
+        "Overcomes severe 0.17% class imbalance using SMOTE oversampling",
+        "Optimized for Precision-Recall AUC to eliminate costly false negatives"
+      ]
+    },
+    {
+      "title": "Employee Attrition & Performance Rating Prediction",
+      "category": "Machine Learning & Analytics",
+      "description": "Predictive HR analytics platform forecasting employee turnover and identifying key retention drivers.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/Employee-Performance-Rating-Prediction",
+      "technologies": [
+        "Python",
+        "Machine Learning",
+        "XGBoost",
+        "Random Forest",
+        "Power BI"
+      ],
+      "highlights": [
+        "Ensemble ML identifying top turnover signals (compensation, overtime, commute)",
+        "Interactive Power BI dashboard for organizational talent insights"
+      ]
+    },
+    {
+      "title": "Profile README Generator",
+      "category": "Full-Stack & Tools",
+      "description": "Web application empowering developers to design customized, visually engaging GitHub profile READMEs.",
+      "githubUrl": "https://github.com/IbrahimAbdelsattar/profile-readme-generator",
+      "technologies": [
+        "TypeScript",
+        "React",
+        "Tailwind CSS"
+      ],
+      "highlights": [
+        "Real-time live markdown preview with badge customizers",
+        "Popular open-source tool for personal developer branding"
+      ]
+    }
+  ],
+  "skills": {
+    "languages": [
+      "Python (Expert)",
+      "SQL",
+      "TypeScript",
+      "JavaScript",
+      "C++",
+      "Java",
+      "R"
+    ],
+    "genAiAndNlp": [
+      "Generative AI",
+      "RAG Systems",
+      "Large Language Models (LLMs)",
+      "LangChain",
+      "Vector DBs (FAISS, ChromaDB)",
+      "Hugging Face Transformers",
+      "BERT",
+      "Prompt Engineering",
+      "Librosa Audio AI",
+      "Knowledge Graphs"
+    ],
+    "machineLearning": [
+      "Deep Learning",
+      "Machine Learning",
+      "PyTorch",
+      "TensorFlow",
+      "Scikit-Learn",
+      "XGBoost",
+      "LightGBM",
+      "Computer Vision",
+      "OpenCV",
+      "SMOTE (Imbalanced Data)",
+      "Clustering (K-Means)",
+      "Time Series Forecasting"
+    ],
+    "dataAndOps": [
+      "Pandas",
+      "NumPy",
+      "Power BI",
+      "Docker",
+      "Dokploy",
+      "FastAPI",
+      "Flask",
+      "Streamlit",
+      "Git & GitHub",
+      "PostgreSQL",
+      "Linux / VPS Deployment",
+      "MLOps"
+    ]
+  },
+  "certifications": [
+    {
+      "title": "HCIA-AI",
+      "issuer": "Huawei ICT Academy"
+    },
+    {
+      "title": "AI & Data Science Specialist",
+      "issuer": "Digital Egypt Pioneers Initiative (DEPI) - MCIT"
+    },
+    {
+      "title": "Natural Language Processing (NLP)",
+      "issuer": "ITIDA & NTI"
+    },
+    {
+      "title": "Machine Learning Engineer",
+      "issuer": "Elevoo Labs"
+    },
+    {
+      "title": "Machine Learning & Deep Learning",
+      "issuer": "IBM SkillsBuild"
+    },
+    {
+      "title": "NLP & Computer Vision",
+      "issuer": "IBM SkillsBuild"
+    },
+    {
+      "title": "Artificial Intelligence Fundamentals",
+      "issuer": "IBM"
+    },
+    {
+      "title": "AI Career Essentials",
+      "issuer": "ALX"
+    },
+    {
+      "title": "AI & Machine Learning Foundations",
+      "issuer": "Sprints"
+    },
+    {
+      "title": "Python Programming",
+      "issuer": "Sprints"
+    },
+    {
+      "title": "Artificial Intelligence",
+      "issuer": "IEEE - Benha"
+    },
+    {
+      "title": "Quantum Machine Learning",
+      "issuer": "Shabab Mobtakeron"
+    },
+    {
+      "title": "Developing AI in Egypt",
+      "issuer": "Ministry of Communications and Information Technology (MCIT)"
+    },
+    {
+      "title": "Business English",
+      "issuer": "OTO Courses & DEPI"
+    }
+  ]
+}

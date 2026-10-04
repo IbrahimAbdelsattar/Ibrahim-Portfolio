@@ -118,7 +118,8 @@ export const ibrahimData: IbrahimProfile = {
       company: "4Mind",
       period: "Feb 2025 - Jul 2025",
       location: "Cairo, Egypt",
-      summary: "Taught core computer science algorithms and machine learning fundamentals."
+      summary: "Taught core computer science algorithms and machine learning fundamentals.",
+      achievements: []
     }
   ],
   featuredProjects: [
