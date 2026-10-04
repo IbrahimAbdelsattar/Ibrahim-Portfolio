@@ -10,10 +10,10 @@ interface SkillBadgeProps {
 const SkillBadge = ({ name, icon: Icon, index }: SkillBadgeProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
+      viewport={{ once: true, margin: "0px 0px 60px 0px" }}
+      transition={{ duration: 0.2, delay: (index % 6) * 0.03 }}
       whileHover={{ scale: 1.05, y: -2 }}
       className="skill-badge flex items-center gap-2 cursor-default text-xs sm:text-sm break-words min-h-[36px]"
     >

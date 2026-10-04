@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Github, Eye, ExternalLink } from "lucide-react";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import { Button } from "@/components/ui/button";
 
 interface ProjectCardProps {
@@ -29,16 +30,14 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
+      viewport={{ once: true, margin: "0px 0px 80px 0px" }}
+      transition={{ duration: 0.25, delay: (index % 3) * 0.04 }}
       className="h-full"
     >
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-        className="h-full group rounded-3xl cursor-pointer"
+      <div
+        className="h-full group rounded-3xl cursor-pointer transition-transform duration-200 hover:-translate-y-1.5"
         onClick={() => onLiveClick?.()}
       >
         <div
@@ -51,10 +50,13 @@ const ProjectCard = ({
           {/* Top Section: Image & Header */}
           <div>
             <div className="relative h-44 sm:h-48 overflow-hidden bg-card/40">
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 pointer-events-none"
-                style={{ backgroundImage: `url(${image})` }}
+              <ResponsiveImage
+                src={image}
+                alt={`${title} preview`}
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                loading={index !== undefined && index < 3 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
               />
               <div
                 aria-hidden="true"
@@ -198,7 +200,7 @@ const ProjectCard = ({
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };

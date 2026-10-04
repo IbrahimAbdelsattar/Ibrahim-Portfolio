@@ -20,9 +20,25 @@ export const Interactive3DScene: React.FC = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    // Respect reduced-motion up front: no canvas sizing, no node allocation, no RAF.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let animationFrameId = 0;
+    let isRunning = false;
+
+    // The canvas is a fixed decorative backdrop at low opacity. Rendering it at full
+    // devicePixelRatio costs fill rate for no visible gain, so the backing store is
+    // capped and the context is scaled once per resize.
+    //
+    // `width`/`height` stay in CSS pixels: every distance threshold below is a fraction of
+    // the sphere radius, so keeping the maths in CSS pixels means the drawn output is
+    // resolution-independent.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.scale(dpr, dpr);
 
     // Target rotation angles and velocities driven by mouse
     let rotX = 0;
@@ -33,9 +49,14 @@ export const Interactive3DScene: React.FC = () => {
     let mouseY = 0;
 
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      // setTransform replaces the previous scale() so repeated resizes don't compound it.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sphereRadius = Math.min(width, height) * 0.42;
+      rebuildEdges();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -47,18 +68,37 @@ export const Interactive3DScene: React.FC = () => {
       targetRotX = -mouseY * 0.4;
     };
 
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mediaQuery.matches) return;
-
-    let isVisible = true;
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-      if (isVisible) {
-        animationFrameId = requestAnimationFrame(render);
-      } else {
-        cancelAnimationFrame(animationFrameId);
-      }
+    const start = () => {
+      if (isRunning) return;
+      isRunning = true;
+      lastFrameTime = 0;
+      animationFrameId = requestAnimationFrame(render);
     };
+
+    const stop = () => {
+      if (!isRunning) return;
+      isRunning = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+
+    // The canvas is `position: fixed`, so it stays "on screen" for the whole session.
+    // Its only purpose is to sit behind the hero, so once the hero has scrolled away the
+    // scene is invisible: stop rendering entirely instead of burning frames in the
+    // background for the rest of the visit.
+    const heroSentinel = document.createElement("div");
+    heroSentinel.setAttribute("aria-hidden", "true");
+    heroSentinel.style.cssText = "position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;";
+    canvas.parentElement?.insertBefore(heroSentinel, canvas);
+    const heroObserver = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      { rootMargin: "100px" }
+    );
+    heroObserver.observe(heroSentinel);
 
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -70,7 +110,7 @@ export const Interactive3DScene: React.FC = () => {
 
     // Generate 3D nodes clustered in a spherical cloud
     const nodeCount = isSmallScreen ? 20 : isMobile ? 28 : 55;
-    const sphereRadius = Math.min(width, height) * 0.42;
+    let sphereRadius = Math.min(width, height) * 0.42;
     const nodes: Node3D[] = [];
 
     for (let i = 0; i < nodeCount; i++) {
@@ -94,6 +134,36 @@ export const Interactive3DScene: React.FC = () => {
     let angle = 0;
     let lastFrameTime = 0;
     const frameInterval = isMobile ? 1000 / 30 : 1000 / 60; // 30fps on mobile, 60fps desktop
+
+    /**
+     * Precomputed connection pairs.
+     *
+     * The naive version recomputes all N*(N-1)/2 distances every frame (1485 pairs at 55
+     * nodes, 60x per second) only to discard almost all of them as "too far apart".
+     *
+     * `maxDistance` is a fixed fraction of `sphereRadius`, so any pair whose separation
+     * already exceeds it can never come into range later: each node only drifts inside the
+     * sphere rather than travelling across it. Solving the pairs once turns the per-frame
+     * cost from O(N^2) into O(edges). Recomputed on resize, since `sphereRadius` changes.
+     */
+    let maxDistance = sphereRadius * 0.45;
+    let edges: [number, number][] = [];
+
+    const rebuildEdges = () => {
+      maxDistance = sphereRadius * 0.45;
+      const next: [number, number][] = [];
+      for (let i = 0; i < nodeCount; i++) {
+        for (let j = i + 1; j < nodeCount; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dz = nodes[i].z - nodes[j].z;
+          if (Math.sqrt(dx * dx + dy * dy + dz * dz) < maxDistance) next.push([i, j]);
+        }
+      }
+      edges = next;
+    };
+
+    rebuildEdges();
 
     const render = (now: number = 0) => {
       // Throttle mobile frame rate for smoothness + battery
@@ -125,10 +195,17 @@ export const Interactive3DScene: React.FC = () => {
       const halfH = height / 2;
 
       // Project 3D nodes into 2D coordinates
-      const projectedNodes: { x2d: number; y2d: number; z: number; radius: number; alpha: number }[] = [];
+      // Reused across frames to avoid allocating 55 objects every 16ms.
+      const projectedNodes: { x2d: number; y2d: number; radius: number; alpha: number }[] = nodes.map(() => ({
+        x2d: 0,
+        y2d: 0,
+        radius: 0,
+        alpha: 0,
+      }));
 
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
+        const p = projectedNodes[i];
 
         // Organic micro-drift
         node.x += node.vx;
@@ -153,35 +230,29 @@ export const Interactive3DScene: React.FC = () => {
         const y2d = y2 * scale + halfH;
         const alpha = Math.max(0.1, Math.min(1, (z2 + sphereRadius) / (sphereRadius * 1.8)));
 
-        projectedNodes.push({
-          x2d,
-          y2d,
-          z: z2,
-          radius: node.baseRadius * scale,
-          alpha,
-        });
+        p.x2d = x2d;
+        p.y2d = y2d;
+        p.radius = node.baseRadius * scale;
+        p.alpha = alpha;
       }
 
-      // Draw connection lines in 3D depth order
-      const maxDistance = sphereRadius * 0.45;
+      // Draw connection lines, reusing the precomputed edge list instead of testing
+      // all N*(N-1)/2 pairs per frame. A single path per batch cuts draw-call count too.
       ctx.lineWidth = 1;
 
-      for (let i = 0; i < projectedNodes.length; i++) {
-        const p1 = projectedNodes[i];
-        for (let j = i + 1; j < projectedNodes.length; j++) {
-          const p2 = projectedNodes[j];
-          const dx = p1.x2d - p2.x2d;
-          const dy = p1.y2d - p2.y2d;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+      for (let e = 0; e < edges.length; e++) {
+        const p1 = projectedNodes[edges[e][0]];
+        const p2 = projectedNodes[edges[e][1]];
+        const dx = p1.x2d - p2.x2d;
+        const dy = p1.y2d - p2.y2d;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < maxDistance) {
-            const lineAlpha = (1 - dist / maxDistance) * 0.18 * ((p1.alpha + p2.alpha) / 2);
-            ctx.strokeStyle = `rgba(54, 135, 227, ${lineAlpha})`;
-            ctx.beginPath();
-            ctx.moveTo(p1.x2d, p1.y2d);
-            ctx.lineTo(p2.x2d, p2.y2d);
-            ctx.stroke();
-          }
+        if (dist < maxDistance) {
+          ctx.strokeStyle = `rgba(54, 135, 227, ${(1 - dist / maxDistance) * 0.18 * ((p1.alpha + p2.alpha) / 2)})`;
+          ctx.beginPath();
+          ctx.moveTo(p1.x2d, p1.y2d);
+          ctx.lineTo(p2.x2d, p2.y2d);
+          ctx.stroke();
         }
       }
 
@@ -202,16 +273,19 @@ export const Interactive3DScene: React.FC = () => {
         }
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      if (isRunning) animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    // Rendering is owned by the IntersectionObserver; a bare render() here would defeat it.
+    start();
 
     return () => {
+      stop();
+      heroObserver.disconnect();
+      heroSentinel.remove();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
