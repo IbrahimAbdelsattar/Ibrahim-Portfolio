@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0f1e" />
     <title>Ibrahim Abdelsattar</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content="Portfolio of Ibrahim Abdelsattar - AI Engineer & Data Scientist specializing in Machine Learning, Deep Learning, NLP, and building intelligent systems." />
     <meta name="author" content="Ibrahim Abdelsattar" />
     <meta name="keywords" content="AI Engineer, Data Scientist, Machine Learning, Deep Learning, NLP, Python, TensorFlow, Portfolio" />
@@ -21,9 +22,45 @@
     <meta name="twitter:description" content="Building intelligent systems and solving real-world problems using Machine Learning & AI." />
     <meta name="twitter:image" content="/og-image.png" />
 
+    <!--
+      Fonts are requested once here rather than via an @import in index.css: an @import sits
+      at the end of the critical CSS chain and costs an extra DNS/TLS round trip discovery.
+
+      The families are preloaded because each one would otherwise be discovered only after the
+      CSS and first paint, which is what causes the visible font swap. Preconnecting to
+      fonts.gstatic.com (where the actual .woff2 files live) removes a second handshake.
+
+      Weights are the ones actually used: Poppins 400/500/600/700 (normal) + 400 italic for the
+      testimonial quotes, Amiri 400/700 for Arabic in the chatbot, JetBrains Mono 400 for code.
+      The previous request asked for 13 Poppins/Amiri styles including 800/900 and Amiri
+      italics that no rule references.
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    />
+
+    <!--
+      The hero portrait is the LCP element on the home page. Preloading an existing variant
+      the hero actually requests starts that fetch in parallel with the entry JS rather than
+      after React mounts.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      href="/optimized/assets/profile-main-320.avif"
+      type="image/avif"
+      imagesrcset="/optimized/assets/profile-main-320.avif 320w, /optimized/assets/profile-main-640.avif 640w"
+      imagesizes="(min-width: 1024px) 420px, 208px"
+      fetchpriority="high"
+    />
   </head>
 
   <body>
