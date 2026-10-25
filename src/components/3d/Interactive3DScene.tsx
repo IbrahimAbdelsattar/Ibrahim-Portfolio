@@ -17,7 +17,8 @@ const Interactive3DScene = () => {
     if (!visible) return;
     let width = 0, height = 0, radius = 0, frame = 0;
     let angle = 0, rotX = 0, rotY = 0, targetX = 0, targetY = 0;
-    let previous = 0, scrollAt = -Infinity;
+    let previous = 0;
+    let resumeTimer: ReturnType<typeof setTimeout> | undefined;
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
@@ -32,11 +33,16 @@ const Interactive3DScene = () => {
         x2: 0, y2: 0, alpha: 0, size: 0, baseSize: 1.2 + (i % 5) * 0.3 };
     });
     const pointer = (e: PointerEvent) => { targetX = -(e.clientY / height - 0.5) * 0.7; targetY = (e.clientX / width - 0.5) * 0.7; };
-    const scroll = () => { scrollAt = performance.now(); };
+    const scroll = () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        previous = performance.now();
+        frame = requestAnimationFrame(render);
+      }, 140);
+    };
     const render = (now: number) => {
       frame = requestAnimationFrame(render);
-      // Keep decoration still while scrolling rather than competing for frame time.
-      if (now - scrollAt < 120) { previous = now; return; }
       const elapsed = now - previous;
       if (elapsed < 1000 / 30) return;
       const delta = Math.min(elapsed, 70) / (1000 / 30);
@@ -80,6 +86,7 @@ const Interactive3DScene = () => {
     frame = requestAnimationFrame(render);
     return () => {
       cancelAnimationFrame(frame);
+      clearTimeout(resumeTimer);
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("pointermove", pointer);

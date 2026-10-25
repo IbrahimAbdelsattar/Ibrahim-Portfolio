@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Award, Calendar, Building2 } from "lucide-react";
 import ResponsiveImage from "@/components/ResponsiveImage";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 
 interface CertificationCardProps {
   title: string;
@@ -19,17 +20,20 @@ const CertificationCard = ({
   index,
   onClick,
 }: CertificationCardProps) => {
+  const reducedMotion = useReducedMotionPreference();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px 80px 0px" }}
       transition={{ duration: 0.25, delay: (index % 4) * 0.04 }}
-      className="h-full"
+      className="h-full certification-card"
     >
-      <div
+      <button
+        type="button"
         onClick={onClick}
-        className="h-full group rounded-3xl cursor-pointer"
+        aria-label={`View ${title} certificate`}
+        className="w-full h-full text-left group rounded-3xl cursor-pointer"
       >
         <div className="h-full glass-card rounded-3xl overflow-hidden hover-glow flex flex-col">
           {/* Certificate Image */}
@@ -70,7 +74,7 @@ const CertificationCard = ({
             </div>
           </div>
         </div>
-      </div>
+      </button>
     </motion.div>
   );
 };

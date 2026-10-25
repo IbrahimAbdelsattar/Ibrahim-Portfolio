@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode, useLayoutEffect } from "react";
+import { useEnhancedEffects } from "@/hooks/use-enhanced-effects";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FloatingShapes from "./FloatingShapes";
@@ -12,11 +13,16 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const enhancedEffects = useEnhancedEffects();
+  useLayoutEffect(() => {
+    document.documentElement.dataset.effects = enhancedEffects ? "full" : "reduced";
+    return () => { delete document.documentElement.dataset.effects; };
+  }, [enhancedEffects]);
   return (
     <div className="min-h-dvh bg-background relative overflow-x-clip">
       <ScrollProgress />
       <FloatingShapes />
-      <Interactive3DScene />
+      {enhancedEffects && <Interactive3DScene />}
       <Navbar />
       <a href="#main-content" className="skip-link">Skip to content</a>
       <main id="main-content" tabIndex={-1} className="relative z-10 pt-16 lg:pt-20 overflow-x-clip outline-none">

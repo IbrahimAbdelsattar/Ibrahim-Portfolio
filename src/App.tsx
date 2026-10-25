@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useLayoutEffect } from "react";
 import { MotionConfig, motion } from "framer-motion";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -21,7 +21,7 @@ const queryClient = new QueryClient();
 const PageRoutes = () => {
   const location = useLocation();
   const reducedMotion = useReducedMotionPreference();
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (canonical) canonical.href = `https://ibrahim-ai-specialist.vercel.app${location.pathname}`;
@@ -56,7 +56,7 @@ const App = () => {
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PageRoutes />
       </BrowserRouter>
     </TooltipProvider>

@@ -32,7 +32,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "80px" }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
-      className="h-full"
+      className="h-full project-card"
     >
       <TiltCard3D maxTilt={5} scale={1.01} glare className="h-full group rounded-3xl">
         <div
@@ -105,7 +105,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
           <div className="p-4 sm:p-5 pt-3 mt-3 border-t border-border/40 flex items-center gap-2.5 bg-card/25 backdrop-blur-sm relative">
             <Link
               to={`/projects/${project.id}`}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl min-h-[38px] px-3 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl min-h-[44px] px-3 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-colors"
             >
               Case study
               <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -118,7 +118,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Open ${project.title} live`}
-                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-primary/40 hover:border-primary text-primary hover:bg-primary/10 min-h-[38px] px-3 text-xs font-medium transition-all"
+                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-primary/40 hover:border-primary text-primary hover:bg-primary/10 min-h-[44px] px-3 text-xs font-medium transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 Live
@@ -131,7 +131,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`View ${project.title} source on GitHub`}
-                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/80 hover:border-primary/50 hover:bg-primary/10 min-h-[38px] px-3 text-xs font-medium transition-all"
+                className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/80 hover:border-primary/50 hover:bg-primary/10 min-h-[44px] px-3 text-xs font-medium transition-colors"
               >
                 <Github className="w-3.5 h-3.5" aria-hidden="true" />
                 Code

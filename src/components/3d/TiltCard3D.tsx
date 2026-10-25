@@ -1,5 +1,4 @@
-import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useEnhancedEffects } from "@/hooks/use-enhanced-effects";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
@@ -22,9 +21,8 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const isCoarsePointer = useMediaQuery("(hover: none), (pointer: coarse)");
-  const reducedMotion = useReducedMotionPreference();
-  const disableTilt = isCoarsePointer || reducedMotion;
+  const enhancedEffects = useEnhancedEffects();
+  const disableTilt = !enhancedEffects;
 
   // Normalized mouse coordinates from -0.5 to 0.5
   const mouseX = useMotionValue(0);

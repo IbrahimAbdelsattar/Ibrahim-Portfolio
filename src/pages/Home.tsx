@@ -1,7 +1,8 @@
 import { ibrahimProfile } from "@/data/profile";
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
+import { useEnhancedEffects } from "@/hooks/use-enhanced-effects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -31,17 +32,18 @@ const Home = () => {
   const heroRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotionPreference();
   const pageVisible = usePageVisible();
+  const enhancedEffects = useEnhancedEffects();
   const heroVisible = useInView(heroRef, { amount: 0.2 });
   const techRef = useRef<HTMLElement>(null);
   const techVisible = useInView(techRef, { amount: 0.1 });
-  const heroMotion = pageVisible && heroVisible && !reduceMotion;
-  const marqueeMotion = pageVisible && techVisible && !reduceMotion;
+  const heroMotion = pageVisible && heroVisible && enhancedEffects;
+  const marqueeMotion = pageVisible && techVisible && enhancedEffects;
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const heroBgY = useTransform(heroProgress, [0, 1], [0, reduceMotion ? 0 : 90]);
-  const heroFade = useTransform(heroProgress, [0, 0.85], [1, reduceMotion ? 1 : 0.25]);
+  const heroBgY = useTransform(heroProgress, [0, 1], [0, enhancedEffects ? 60 : 0]);
+  const heroFade = useTransform(heroProgress, [0, 0.85], [1, enhancedEffects ? 0.5 : 1]);
 
   // Homepage shows a curated selection of flagship work; the full archive
   // lives on /projects. Counts shown as stats are derived, never hardcoded.
@@ -87,31 +89,10 @@ const Home = () => {
         <motion.div style={{ y: heroBgY }} className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
         <motion.div style={{ opacity: heroFade }} className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Mobile profile image — compact, shown first on small screens */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              className="lg:hidden flex justify-center order-first"
-            >
-              <div className="relative w-40 h-40 sm:w-52 sm:h-52">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 rounded-full blur-[40px]" />
-                <ResponsiveImage
-                  src="/assets/profile-main.jpg"
-                  sizes="200px"
-                  fetchPriority="high"
-                  alt="Ibrahim Abdelsattar"
-                  loading="eager"
-                  decoding="async"
-                  className="relative z-10 w-full h-full object-cover rounded-full border-2 border-primary/30 shadow-2xl"
-                />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
               className="text-center lg:text-left"
             >
               <h2 className="text-lg sm:text-xl lg:text-2xl font-medium text-primary mb-3 sm:mb-4">
@@ -156,18 +137,18 @@ const Home = () => {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative hidden lg:flex justify-center"
+              transition={{ duration: 0.4 }}
+              className="relative flex justify-center order-first lg:order-none"
             >
-              <div className="relative w-full max-w-[420px] mx-auto">
-                <TiltCard3D maxTilt={16} scale={1.03} glare={false} className="w-full">
+              <div className="relative w-40 sm:w-52 lg:w-full lg:max-w-[420px] mx-auto">
+                <TiltCard3D maxTilt={8} scale={1.02} glare={false} className="w-full">
                   <div className="relative w-full aspect-square preserve-3d">
                     <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px]" />
                     <ResponsiveImage
                       src="/assets/profile-main.jpg"
-                      sizes="(min-width: 1280px) 480px, 40vw"
+                      sizes="(min-width: 1024px) 420px, (min-width: 640px) 208px, 160px"
                       fetchPriority="high"
                       alt="Ibrahim Abdelsattar"
                       loading="eager"
@@ -180,7 +161,7 @@ const Home = () => {
                         style={{ z: 40 }}
                         animate={heroMotion ? { y: [0, -10, 0] } : { y: 0 }}
                         transition={{ duration: heroMotion ? 4 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut" }}
-                        className="absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
+                        className="hidden lg:block absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
@@ -197,7 +178,7 @@ const Home = () => {
                         style={{ z: 50 }}
                         animate={heroMotion ? { y: [0, 10, 0] } : { y: 0 }}
                         transition={{ duration: heroMotion ? 5 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut", delay: 1 }}
-                        className="absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
+                        className="hidden lg:block absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-primary backdrop-blur-md">
@@ -219,16 +200,17 @@ const Home = () => {
 
       {/* Equal-width copies keep the marquee seamless at the loop boundary. */}
       <section ref={techRef} className="py-8 sm:py-10 border-y border-border/40 bg-card/20 overflow-x-clip">
-        <div className={`flex relative w-full ${reduceMotion ? "overflow-x-auto" : "overflow-hidden"}`}>
-          <motion.div className="flex items-center w-max" animate={marqueeMotion ? { x: ["0%", "-50%"] } : { x: 0 }}
-            transition={{ repeat: marqueeMotion ? Infinity : 0, ease: "linear", duration: marqueeMotion ? 30 : 0 }}>
-            {(reduceMotion ? [0] : [0, 1]).map(copy => <div key={copy} aria-hidden={copy === 1 ? true : undefined}
+        <div className={`tech-marquee flex relative w-full ${enhancedEffects ? "overflow-hidden" : "overflow-x-auto"}`}
+          tabIndex={0} role="region" aria-label="Technology stack" >
+          <div className={`flex items-center w-max ${enhancedEffects ? "tech-marquee-track" : ""}`}
+            style={{ animationPlayState: marqueeMotion ? "running" : "paused" }}>
+            {(enhancedEffects ? [0, 1] : [0]).map(copy => <div key={copy} aria-hidden={copy === 1 ? true : undefined}
               className="flex gap-10 sm:gap-16 pr-10 sm:pr-16 items-center shrink-0">
               {techStack.map(tech => <div key={tech.name} className="grayscale hover:grayscale-0 transition-[filter] duration-200 shrink-0" title={tech.name}>
-                <img src={tech.logo} alt={tech.name} loading="lazy" decoding="async" className="h-8 sm:h-12 w-auto max-w-[80px] object-contain" />
+                <img src={tech.logo} alt={copy === 1 ? "" : tech.name} width="80" height="48" loading="lazy" decoding="async" className="h-8 sm:h-12 w-16 sm:w-20 object-contain" />
               </div>)}
             </div>)}
-          </motion.div>
+          </div>
         </div>
       </section>
 

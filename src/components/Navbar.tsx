@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Brain, Sun, Moon } from "lucide-react";
@@ -16,6 +18,10 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const desktop = useMediaQuery("(min-width: 1024px)");
+  const reducedMotion = useReducedMotionPreference();
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Theme State
   const [theme, setTheme] = useState(() => {
@@ -46,33 +52,47 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     setIsOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, desktop]);
 
   // Lock body scroll when mobile menu is open + close on Escape
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    menuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        menuButton.current?.focus({ preventScroll: true });
+      }
+      if (e.key === "Tab") {
+        const controls = [menuButton.current, ...Array.from(menuRef.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])].filter(Boolean) as HTMLElement[];
+        const first = controls[0], last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
     };
   }, [isOpen]);
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      initial={reducedMotion ? false : { y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      data-scrolled={scrolled || isOpen}
+      className={`site-nav fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-200 ${
         scrolled 
           ? "bg-background/65 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]" 
           : "bg-transparent"
@@ -160,8 +180,10 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
+              ref={menuButton}
               aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
               className="min-h-[44px] min-w-[44px]"
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -174,22 +196,25 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="lg:hidden bg-card/90 backdrop-blur-2xl border-b border-white/10 dark:border-white/10 shadow-2xl overflow-hidden"
+            id="mobile-navigation"
+            ref={menuRef}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reducedMotion ? 0 : -8 }}
+            transition={{ duration: reducedMotion ? 0 : 0.18 }}
+            className="absolute inset-x-0 top-full lg:hidden bg-card/95 backdrop-blur-md border-b border-white/10 dark:border-white/10 shadow-2xl overflow-hidden"
           >
             <div className="container mx-auto px-4 py-4 pb-safe flex flex-col gap-2 max-h-[70dvh] overflow-y-auto scroll-smooth-touch custom-scrollbar">
-              {navLinks.map((link, index) => (
+              {navLinks.map((link) => (
                 <motion.div
                   key={link.path}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={false}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ duration: 0.15 }}
                 >
                   <Link
                     to={link.path}
+                    aria-current={location.pathname === link.path ? "page" : undefined}
                     className={`block px-4 py-3.5 min-h-[48px] flex items-center rounded-xl text-[15px] font-medium transition-colors ${
                       (location.pathname === link.path || (link.path === "/projects" && location.pathname.startsWith("/projects/")))
                         ? "bg-primary/10 text-primary border border-primary/20"
