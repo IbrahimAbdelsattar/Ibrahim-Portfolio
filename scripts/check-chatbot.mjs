@@ -7,7 +7,10 @@ const apiUrl = process.argv.find(arg => arg.startsWith('--url='))?.slice(6);
 let local;
 if (!apiUrl) {
   local = parseEnv(readFileSync(new URL('../.env.vercel.local', import.meta.url), 'utf8'));
-  for (const name of ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL']) {
+  const required = local.OPENROUTER_API_KEY
+    ? ['OPENROUTER_API_KEY', 'OPENROUTER_MODEL']
+    : ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL'];
+  for (const name of required) {
     if (!local[name]?.trim()) throw new Error(`${name} is missing from .env.vercel.local`);
   }
   console.log('Using server configuration from .env.vercel.local (key not displayed).');

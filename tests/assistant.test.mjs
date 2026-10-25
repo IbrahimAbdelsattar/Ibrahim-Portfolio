@@ -71,7 +71,7 @@ const post = (body, extra = {}) => new Request('https://portfolio.example/api/ch
 
 const providerEnv = (values = {}) => {
   values = { ...(values.OMNIROUTE_API_KEY ? { OMNIROUTE_API_URL: 'https://omniroute.example/v1/chat/completions', OMNIROUTE_MODEL: 'test-model' } : {}), ...values };
-  const names = ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL', 'VITE_OMNIROUTE_API_KEY', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN', 'AI_GATEWAY_MODEL', 'VERCEL'];
+  const names = ['OPENROUTER_API_KEY', 'OPENROUTER_MODEL', 'OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL', 'VITE_OMNIROUTE_API_KEY', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN', 'AI_GATEWAY_MODEL', 'VERCEL'];
   const saved = Object.fromEntries(names.map(name => [name, process.env[name]]));
   for (const name of names) {
     if (values[name] === undefined) delete process.env[name]; else process.env[name] = values[name];

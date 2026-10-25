@@ -70,11 +70,17 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   )) return json({ error: "Invalid conversation history" }, 400);
   const history: ConversationTurn[] = rawHistory.map(turn => ({ role: turn.role, content: turn.content }));
 
-  // OmniRoute uses only server-owned variables; never accept VITE_ credentials.
+  // OpenRouter is exclusive when configured: use the owner's selected model,
+  // without falling back to stale credentials or a different paid model.
+  const openRouterKey = env.OPENROUTER_API_KEY?.trim();
+  const openRouterModel = env.OPENROUTER_MODEL?.trim();
+  if (openRouterKey && !openRouterModel)
+    return json({ error: "OpenRouter model is not configured" }, 503);
+  // Legacy providers remain available for installations without OpenRouter.
   const omniKey = env.OMNIROUTE_API_KEY?.trim();
   const omniUrl = env.OMNIROUTE_API_URL?.trim();
   const omniModel = env.OMNIROUTE_MODEL?.trim();
-  if (omniKey) {
+  if (!openRouterKey && omniKey) {
     try {
       if (!omniUrl || !omniModel || new URL(omniUrl).protocol !== "https:") throw new Error("Invalid configuration");
     } catch { return json({ error: "Chatbot endpoint or model is not configured correctly" }, 503); }
@@ -82,7 +88,8 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   // Retain the incoming real Gateway integration, with refreshed platform OIDC.
   const runtimeOidc = env.VERCEL === "1" ? request.headers.get("x-vercel-oidc-token") : null;
   const gatewayKey = env.AI_GATEWAY_API_KEY || runtimeOidc || env.VERCEL_OIDC_TOKEN;
-  const providers = [
+  const providers = openRouterKey ? [{ name: "openrouter", url: "https://openrouter.ai/api/v1/chat/completions",
+    key: openRouterKey, model: openRouterModel! }] : [
     ...(omniKey && omniUrl && omniModel ? [{ name: "omniroute", url: omniUrl, key: omniKey, model: omniModel }] : []),
     ...(gatewayKey ? [{ name: "vercel", url: "https://ai-gateway.vercel.sh/v1/chat/completions",
       key: gatewayKey, model: env.AI_GATEWAY_MODEL || "google/gemini-3.1-flash-lite" }] : []),
@@ -101,7 +108,9 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.key}` },
         body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: 700,
           messages: [{ role: "system", content: `${IBRAHIM_SYSTEM_PROMPT}\n\nVERIFIED PUBLIC EVIDENCE:\n${buildAssistantContext(message, history)}` },
-            ...history, { role: "user", content: message }], stream: false }),
+            ...history, { role: "user", content: message }], stream: false,
+          ...(provider.name === "openrouter" ? { reasoning: { enabled: false } } : {}),
+        }),
         signal: AbortSignal.any([request.signal, controller.signal]),
       });
       if (response.ok) {

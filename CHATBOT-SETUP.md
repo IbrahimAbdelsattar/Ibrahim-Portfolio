@@ -1,16 +1,14 @@
-﻿# Chatbot setup and verification
+# Chatbot setup and verification
 
-## Temporary UI maintenance — 2026-10-25
+## Active provider — OpenRouter
 
-The assistant is hidden by default while the configured providers reject live requests. Production runtime logs and a real `POST /api/chat` confirmed OmniRoute HTTP **401** and Vercel AI Gateway HTTP **403**, followed by the API returning **502 / PROVIDER_AUTH_FAILED**. All three `OMNIROUTE_*` variables exist in the Production environment; their presence does not establish that the provider accepts the credential. No working credential was available to replace it during this investigation.
+The browser calls the same-origin `/api/chat` endpoint. The server sends requests to `https://openrouter.ai/api/v1/chat/completions` using **server-only** `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. The current selected model is `nvidia/nemotron-3.5-super-vl:free`; it was confirmed in OpenRouter's live model catalog with zero prompt/completion pricing. A live request through the shared handler returned HTTP 200 with the correct MTI University and 3.5 GPA facts on 2026-10-25.
 
-The endpoint and conversation implementation remain available for repair and testing. Only the launcher/UI is disabled, via `src/config/features.ts`. To restore it:
+When `OPENROUTER_API_KEY` is configured, OpenRouter is the only provider used. Rejected legacy OmniRoute/Gateway settings cannot block it, and failures never trigger a different paid model. Reasoning is disabled for the short portfolio answers so the output budget goes to the visible response. The browser contains no provider key and has no canned-answer fallback.
 
-1. Replace the rejected OmniRoute key with a valid key for the configured endpoint/model, or resolve the Vercel AI Gateway account/access failure. The runtime logs now include recognized upstream error identifiers, such as `customer_verification_required` or `insufficient_funds`, without logging provider text or secrets. A generic 403 by itself does not prove a billing failure.
-2. Redeploy after updating server environment variables and run `npm run check:chat -- --url=https://ibrahim-ai-specialist.vercel.app/api/chat`. Remote checks do not require a local env file and stop on the first failure. GET only checks that the route loads; it does not test model generation.
-3. Once the live check passes, set the **public boolean** `VITE_CHATBOT_ENABLED=true` in the Vercel environment you are deploying and redeploy. Omit it or set it to `false` to hide the UI again. Never place an API key in this variable.
+Production has `VITE_CHATBOT_ENABLED=true` to show the launcher. To hide the assistant temporarily, set this **public boolean** to `false` and redeploy. Set it back to `true` and redeploy after successful live verification. Never put a credential in a `VITE_` variable.
 
-The browser calls the same-origin `/api/chat` endpoint. Only the server sends requests to OmniRoute, using `OMNIROUTE_API_URL`, `OMNIROUTE_API_KEY`, and `OMNIROUTE_MODEL`. The browser contains no provider key and has no offline or canned-answer fallback. API failures display an unavailable message.
+Earlier on 2026-10-25, runtime logs confirmed OmniRoute HTTP 401 and Vercel AI Gateway HTTP 403 despite the three OmniRoute variables being present in Production. The UI was temporarily hidden until a working provider was available. OpenRouter replaces that rejected path. The legacy integrations remain supported only when OpenRouter is absent.
 
 Replies are instructed to use the latest user's conversational language, with Egyptian Arabic for Arabic questions and the corresponding language for all other questions. Each reply must use one language without a repeated translation or second-language greeting. Technical terms, proper names, URLs, and email addresses may remain in English. A technical-term-only follow-up keeps the established conversation language.
 
@@ -18,7 +16,7 @@ The interface provides separate Arabic and English welcome messages and controls
 
 ## Local development
 
-Keep the three server variables in `.env.vercel.local` (ignored by Git). To preview the launcher locally, also put `VITE_CHATBOT_ENABLED=true` in `.env.local`, which Vite loads for the frontend. Run `npm run dev`. The Vite development middleware reads `.env.vercel.local` on each API request and runs the same handler as Vercel. Existing server environment variables take precedence. Restart after changing externally supplied environment variables.
+Keep `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` in `.env.vercel.local` (ignored by Git). To preview the launcher locally, also put `VITE_CHATBOT_ENABLED=true` in `.env.local`, which Vite loads for the frontend. Run `npm run dev`. The Vite development middleware reads `.env.vercel.local` on each API request and runs the same handler as Vercel. Existing server environment variables take precedence. Restart after changing externally supplied environment variables.
 
 Run `npm run check:chat` to make real model requests with the configuration read directly from `.env.vercel.local`. The check validates the university/GPA, follow-up context, Arabic, unknown salary, and refusal to fabricate a degree. It stops on the first failure and prints responses/status codes without printing the key. To check the running local HTTP endpoint:
 
@@ -26,15 +24,15 @@ Run `npm run check:chat` to make real model requests with the configuration read
 npm run check:chat -- --url=http://127.0.0.1:8080/api/chat
 ```
 
-The earlier live verification on 2026-10-05 also returned OmniRoute HTTP 401 Unauthorized. The current 2026-10-25 result is documented above. Real answer accuracy remains unverified until at least one provider accepts requests. The previous browser implementation contained a hardcoded credential; use a newly issued key in the local file and Vercel.
+A remote check does not need a local env file: `npm run check:chat -- --url=https://ibrahim-ai-specialist.vercel.app/api/chat`. GET checks only that the route loads; use POST or this verification command to test generation.
 
 ## Vercel
 
-Import the variables from `.env.vercel.local` under the project's Settings > Environment Variables for Production/Preview, then deploy the code and redeploy after changing variables. A local env file is not automatically deployed as production configuration. Never prefix the key with `VITE_`.
+Configure `OPENROUTER_API_KEY` as a secret, `OPENROUTER_MODEL` as a server config value, and `VITE_CHATBOT_ENABLED=true` as a public boolean under the project’s Settings > Environment Variables for the target environment. Redeploy after changes. A local env file is not automatically deployed as production configuration. Never prefix the API key with `VITE_`. Production is configured; other deployment environments need their own settings.
 
 `vercel.json` preserves API routes and gives the chat function 60 seconds; the provider request times out after 40 seconds. The model receives `src/data/ibrahimProfile.json` and up to eight prior conversation messages. Keep that profile current with the portfolio. Error messages and the static welcome text are excluded from history. Requests are serialized in the UI.
 
-The optional legacy `chatbot_api.py` also reads server environment variables or `.env.vercel.local`, uses the same portfolio facts, and has no canned fallback. The website does not require that Python service.
+The optional legacy `chatbot_api.py` is not used by the website. Use the TypeScript `/api/chat` endpoint for OpenRouter.
 
 ## Automated checks
 

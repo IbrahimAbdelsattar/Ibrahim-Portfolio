@@ -165,3 +165,34 @@ test('local server configuration is isolated from ambient environment variables'
   assert.equal((await call({ message: 'Hello' }, 'POST', config)).status, 200);
   assert.equal(process.env.OMNIROUTE_API_KEY, ambientKey);
 });
+
+test('OpenRouter uses the selected free model and server credential despite invalid legacy configuration', async () => {
+  const config = { OPENROUTER_API_KEY: ' openrouter-test-secret ', OPENROUTER_MODEL: ' nvidia/nemotron-3.5-super-vl:free ',
+    OMNIROUTE_API_KEY: 'rejected-old-key', OMNIROUTE_API_URL: 'invalid', VERCEL_OIDC_TOKEN: 'old-oidc-token' };
+  let calls = 0;
+  globalThis.fetch = async (url, options) => {
+    calls++;
+    assert.equal(url, 'https://openrouter.ai/api/v1/chat/completions');
+    assert.equal(options.headers.Authorization, 'Bearer openrouter-test-secret');
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.model, 'nvidia/nemotron-3.5-super-vl:free');
+    assert.deepEqual(payload.reasoning, { enabled: false });
+    assert.match(payload.messages[0].content, /VERIFIED PUBLIC EVIDENCE/);
+    assert.doesNotMatch(JSON.stringify(payload), /openrouter-test-secret|old-oidc-token/);
+    return Response.json({ choices: [{ message: { content: 'A live OpenRouter response.' } }] });
+  };
+  assert.deepEqual((await call({ message: 'Hello' }, 'POST', config)).body,
+    { reply: 'A live OpenRouter response.', isLive: true, source: 'ai' });
+  assert.equal(calls, 1);
+  globalThis.fetch = async () => { calls++; return Response.json({ error: { message: 'Rejected' } }, { status: 401 }); };
+  assert.equal((await call({ message: 'Hello' }, 'POST', config)).status, 502);
+  assert.equal(calls, 2, 'OpenRouter errors must not use a different provider or model');
+});
+
+test('OpenRouter requires an explicit model and never accepts a browser-exposed key', async () => {
+  globalThis.fetch = () => { throw new Error('No configured server model'); };
+  assert.equal((await call({ message: 'Hello' }, 'POST', { OPENROUTER_API_KEY: 'server-key' })).status, 503);
+  assert.equal((await call({ message: 'Hello' }, 'POST', {
+    VITE_OPENROUTER_API_KEY: 'exposed-key', OPENROUTER_MODEL: 'nvidia/nemotron-3.5-super-vl:free',
+  })).status, 503);
+});
