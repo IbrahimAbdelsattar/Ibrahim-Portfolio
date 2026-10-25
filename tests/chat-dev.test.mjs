@@ -39,3 +39,39 @@ test('development serves the real API with server credentials and JSON errors, n
     await server.close();
   }
 });
+
+test('development flushes OpenRouter tokens before completion and aborts on disconnect', { timeout: 5000 }, async () => {
+  const originalEnv = { ...process.env };
+  const originalFetch = globalThis.fetch;
+  Object.assign(process.env, { OPENROUTER_API_KEY: 'stream-test-key', OPENROUTER_MODEL: 'nvidia/nemotron-3.5-super-vl:free' });
+  const server = await createServer({ configFile: false, plugins: [chatDevPlugin()],
+    server: { host: '127.0.0.1', port: 0 }, logLevel: 'error' });
+  let providerAborted;
+  const aborted = new Promise(resolve => { providerAborted = resolve; });
+  let cancelled = false;
+  try {
+    await server.listen();
+    globalThis.fetch = async (url, options) => {
+      assert.equal(url, 'https://openrouter.ai/api/v1/chat/completions');
+      assert.equal(JSON.parse(options.body).stream, true);
+      options.signal.addEventListener('abort', providerAborted, { once: true });
+      return new Response(new ReadableStream({
+        start(c) { c.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"First text"}}]}\n\n')); },
+        cancel() { cancelled = true; },
+      }), { headers: { 'Content-Type': 'text/event-stream' } });
+    };
+    const controller = new AbortController();
+    const response = await originalFetch(`http://127.0.0.1:${server.httpServer.address().port}/api/chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'Hello', stream: true }), signal: controller.signal,
+    });
+    assert.match(response.headers.get('content-type'), /text\/event-stream/);
+    const reader = response.body.getReader();
+    let first = '';
+    while (!first.includes('First text')) first += new TextDecoder().decode((await reader.read()).value);
+    assert.match(first, /"type":"delta"/);
+    assert.ok(!first.includes('"type":"done"'));
+    controller.abort();
+    await aborted;
+    assert.equal(cancelled, true);
+  } finally { globalThis.fetch = originalFetch; process.env = originalEnv; await server.close(); }
+});

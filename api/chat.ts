@@ -1,5 +1,6 @@
 import { buildAssistantContext, IBRAHIM_SYSTEM_PROMPT } from "../src/data/ibrahimKnowledge.ts";
 import type { ConversationTurn } from "../src/data/ibrahimKnowledge.ts";
+import { readSseData } from "../src/lib/sse.ts";
 
 type ChatEnvironment = Record<string, string | undefined>;
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -35,6 +36,45 @@ function parseReply(raw: string): unknown {
   return JSON.parse(raw).choices?.[0]?.message?.content;
 }
 
+/** Forward only visible text; provider metadata/reasoning/errors stay on the server. */
+function streamReply(response: Response, controller: AbortController, cleanup: () => void, provider: string): Response {
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    async start(sink) {
+      const emit = (event: object) => sink.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+      let text = "", completed = false;
+      try {
+        sink.enqueue(encoder.encode(": connected\n\n"));
+        if (response.headers.get("content-type")?.includes("text/event-stream") && response.body) {
+          for await (const data of readSseData(response.body, controller.signal)) {
+            if (data === "[DONE]") { completed = true; break; }
+            const event = JSON.parse(data);
+            if (event.error || event.choices?.[0]?.finish_reason === "error") throw new Error("Provider stream failed");
+            const delta = event.choices?.[0]?.delta?.content;
+            if (typeof delta === "string" && delta) { text += delta; emit({ type: "delta", text: delta }); }
+            if (event.choices?.[0]?.finish_reason === "stop") completed = true;
+          }
+        } else {
+          const reply = parseReply(await response.text());
+          if (typeof reply === "string") { text = reply; emit({ type: "delta", text: reply }); completed = true; }
+        }
+        if (!completed || !text.trim()) throw new Error("Incomplete provider stream");
+        emit({ type: "done" });
+        sink.close();
+      } catch {
+        if (!controller.signal.aborted) console.warn("portfolio_chat_provider_unavailable", { provider, reason: "stream_interrupted" });
+        try { emit({ type: "error" }); sink.close(); } catch { /* The visitor disconnected. */ }
+      } finally { cleanup(); }
+    },
+    cancel() { controller.abort(); cleanup(); },
+  });
+  return new Response(body, { headers: {
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-store, no-transform",
+    "X-Accel-Buffering": "no",
+  } });
+}
+
 export async function fetchChat(request: Request, env: ChatEnvironment = process.env): Promise<Response> {
   if (request.method === "GET") return json({ status: "ready", persona: "Ibrahim Abdelsattar" });
   if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "GET, POST" } });
@@ -53,7 +93,7 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
     if (entry && entry.reset > now) { if (entry.count++ >= 30) return json({ error: "Please try again shortly" }, 429); }
     else attempts.set(ip, { count: 1, reset: now + 60_000 });
   }
-  let body: { message?: unknown; history?: unknown };
+  let body: { message?: unknown; history?: unknown; stream?: unknown };
   try {
     if (Number(request.headers.get("content-length") ?? 0) > 16_000) return json({ error: "Message too large" }, 413);
     const raw = await request.text();
@@ -64,6 +104,8 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   if (typeof body.message !== "string" || !body.message.trim() || body.message.length > 2000)
     return json({ error: "Message must contain 1–2000 characters" }, 400);
   const message = body.message.trim();
+  if (body.stream !== undefined && typeof body.stream !== "boolean") return json({ error: "Invalid stream option" }, 400);
+  const streaming = body.stream === true;
   const rawHistory = body.history ?? [];
   if (!Array.isArray(rawHistory) || rawHistory.length > 8 || rawHistory.some(turn =>
     !turn || !["user", "assistant"].includes(turn.role) || typeof turn.content !== "string" || turn.content.length > 4000
@@ -103,17 +145,29 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
     if (remaining < 500 || request.signal.aborted) break;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), index === 0 && providers.length > 1 ? Math.min(8000, remaining) : remaining);
+    let streamOwnsTimer = false;
     try {
-      const response = await fetch(provider.url, {
+      const options = {
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.key}` },
         body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: 700,
-          messages: [{ role: "system", content: `${IBRAHIM_SYSTEM_PROMPT}\n\nVERIFIED PUBLIC EVIDENCE:\n${buildAssistantContext(message, history)}` },
-            ...history, { role: "user", content: message }], stream: false,
-          ...(provider.name === "openrouter" ? { reasoning: { enabled: false } } : {}),
+          messages: [{ role: "system", content: `${IBRAHIM_SYSTEM_PROMPT}\n\nVERIFIED PUBLIC EVIDENCE:\n${buildAssistantContext(message, history, true)}` },
+            ...history, { role: "user", content: message }], stream: streaming,
+          ...(provider.name === "openrouter" ? { reasoning: { enabled: false }, provider: { sort: "latency" } } : {}),
         }),
         signal: AbortSignal.any([request.signal, controller.signal]),
-      });
+      };
+      let response = await fetch(provider.url, options);
+      // A free endpoint can reject a transiently busy request. Retry once before
+      // returning any text; never restart a partially delivered answer.
+      if (provider.name === "openrouter" && [502, 503, 504].includes(response.status) && deadline - Date.now() > 1000) {
+        await response.body?.cancel();
+        response = await fetch(provider.url, options);
+      }
       if (response.ok) {
+        if (streaming) {
+          streamOwnsTimer = true;
+          return streamReply(response, controller, () => clearTimeout(timer), provider.name);
+        }
         const reply = parseReply(await response.text());
         if (typeof reply === "string" && reply.trim()) return json({ reply: reply.trim(), isLive: true, source: "ai" });
         console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, reason: "empty_reply" });
@@ -129,7 +183,7 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
       if (!request.signal.aborted) console.warn("portfolio_chat_provider_unavailable", {
         provider: provider.name, reason: timedOut ? "timeout" : "connection_or_invalid_reply",
       });
-    } finally { clearTimeout(timer); }
+    } finally { if (!streamOwnsTimer) clearTimeout(timer); }
   }
   // Generation failures are errors, never local profile text presented as AI.
   if (authenticationFailed) return json({ error: "The AI service is currently unavailable.", code: "PROVIDER_AUTH_FAILED" }, 502);
@@ -142,11 +196,18 @@ interface NodeRequest {
   body?: unknown;
   url?: string;
   headers?: Record<string, string | string[] | undefined>;
+  signal?: AbortSignal;
 }
 interface NodeResponse {
   setHeader(name: string, value: string): unknown;
   status(code: number): NodeResponse;
   json(body: unknown): unknown;
+  write?(chunk: Uint8Array): boolean;
+  end?(): unknown;
+  flushHeaders?(): unknown;
+  once?(event: string, callback: () => void): unknown;
+  off?(event: string, callback: () => void): unknown;
+  destroyed?: boolean;
 }
 export async function handleChat(req: NodeRequest, res: NodeResponse, env: ChatEnvironment = process.env) {
   const headers = new Headers();
@@ -156,10 +217,33 @@ export async function handleChat(req: NodeRequest, res: NodeResponse, env: ChatE
   const origin = `http://${headers.get("host") || "localhost"}`;
   const request = new Request(new URL(req.url || "/api/chat", origin), {
     method, headers,
+    signal: req.signal,
     ...(method !== "GET" && method !== "HEAD" ? { body: typeof req.body === "string" ? req.body : JSON.stringify(req.body) ?? "" } : {}),
   });
   const response = await fetchChat(request, env);
   response.headers.forEach((value, name) => res.setHeader(name, value));
+  if (response.headers.get("content-type")?.includes("text/event-stream") && response.body && res.write && res.end) {
+    res.status(response.status);
+    res.flushHeaders?.();
+    const reader = response.body.getReader();
+    const disconnect = () => { void reader.cancel().catch(() => {}); };
+    res.once?.("close", disconnect);
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done || res.destroyed) break;
+        if (!res.write(value) && res.once) await new Promise<void>(resolve => {
+          const finish = () => { res.off?.("drain", finish); res.off?.("close", finish); resolve(); };
+          res.once!("drain", finish); res.once!("close", finish);
+        });
+      }
+    } finally {
+      res.off?.("close", disconnect);
+      await reader.cancel().catch(() => {}); reader.releaseLock();
+      if (!res.destroyed) res.end();
+    }
+    return;
+  }
   const raw = await response.text();
   return res.status(response.status).json(raw ? JSON.parse(raw) : null);
 }

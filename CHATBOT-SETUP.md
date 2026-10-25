@@ -8,6 +8,16 @@ When `OPENROUTER_API_KEY` is configured, OpenRouter is the only provider used. R
 
 Production has `VITE_CHATBOT_ENABLED=true` to show the launcher. To hide the assistant temporarily, set this **public boolean** to `false` and redeploy. Set it back to `true` and redeploy after successful live verification. Never put a credential in a `VITE_` variable.
 
+## Streaming and response latency
+
+The UI sends `stream: true` to `/api/chat`. The server requests OpenRouter streaming and immediately forwards visible text as SSE `delta` events, followed by `done`. Provider reasoning and metadata are not sent to the browser. Calls without `stream: true` retain the JSON response used by the live verification CLI.
+
+The client decodes SSE across network and UTF-8 boundaries and updates one assistant bubble about every 32 ms. Completed message rendering is memoized. Interrupted answers retain their partial text with a retry action and are excluded from conversation history; a truncated or empty stream is never marked as a complete answer. Disconnects cancel the upstream request. Development middleware flushes chunks and supports the same server-only OpenRouter variables as Production.
+
+An OpenRouter 502/503/504 can be retried once within the request deadline before any text is delivered. A partially delivered answer is never restarted automatically.
+
+Requests use OpenRouter's `provider.sort: latency` preference with the same configured free model and disabled reasoning. The evidence payload includes profile/certification facts and relevant project details; the full repository directory is included only when the question asks for the catalog. Three representative queries reduced context size from 27–31k characters to 7–9k. Default answers are concise, with more detail when requested. Streaming exposes tokens as they arrive; the model's queue and time to first token remain provider-dependent.
+
 Earlier on 2026-10-25, runtime logs confirmed OmniRoute HTTP 401 and Vercel AI Gateway HTTP 403 despite the three OmniRoute variables being present in Production. The UI was temporarily hidden until a working provider was available. OpenRouter replaces that rejected path. The legacy integrations remain supported only when OpenRouter is absent.
 
 Replies are instructed to use the latest user's conversational language, with Egyptian Arabic for Arabic questions and the corresponding language for all other questions. Each reply must use one language without a repeated translation or second-language greeting. Technical terms, proper names, URLs, and email addresses may remain in English. A technical-term-only follow-up keeps the established conversation language.

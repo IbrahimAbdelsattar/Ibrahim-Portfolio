@@ -16,6 +16,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
   const reducedMotion = useReducedMotionPreference();
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [replyStarted, setReplyStarted] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(() => [{
     id: "welcome", sender: "bot", text: chatUi[locale].welcome, timestamp: timestamp(locale),
   }]);
@@ -53,19 +54,36 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
     ]);
     if (!textToSend) setInput("");
     setIsTyping(true);
+    setReplyStarted(false);
+    const replyId = crypto.randomUUID();
+    let partialText = "";
+    let renderTimer: ReturnType<typeof setTimeout> | undefined;
+    const showReply = (text: string, isError = false) => {
+      setMessages(prev => {
+        const reply = { id: replyId, sender: "bot" as const, text, timestamp: timestamp(nextLocale), isError };
+        return prev.some(m => m.id === replyId) ? prev.map(m => m.id === replyId ? reply : m) : [...prev, reply];
+      });
+    };
     try {
-      const response = await sendChatMessage(messageText, history, controller.signal);
+      const response = await sendChatMessage(messageText, history, controller.signal, text => {
+        if (controller.signal.aborted || !text) return;
+        partialText = text;
+        // Batch tokens so long Markdown replies do not rerender on every network packet.
+        if (!renderTimer) renderTimer = setTimeout(() => {
+          renderTimer = undefined;
+          if (!controller.signal.aborted) { setReplyStarted(true); showReply(partialText); }
+        }, 32);
+      });
       if (controller.signal.aborted) return;
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(), sender: "bot", text: response.text, timestamp: timestamp(nextLocale),
-      }]);
+      clearTimeout(renderTimer);
+      showReply(response.text);
     } catch {
       if (controller.signal.aborted) return;
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(), sender: "bot", text: chatUi[nextLocale].unavailable,
-        timestamp: timestamp(nextLocale), isError: true,
-      }]);
+      clearTimeout(renderTimer);
+      // Retain partial text for reading, but exclude this failed turn from future context.
+      showReply(partialText ? `${partialText}\n\n${chatUi[nextLocale].unavailable}` : chatUi[nextLocale].unavailable, true);
     } finally {
+      clearTimeout(renderTimer);
       requestPending.current = false;
       requestRef.current = null;
       setIsTyping(false);
@@ -110,7 +128,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
                 </button>
               </div>
             </header>
-            <div role="log" aria-live="polite" aria-relevant="additions" aria-label={ui.title} dir="ltr"
+            <div role="log" aria-live="polite" aria-relevant="additions" aria-busy={isTyping} aria-label={ui.title} dir="ltr"
               className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 py-5 custom-scrollbar">
               {messages.map((msg, index) => {
                 const rtl = hasRtlText(msg.text);
@@ -139,7 +157,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
                   </div>
                 );
               })}
-              {isTyping && (
+              {isTyping && !replyStarted && (
                 <div role="status" dir={direction} className="flex items-center gap-2 rounded-xl px-1 text-xs text-muted-foreground">
                   <span aria-hidden="true" className="flex gap-1">
                     {[0, 1, 2].map(i => <span key={i} className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" style={{ animationDelay: `${i * 150}ms` }} />)}

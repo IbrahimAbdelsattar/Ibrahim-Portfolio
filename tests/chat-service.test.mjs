@@ -8,7 +8,7 @@ test('frontend sends only conversation to same-origin API, excluding welcome and
   globalThis.fetch = async (url, options) => {
     assert.equal(url, '/api/chat');
     assert.equal(options.headers.Authorization, undefined);
-    assert.deepEqual(JSON.parse(options.body), { message: 'Follow up', history: [{ role: 'user', content: 'First question' }] });
+    assert.deepEqual(JSON.parse(options.body), { message: 'Follow up', history: [{ role: 'user', content: 'First question' }], stream: true });
     return new Response(JSON.stringify({ reply: 'Real model answer', isLive: true }));
   };
   const result = await sendChatMessage('Follow up', [

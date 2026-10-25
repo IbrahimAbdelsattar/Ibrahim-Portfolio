@@ -83,7 +83,7 @@ const renderInlineTokens = (content: string, isRtlContext: boolean): React.React
   });
 };
 
-export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) => {
+export const ChatMessageContent = React.memo(({ text }: ChatMessageContentProps) => {
   const sanitizedText = stripForbiddenCharacters(text);
   const rootIsRtl = hasRtlText(sanitizedText);
   const lines = sanitizedText.split("\n");
@@ -230,6 +230,6 @@ export const ChatMessageContent: React.FC<ChatMessageContentProps> = ({ text }) 
       {elements}
     </div>
   );
-};
+});
 
 export default ChatMessageContent;
