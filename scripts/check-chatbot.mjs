@@ -3,14 +3,15 @@ import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import { handleChat } from '../api/chat.ts';
 
-const local = parseEnv(readFileSync(new URL('../.env.vercel.local', import.meta.url), 'utf8'));
-for (const name of ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL']) {
-  if (!local[name] || process.env[name] !== local[name]) {
-    throw new Error(`${name} must match .env.vercel.local; run npm run check:chat`);
-  }
-}
-console.log('Configuration verified against .env.vercel.local (key not displayed).');
 const apiUrl = process.argv.find(arg => arg.startsWith('--url='))?.slice(6);
+let local;
+if (!apiUrl) {
+  local = parseEnv(readFileSync(new URL('../.env.vercel.local', import.meta.url), 'utf8'));
+  for (const name of ['OMNIROUTE_API_KEY', 'OMNIROUTE_API_URL', 'OMNIROUTE_MODEL']) {
+    if (!local[name]?.trim()) throw new Error(`${name} is missing from .env.vercel.local`);
+  }
+  console.log('Using server configuration from .env.vercel.local (key not displayed).');
+}
 const realFetch = globalThis.fetch;
 let providerStatus;
 if (!apiUrl) {
@@ -35,7 +36,7 @@ async function ask(message, history = []) {
       status(code) { status = code; return this; },
       json(data) { result = data; return this; },
     };
-    await handleChat({ method: 'POST', body: { message, history } }, res);
+    await handleChat({ method: 'POST', body: { message, history } }, res, local);
   }
   console.log(JSON.stringify({ message, status, providerStatus, ...result }, null, 2));
   assert.ok(status === 200 && result.isLive === true && result.reply?.trim(),

@@ -125,6 +125,33 @@ test('provider authentication failures have an actionable code without leaking c
   }
 });
 
+test('provider diagnostics distinguish account failures without logging upstream text or credentials', async () => {
+  const originalWarn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args);
+  try {
+    for (const reason of ['customer_verification_required', 'insufficient_funds', 'quota_for_entity_exceeded', 'invalid_api_key']) {
+      globalThis.fetch = async () => Response.json({ error: {
+        code: reason, message: 'test-secret and private conversation must never reach logs',
+      } }, { status: 403 });
+      const result = await call({ message: 'private conversation' }, 'POST', {
+        AI_GATEWAY_API_KEY: 'test-secret',
+      });
+      assert.equal(result.status, 502);
+      assert.equal(result.body.reply, undefined);
+      assert.deepEqual(warnings.at(-1), ['portfolio_chat_provider_unavailable', {
+        provider: 'vercel', status: 403, reason,
+      }]);
+    }
+    for (const error of [null, { error: { code: 'test-secret', type: 'private conversation' } }]) {
+      globalThis.fetch = async () => Response.json(error, { status: 401 });
+      await call({ message: 'private conversation' }, 'POST', { AI_GATEWAY_API_KEY: 'test-secret' });
+      assert.deepEqual(warnings.at(-1), ['portfolio_chat_provider_unavailable', { provider: 'vercel', status: 401 }]);
+    }
+    assert.doesNotMatch(JSON.stringify(warnings), /test-secret|private conversation|message/);
+  } finally { console.warn = originalWarn; }
+});
+
 test('local server configuration is isolated from ambient environment variables', async () => {
   configure();
   const ambientKey = process.env.OMNIROUTE_API_KEY;

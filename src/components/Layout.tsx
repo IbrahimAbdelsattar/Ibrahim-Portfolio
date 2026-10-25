@@ -1,5 +1,6 @@
 import { ReactNode, useLayoutEffect } from "react";
 import { useEnhancedEffects } from "@/hooks/use-enhanced-effects";
+import { chatbotEnabled } from "@/config/features";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FloatingShapes from "./FloatingShapes";
@@ -30,7 +31,7 @@ const Layout = ({ children }: LayoutProps) => {
       </main>
       <Footer />
       <BackToTop />
-      <ChatWidget />
+      {chatbotEnabled && <ChatWidget />}
     </div>
   );
 };

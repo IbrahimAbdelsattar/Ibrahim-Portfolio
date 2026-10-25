@@ -5,6 +5,21 @@ type ChatEnvironment = Record<string, string | undefined>;
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 const attempts = new Map<string, { count: number; reset: number }>();
 
+// Log only recognized error identifiers, never upstream text, credentials, or conversations.
+const providerFailureReasons = new Set([
+  "customer_verification_required", "insufficient_funds", "quota_for_entity_exceeded",
+  "rate_limit_exceeded", "invalid_api_key", "authentication_error", "model_not_found",
+]);
+async function providerFailureReason(response: Response): Promise<string | undefined> {
+  try {
+    const body = await response.json() as {
+      error?: { code?: unknown; type?: unknown }; code?: unknown; type?: unknown;
+    } | null;
+    return [body?.error?.code, body?.error?.type, body?.code, body?.type]
+      .find((value): value is string => typeof value === "string" && providerFailureReasons.has(value));
+  } catch { return undefined; }
+}
+
 function parseReply(raw: string): unknown {
   if (/^data:/m.test(raw)) {
     return raw.split(/\r?\n/).reduce((reply, line) => {
@@ -95,7 +110,10 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
         console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, reason: "empty_reply" });
       } else {
         authenticationFailed ||= [401, 403].includes(response.status);
-        console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, status: response.status });
+        const reason = await providerFailureReason(response);
+        console.warn("portfolio_chat_provider_unavailable", {
+          provider: provider.name, status: response.status, ...(reason ? { reason } : {}),
+        });
       }
     } catch (error) {
       timedOut ||= controller.signal.aborted || (error instanceof Error && error.name === "AbortError");
