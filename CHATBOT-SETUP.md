@@ -2,7 +2,7 @@
 
 ## Active provider — OpenRouter
 
-The browser calls the same-origin `/api/chat` endpoint. The server sends requests to `https://openrouter.ai/api/v1/chat/completions` using **server-only** `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. The current selected model is `nvidia/nemotron-3.5-super-vl:free`; it was confirmed in OpenRouter's live model catalog with zero prompt/completion pricing. A live request through the shared handler returned HTTP 200 with the correct MTI University and 3.5 GPA facts on 2026-10-25.
+The browser calls the same-origin `/api/chat` endpoint. The server sends requests to `https://openrouter.ai/api/v1/chat/completions` using **server-only** `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. The current selected model is `nvidia/nemotron-3.5-super-vl:free`; it was confirmed in OpenRouter's live model catalog with zero prompt/completion pricing. Live handler and Production endpoint requests returned HTTP 200 on 2026-10-25. Browser verification confirmed an Arabic answer with the correct MTI University and 3.5 GPA facts, visible on mobile and desktop, without JavaScript errors.
 
 When `OPENROUTER_API_KEY` is configured, OpenRouter is the only provider used. Rejected legacy OmniRoute/Gateway settings cannot block it, and failures never trigger a different paid model. Reasoning is disabled for the short portfolio answers so the output budget goes to the visible response. The browser contains no provider key and has no canned-answer fallback.
 
