@@ -42,12 +42,12 @@ const CertificationCard = ({
               src={image}
               alt={`${title} certificate`}
               sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="absolute inset-0 w-full h-full object-cover opacity-85 transition-all duration-700 group-hover:scale-110 group-hover:opacity-100"
+              className="absolute inset-0 w-full h-full object-cover opacity-85 transition-all duration-700 group-hover:opacity-100"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/40 to-transparent" />
             
             {/* Badge */}
-            <div className="absolute top-4 right-4 w-10 h-10 rounded-full glass-card border border-white/20 flex items-center justify-center backdrop-blur-md shadow-xl group-hover:scale-110 transition-transform">
+            <div className="absolute top-4 right-4 w-10 h-10 rounded-full glass-card border border-white/20 flex items-center justify-center backdrop-blur-md shadow-xl transition-transform">
               <Award className="w-5 h-5 text-primary" />
             </div>
           </div>

@@ -6,6 +6,16 @@ type ChatEnvironment = Record<string, string | undefined>;
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 const attempts = new Map<string, { count: number; reset: number }>();
 
+function waitForRetry(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const finish = () => { signal.removeEventListener("abort", abort); resolve(); };
+    const timer = setTimeout(finish, ms);
+    const abort = () => { clearTimeout(timer); signal.removeEventListener("abort", abort); reject(signal.reason); };
+    signal.addEventListener("abort", abort, { once: true });
+    if (signal.aborted) abort();
+  });
+}
+
 // Log only recognized error identifiers, never upstream text, credentials, or conversations.
 const providerFailureReasons = new Set([
   "customer_verification_required", "insufficient_funds", "quota_for_entity_exceeded",
@@ -116,8 +126,11 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   // without falling back to stale credentials or a different paid model.
   const openRouterKey = env.OPENROUTER_API_KEY?.trim();
   const openRouterModel = env.OPENROUTER_MODEL?.trim();
+  const openRouterFallback = env.OPENROUTER_FALLBACK_MODEL?.trim();
   if (openRouterKey && !openRouterModel)
     return json({ error: "OpenRouter model is not configured" }, 503);
+  if (openRouterKey && openRouterFallback && !openRouterFallback.endsWith(":free") && openRouterFallback !== "openrouter/free")
+    return json({ error: "The automatic fallback must be a free model" }, 503);
   // Legacy providers remain available for installations without OpenRouter.
   const omniKey = env.OMNIROUTE_API_KEY?.trim();
   const omniUrl = env.OMNIROUTE_API_URL?.trim();
@@ -130,8 +143,8 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   // Retain the incoming real Gateway integration, with refreshed platform OIDC.
   const runtimeOidc = env.VERCEL === "1" ? request.headers.get("x-vercel-oidc-token") : null;
   const gatewayKey = env.AI_GATEWAY_API_KEY || runtimeOidc || env.VERCEL_OIDC_TOKEN;
-  const providers = openRouterKey ? [{ name: "openrouter", url: "https://openrouter.ai/api/v1/chat/completions",
-    key: openRouterKey, model: openRouterModel! }] : [
+  const providers = openRouterKey ? [openRouterModel!, ...(openRouterFallback && openRouterFallback !== openRouterModel ? [openRouterFallback] : [])]
+    .map(model => ({ name: "openrouter", url: "https://openrouter.ai/api/v1/chat/completions", key: openRouterKey, model })) : [
     ...(omniKey && omniUrl && omniModel ? [{ name: "omniroute", url: omniUrl, key: omniKey, model: omniModel }] : []),
     ...(gatewayKey ? [{ name: "vercel", url: "https://ai-gateway.vercel.sh/v1/chat/completions",
       key: gatewayKey, model: env.AI_GATEWAY_MODEL || "google/gemini-3.1-flash-lite" }] : []),
@@ -140,6 +153,9 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   const deadline = Date.now() + 40_000;
   let timedOut = false;
   let authenticationFailed = false;
+  let busy = false;
+  let rateLimited = false;
+  let retryAfter = 3;
   for (const [index, provider] of providers.entries()) {
     const remaining = deadline - Date.now();
     if (remaining < 500 || request.signal.aborted) break;
@@ -157,10 +173,12 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
         signal: AbortSignal.any([request.signal, controller.signal]),
       };
       let response = await fetch(provider.url, options);
-      // A free endpoint can reject a transiently busy request. Retry once before
-      // returning any text; never restart a partially delivered answer.
-      if (provider.name === "openrouter" && [502, 503, 504].includes(response.status) && deadline - Date.now() > 1000) {
+      // Give an overloaded free endpoint time to recover. Retry only before any
+      // text is delivered, with cancellation and the existing overall deadline.
+      for (const delay of provider.name === "openrouter" ? (providers.length > 1 && index === 0 ? [300] : [300, 900, 1800]) : []) {
+        if (![502, 503, 504].includes(response.status) || deadline - Date.now() < delay + 1000) break;
         await response.body?.cancel();
+        await waitForRetry(delay, options.signal);
         response = await fetch(provider.url, options);
       }
       if (response.ok) {
@@ -173,10 +191,15 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
         console.warn("portfolio_chat_provider_unavailable", { provider: provider.name, reason: "empty_reply" });
       } else {
         authenticationFailed ||= [401, 403].includes(response.status);
+        busy ||= [502, 503, 504].includes(response.status);
+        rateLimited ||= response.status === 429;
+        const hint = Number(response.headers.get("retry-after"));
+        if (response.status === 429 && Number.isFinite(hint) && hint > 0) retryAfter = Math.min(Math.ceil(hint), 86400);
         const reason = await providerFailureReason(response);
         console.warn("portfolio_chat_provider_unavailable", {
           provider: provider.name, status: response.status, ...(reason ? { reason } : {}),
         });
+        if (provider.name === "openrouter" && [401, 403].includes(response.status)) break;
       }
     } catch (error) {
       timedOut ||= controller.signal.aborted || (error instanceof Error && error.name === "AbortError");
@@ -187,6 +210,12 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
   }
   // Generation failures are errors, never local profile text presented as AI.
   if (authenticationFailed) return json({ error: "The AI service is currently unavailable.", code: "PROVIDER_AUTH_FAILED" }, 502);
+  if (rateLimited || busy) {
+    const response = json({ error: rateLimited ? "The AI provider is temporarily rate limited." : "The AI provider is temporarily busy.",
+      code: rateLimited ? "PROVIDER_RATE_LIMITED" : "PROVIDER_BUSY", retryAfter }, rateLimited ? 429 : 503);
+    response.headers.set("Retry-After", String(retryAfter));
+    return response;
+  }
   return json({ error: timedOut ? "The AI provider timed out." : "The AI provider returned no usable answer." }, timedOut ? 504 : 502);
 }
 

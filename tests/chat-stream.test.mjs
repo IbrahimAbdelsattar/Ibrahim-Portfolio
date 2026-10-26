@@ -61,7 +61,7 @@ test('errors, truncated or empty streams cannot become successful AI answers', a
   }
 });
 
-test('a transient OpenRouter rejection is retried once before any answer text is delivered', async () => {
+test('transient OpenRouter rejections use bounded retries before any answer text is delivered', async () => {
   let calls = 0;
   wire(async () => ++calls === 1 ? new Response('Busy', { status: 502 })
     : responseFor(textStream(delta('Recovered answer') + 'data: [DONE]\n\n')));
@@ -70,7 +70,7 @@ test('a transient OpenRouter rejection is retried once before any answer text is
   calls = 0;
   wire(async () => { calls++; return new Response('Busy', { status: 503 }); });
   await assert.rejects(sendChatMessage('Hello'));
-  assert.equal(calls, 2, 'Busy providers must not cause an unbounded retry loop');
+  assert.equal(calls, 4, 'Busy providers must not cause an unbounded retry loop');
 });
 
 test('cancelling an in-flight stream stops the provider and releases the reader', { timeout: 5000 }, async () => {
@@ -113,4 +113,65 @@ test('compact context retains profile facts, named project evidence, and upstrea
   assert.equal(project.sourceKind, 'fork');
   assert.match(project.upstreamUrl, /^https:\/\/github.com\//);
   assert.equal(JSON.parse(buildAssistantContext('List all repositories', [], true)).repositoryDirectory.length, 60);
+});
+
+test('a follow-up survives several provider 502s without changing its conversation or model', async () => {
+  const bodies = [];
+  wire(async (_, options) => {
+    bodies.push(JSON.parse(options.body));
+    return bodies.length < 4 ? new Response('NVIDIA temporary failure', { status: 502 })
+      : responseFor(textStream(delta('More about his projects.') + 'data: [DONE]\n\n'));
+  });
+  const result = await sendChatMessage('what more', [
+    { id: 'q', sender: 'user', text: 'Tell me about Ibrahim' },
+    { id: 'a', sender: 'bot', text: 'He is an AI engineer.' },
+  ]);
+  assert.equal(result.text, 'More about his projects.');
+  assert.equal(bodies.length, 4);
+  assert.ok(bodies.every(body => JSON.stringify(body) === JSON.stringify(bodies[0])));
+  assert.equal(bodies[0].model, config.OPENROUTER_MODEL);
+  assert.deepEqual(bodies[0].messages.slice(-3), [
+    { role: 'user', content: 'Tell me about Ibrahim' },
+    { role: 'assistant', content: 'He is an AI engineer.' },
+    { role: 'user', content: 'what more' },
+  ]);
+});
+
+test('upstream rate limits stay 429 with Retry-After and are not blindly retried', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return Response.json({ error: { code: 429, message: 'private-upstream-sentinel' } }, {
+    status: 429, headers: { 'Retry-After': '60' },
+  }); };
+  const response = await fetchChat(post({ message: 'Hello', stream: true }), config);
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get('retry-after'), '60');
+  const body = await response.json();
+  assert.equal(body.code, 'PROVIDER_RATE_LIMITED');
+  assert.equal(calls, 1);
+  assert.ok(!JSON.stringify(body).includes('private-upstream-sentinel'));
+});
+
+test('an explicitly configured free fallback recovers a rejected primary with the same conversation', async () => {
+  const bodies = [];
+  globalThis.fetch = async (_, options) => {
+    const body = JSON.parse(options.body);bodies.push(body);
+    return body.model === config.OPENROUTER_MODEL ? Response.json({ error: { code: 429 } }, { status: 429 })
+      : responseFor(textStream(delta('Fallback answer') + 'data: [DONE]\n\n'));
+  };
+  const response = await fetchChat(post({ message: 'what more', history: [{ role: 'user', content: 'Tell me about Ibrahim' }], stream: true }),
+    { ...config, OPENROUTER_FALLBACK_MODEL: 'openrouter/free' });
+  assert.equal(response.status, 200);
+  let result='';for await(const raw of readSseData(response.body)){const event=JSON.parse(raw);if(event.type==='delta')result+=event.text;}
+  assert.equal(result, 'Fallback answer');
+  assert.deepEqual(bodies.map(b=>b.model), [config.OPENROUTER_MODEL, 'openrouter/free']);
+  assert.deepEqual(bodies[0].messages, bodies[1].messages);
+});
+
+test('a paid fallback is rejected and failed credentials never trigger model fallback', async () => {
+  let calls=0;
+  globalThis.fetch=async()=>{calls++;return new Response('Invalid key',{status:401});};
+  const invalid=await fetchChat(post({message:'Hello',stream:true}),{...config,OPENROUTER_FALLBACK_MODEL:'paid/model'});
+  assert.equal(invalid.status,503);assert.equal(calls,0);
+  const auth=await fetchChat(post({message:'Hello',stream:true}),{...config,OPENROUTER_FALLBACK_MODEL:'openrouter/free'});
+  assert.equal(auth.status,502);assert.equal(calls,1);
 });

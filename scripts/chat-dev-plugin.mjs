@@ -2,7 +2,7 @@ import { loadEnv } from 'vite';
 import { handleChat } from '../api/chat.ts';
 
 export function chatDevPlugin() {
-  const names = ['OPENROUTER_API_KEY', 'OPENROUTER_MODEL', 'OMNIROUTE_API_URL', 'OMNIROUTE_API_KEY', 'OMNIROUTE_MODEL',
+  const names = ['OPENROUTER_API_KEY', 'OPENROUTER_MODEL', 'OPENROUTER_FALLBACK_MODEL', 'OMNIROUTE_API_URL', 'OMNIROUTE_API_KEY', 'OMNIROUTE_MODEL',
     'AI_GATEWAY_API_KEY', 'AI_GATEWAY_MODEL', 'VERCEL_OIDC_TOKEN'];
   const runtimeEnv = Object.fromEntries(names.map(name => [name, process.env[name]]));
   return {

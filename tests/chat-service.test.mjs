@@ -55,3 +55,10 @@ test('keeps the last eight valid conversation messages and validates input befor
   await assert.rejects(sendChatMessage(' '), /1 to 2000/);
   await assert.rejects(sendChatMessage('x'.repeat(2001)), /1 to 2000/);
 });
+
+test('frontend preserves safe provider availability codes for localized retry notices', async () => {
+  for (const [status, code] of [[503, 'PROVIDER_BUSY'], [429, 'PROVIDER_RATE_LIMITED']]) {
+    globalThis.fetch = async () => Response.json({ code, error: 'private-upstream-sentinel' }, { status });
+    await assert.rejects(sendChatMessage('what more'), error => error.name === 'ChatServiceError' && error.code === code && !error.message.includes('private-upstream-sentinel'));
+  }
+});

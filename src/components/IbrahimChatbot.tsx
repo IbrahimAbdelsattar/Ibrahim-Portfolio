@@ -4,7 +4,7 @@ import { ArrowUp, Bot, ChevronRight, RotateCcw, Sparkles, TriangleAlert, X } fro
 import { ChatMessageContent } from "@/components/chat/ChatMessageContent";
 import ResponsiveImage from "@/components/ResponsiveImage";
 import { chatLocaleForMessage, chatUi, hasRtlText, initialChatLocale } from "@/data/chatUi";
-import { sendChatMessage, type ChatMessage } from "@/services/chatService";
+import { ChatServiceError, sendChatMessage, type ChatMessage } from "@/services/chatService";
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import type { ChatLocale } from "@/data/chatUi";
 
@@ -77,11 +77,14 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
       if (controller.signal.aborted) return;
       clearTimeout(renderTimer);
       showReply(response.text);
-    } catch {
+    } catch (error) {
       if (controller.signal.aborted) return;
       clearTimeout(renderTimer);
       // Retain partial text for reading, but exclude this failed turn from future context.
-      showReply(partialText ? `${partialText}\n\n${chatUi[nextLocale].unavailable}` : chatUi[nextLocale].unavailable, true);
+      const notice = error instanceof ChatServiceError
+        ? error.code === "PROVIDER_RATE_LIMITED" ? chatUi[nextLocale].rateLimited : chatUi[nextLocale].busy
+        : chatUi[nextLocale].unavailable;
+      showReply(partialText ? `${partialText}\n\n${notice}` : notice, true);
     } finally {
       clearTimeout(renderTimer);
       requestPending.current = false;

@@ -6,7 +6,6 @@ import ProjectCover from "./project/ProjectCover";
 import TechBadge from "./project/TechBadge";
 import ProjectStatusBadge from "./project/ProjectStatusBadge";
 import type { Project } from "@/data/types";
-import TiltCard3D from "./3d/TiltCard3D";
 
 interface ProjectCardProps extends Project {
   index: number;
@@ -34,7 +33,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.25) }}
       className="h-full project-card"
     >
-      <TiltCard3D maxTilt={5} scale={1.01} glare className="h-full group rounded-3xl">
+      <div className="card-surface h-full group rounded-3xl">
         <div
           className={`glass-card rounded-3xl overflow-hidden flex flex-col justify-between h-full relative ${
             project.tier === "flagship"
@@ -47,7 +46,6 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
               <ProjectCover
                 src={project.image}
                 alt={project.title}
-                interactive
                 className="absolute inset-0 w-full h-full"
               />
               <div
@@ -149,7 +147,7 @@ const ProjectCard = ({ index, ...project }: ProjectCardProps) => {
             )}
           </div>
         </div>
-      </TiltCard3D>
+      </div>
     </motion.article>
   );
 };

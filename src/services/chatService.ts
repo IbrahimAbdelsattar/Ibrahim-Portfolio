@@ -9,6 +9,15 @@ export interface ChatMessage {
   isError?: boolean;
 }
 
+export class ChatServiceError extends Error {
+  readonly code: "PROVIDER_BUSY" | "PROVIDER_RATE_LIMITED";
+  constructor(code: "PROVIDER_BUSY" | "PROVIDER_RATE_LIMITED") {
+    super("The AI provider is temporarily unavailable");
+    this.name = "ChatServiceError";
+    this.code = code;
+  }
+}
+
 // Preserve Markdown, Arabic, and URL punctuation; remove only control characters.
 export function stripForbiddenCharacters(text: string): string {
   // eslint-disable-next-line no-control-regex -- Intentionally removes non-printing ASCII controls.
@@ -37,7 +46,11 @@ export async function sendChatMessage(
       body: JSON.stringify({ message, history: recentHistory, stream: true }),
       signal: requestSignal,
     });
-    if (!response.ok) throw new Error("The AI service is unavailable. Please try again later.");
+    if (!response.ok) {
+      const error = await response.json().catch(() => null);
+      if (error?.code === "PROVIDER_BUSY" || error?.code === "PROVIDER_RATE_LIMITED") throw new ChatServiceError(error.code);
+      throw new Error("The AI service is unavailable. Please try again later.");
+    }
     if (response.headers.get("content-type")?.includes("text/event-stream") && response.body) {
       let text = "", completed = false;
       for await (const data of readSseData(response.body, requestSignal)) {

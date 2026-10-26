@@ -5,7 +5,6 @@ import { Briefcase, GraduationCap, Target, Code2, Sparkles, Cpu, Layers, Termina
 import SkillBadge from "@/components/SkillBadge";
 import AnimatedTabs, { AnimatedTabPanel } from "@/components/AnimatedTabs";
 import Reveal from "@/components/Reveal";
-import { TiltCard3D } from "@/components/3d/TiltCard3D";
 
 const skillGroups = [
   { value: "languages", label: "Languages", icon: Code2, items: ["Python", "SQL", "TypeScript", "JavaScript", "C++", "Java", "R"] },
@@ -62,9 +61,9 @@ const About = () => {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <TiltCard3D maxTilt={6} scale={1.01} className="h-full">
-                      <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow h-full preserve-3d">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between mb-2 translate-z-10">
+                    <div className="card-surface h-full">
+                      <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow h-full ">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between mb-2 ">
                           <div className="min-w-0">
                             <h3 className="font-semibold text-foreground text-base sm:text-lg leading-snug">{job.role}</h3>
                             <p className="text-primary font-medium text-sm sm:text-base">{job.company}</p>
@@ -73,13 +72,13 @@ const About = () => {
                             {job.period}
                           </span>
                         </div>
-                        <ul className="list-disc list-outside pl-5 space-y-1 text-sm text-muted-foreground mt-3 translate-z-5">
+                        <ul className="list-disc list-outside pl-5 space-y-1 text-sm text-muted-foreground mt-3 ">
                           {job.description.map((point, i) => (
                             <li key={i}>{point}</li>
                           ))}
                         </ul>
                       </div>
-                    </TiltCard3D>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -94,9 +93,9 @@ const About = () => {
               className="space-y-6"
             >
               {/* Bio / Overview */}
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-2xl p-5 sm:p-8 preserve-3d">
-                  <div className="flex items-center gap-4 mb-6 translate-z-10">
+              <div className="card-surface">
+                <div className="glass-card rounded-2xl p-5 sm:p-8 ">
+                  <div className="flex items-center gap-4 mb-6 ">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
                       <Cpu className="w-6 h-6 text-primary" />
                     </div>
@@ -105,7 +104,7 @@ const About = () => {
                       <p className="text-primary text-sm font-medium">Applied AI & Data Science</p>
                     </div>
                   </div>
-                  <div className="text-muted-foreground leading-relaxed space-y-4 text-sm md:text-base translate-z-5">
+                  <div className="text-muted-foreground leading-relaxed space-y-4 text-sm md:text-base ">
                     <p>
                       I specialize in building intelligent software solutions that combine cutting-edge <strong className="text-foreground">Generative AI</strong>, <strong className="text-foreground">RAG Architecture</strong>, <strong className="text-foreground">Dialectal NLP</strong>, and <strong className="text-foreground">Predictive Machine Learning</strong>.
                     </p>
@@ -133,16 +132,16 @@ const About = () => {
                     </ul>
                   </div>
                 </div>
-              </TiltCard3D>
+              </div>
 
               {/* Why Work With Me */}
-              <TiltCard3D maxTilt={5} scale={1.01}>
-                <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow preserve-3d">
-                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 translate-z-10">
+              <div className="card-surface">
+                <div className="glass-card rounded-xl p-5 sm:p-6 hover-glow ">
+                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 ">
                     <Target className="w-6 h-6 text-primary" />
                     Why Work With Me?
                   </h3>
-                  <div className="space-y-3 text-sm translate-z-5">
+                  <div className="space-y-3 text-sm ">
                     <div className="flex gap-3">
                       <span className="text-primary">✔️</span>
                       <p className="text-muted-foreground"><strong className="text-foreground">Production-Ready Code:</strong> Modular, reproducible, and containerized AI pipelines.</p>
@@ -157,7 +156,7 @@ const About = () => {
                     </div>
                   </div>
                 </div>
-              </TiltCard3D>
+              </div>
             </motion.div>
           </div>
 
@@ -171,12 +170,12 @@ const About = () => {
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">
               Education
             </h2>
-            <TiltCard3D maxTilt={5} scale={1.01} className="max-w-3xl mx-auto">
-              <div className="glass-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover-glow preserve-3d">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 translate-z-10">
+            <div className="card-surface max-w-3xl mx-auto">
+              <div className="glass-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-6 hover-glow ">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 ">
                   <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div className="translate-z-5 min-w-0">
+                <div className=" min-w-0">
                   <h3 className="text-lg sm:text-xl font-bold text-foreground">MTI University</h3>
                   <p className="text-primary font-medium text-sm sm:text-base">Bachelor of Computer Science & Artificial Intelligence</p>
                   <div className="flex flex-wrap gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-muted-foreground">
@@ -186,7 +185,7 @@ const About = () => {
                   </div>
                 </div>
               </div>
-            </TiltCard3D>
+            </div>
           </motion.div>
 
           {/* Skills Section */}

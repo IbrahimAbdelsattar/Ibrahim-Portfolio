@@ -22,7 +22,6 @@ import {
 import Reveal from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/ProjectCard";
-import TiltCard3D from "@/components/3d/TiltCard3D";
 import { projects, projectStats } from "@/data/projects";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
@@ -143,8 +142,8 @@ const Home = () => {
               className="relative flex justify-center order-first lg:order-none"
             >
               <div className="relative w-40 sm:w-52 lg:w-full lg:max-w-[420px] mx-auto">
-                <TiltCard3D maxTilt={8} scale={1.02} glare={false} className="w-full">
-                  <div className="relative w-full aspect-square preserve-3d">
+                <div className="card-surface w-full">
+                  <div className="relative w-full aspect-square ">
                     <div className="absolute -inset-4 bg-primary/20 rounded-full blur-[60px]" />
                     <ResponsiveImage
                       src="/assets/profile-main.jpg"
@@ -153,15 +152,15 @@ const Home = () => {
                       alt="Ibrahim Abdelsattar"
                       loading="eager"
                       decoding="async"
-                      className="relative z-10 w-full aspect-square object-cover rounded-full border-2 border-primary/30 shadow-2xl translate-z-20"
+                      className="relative z-10 w-full aspect-square object-cover rounded-full border-2 border-primary/30 shadow-2xl "
                     />
 
                     {/* Floating Achievement Cards with true 3D spatial depth */}
                     <motion.div
-                        style={{ z: 40 }}
+
                         animate={heroMotion ? { y: [0, -10, 0] } : { y: 0 }}
                         transition={{ duration: heroMotion ? 4 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut" }}
-                        className="hidden lg:block absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30 translate-z-40 shadow-2xl"
+                        className="hidden lg:block absolute -left-14 top-10 glass-card p-4 rounded-2xl z-30  shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/15 border border-primary/25 rounded-xl text-primary backdrop-blur-md">
@@ -175,10 +174,10 @@ const Home = () => {
                     </motion.div>
 
                     <motion.div
-                        style={{ z: 50 }}
+
                         animate={heroMotion ? { y: [0, 10, 0] } : { y: 0 }}
                         transition={{ duration: heroMotion ? 5 : 0, repeat: heroMotion ? Infinity : 0, ease: "easeInOut", delay: 1 }}
-                        className="hidden lg:block absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30 translate-z-50 shadow-2xl"
+                        className="hidden lg:block absolute -right-14 bottom-12 glass-card p-4 rounded-2xl z-30  shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-secondary/20 border border-secondary/30 rounded-xl text-primary backdrop-blur-md">
@@ -191,7 +190,7 @@ const Home = () => {
                         </div>
                     </motion.div>
                   </div>
-                </TiltCard3D>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -249,17 +248,17 @@ const Home = () => {
                     transition={{ delay: index * 0.1 }}
                     className="h-full"
                 >
-                    <TiltCard3D maxTilt={14} scale={1.03} className="h-full rounded-2xl">
-                      <div className="p-5 sm:p-6 h-full rounded-2xl glass-card hover-glow transition-all group flex flex-col justify-between preserve-3d">
+                    <div className="card-surface h-full rounded-2xl">
+                      <div className="p-5 sm:p-6 h-full rounded-2xl glass-card hover-glow transition-all group flex flex-col justify-between ">
                         <div>
-                          <div className="mb-3 sm:mb-4 transform group-hover:scale-110 transition-transform duration-300 translate-z-30">
+                          <div className="mb-3 sm:mb-4 transform transition-transform duration-300 ">
                               {skill.icon}
                           </div>
-                          <h3 className="text-lg sm:text-xl font-semibold mb-1.5 sm:mb-2 translate-z-20">{skill.name}</h3>
-                          <p className="text-sm text-muted-foreground translate-z-10">{skill.desc}</p>
+                          <h3 className="text-lg sm:text-xl font-semibold mb-1.5 sm:mb-2 ">{skill.name}</h3>
+                          <p className="text-sm text-muted-foreground ">{skill.desc}</p>
                         </div>
                       </div>
-                    </TiltCard3D>
+                    </div>
                 </motion.div>
             ))}
           </div>
@@ -353,13 +352,13 @@ const Home = () => {
                       transition={{ delay: index * 0.1 }}
                       className="h-full"
                     >
-                      <TiltCard3D maxTilt={10} scale={1.02} className="h-full rounded-3xl">
-                        <div className="p-6 sm:p-8 h-full rounded-3xl glass-card hover-glow relative flex flex-col justify-between preserve-3d">
+                      <div className="card-surface h-full rounded-3xl">
+                        <div className="p-6 sm:p-8 h-full rounded-3xl glass-card hover-glow relative flex flex-col justify-between ">
                           <div className="text-4xl text-primary/20 absolute top-4 left-4 pointer-events-none">"</div>
-                          <p className="text-sm sm:text-base italic mb-6 relative z-10 text-muted-foreground flex-grow translate-z-10 leading-relaxed">
+                          <p className="text-sm sm:text-base italic mb-6 relative z-10 text-muted-foreground flex-grow  leading-relaxed">
                             "{testimonial.text}"
                           </p>
-                          <div className="flex items-center gap-4 mt-auto translate-z-20">
+                          <div className="flex items-center gap-4 mt-auto ">
                             <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white font-bold shrink-0 shadow-md`}>
                               {testimonial.initials}
                             </div>
@@ -369,7 +368,7 @@ const Home = () => {
                             </div>
                           </div>
                         </div>
-                      </TiltCard3D>
+                      </div>
                     </motion.div>
                   ))}
               </div>

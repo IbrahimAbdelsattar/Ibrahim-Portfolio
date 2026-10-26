@@ -14,7 +14,7 @@ The UI sends `stream: true` to `/api/chat`. The server requests OpenRouter strea
 
 The client decodes SSE across network and UTF-8 boundaries and updates one assistant bubble about every 32 ms. Completed message rendering is memoized. Interrupted answers retain their partial text with a retry action and are excluded from conversation history; a truncated or empty stream is never marked as a complete answer. Disconnects cancel the upstream request. Development middleware flushes chunks and supports the same server-only OpenRouter variables as Production.
 
-An OpenRouter 502/503/504 can be retried once within the request deadline before any text is delivered. A partially delivered answer is never restarted automatically.
+OpenRouter 502/503/504 failures are retried up to three times, after 300 ms, 900 ms, and 1800 ms, within the existing request deadline and before any text is delivered. A partially delivered answer is never restarted automatically. Exhausted temporary failures return HTTP 503 with `PROVIDER_BUSY`; upstream rate limits preserve HTTP 429 and `Retry-After` rather than being mislabeled as 502. Both have localized notices that preserve the question for retry. An optional `OPENROUTER_FALLBACK_MODEL` can enable a second free model (or `openrouter/free`); it is unset by default. A paid fallback is rejected. With a fallback configured, the primary receives one short retry before failover, and a started answer is never switched to another model.
 
 Requests use OpenRouter's `provider.sort: latency` preference with the same configured free model and disabled reasoning. The evidence payload includes profile/certification facts and relevant project details; the full repository directory is included only when the question asks for the catalog. Three representative queries reduced context size from 27–31k characters to 7–9k. Default answers are concise, with more detail when requested. Streaming exposes tokens as they arrive; the model's queue and time to first token remain provider-dependent.
 
@@ -34,7 +34,7 @@ Run `npm run check:chat` to make real model requests with the configuration read
 npm run check:chat -- --url=http://127.0.0.1:8080/api/chat
 ```
 
-A remote check does not need a local env file: `npm run check:chat -- --url=https://ibrahim-ai-specialist.vercel.app/api/chat`. GET checks only that the route loads; use POST or this verification command to test generation.
+A remote check does not need a local env file: `npm run check:chat -- --url=https://www.ibrahim-abdelsattar.cloud/api/chat`. GET checks only that the route loads; use POST or this verification command to test generation.
 
 ## Vercel
 
@@ -53,3 +53,7 @@ npm.cmd run build
 ```
 
 Automated tests use simulated provider responses to verify behavior, including failures. They do not prove the provider account works; `check:chat` performs that separate live verification.
+
+## Custom domain
+
+The Production site is https://www.ibrahim-abdelsattar.cloud/. The apex domain redirects there with HTTP 308; both names are attached to the existing Vercel project. DNS remains at Hostinger, with the apex A record pointing to Vercel. The canonical URL and generated portfolio/case-study links use the custom domain.

@@ -9,7 +9,7 @@ export const ibrahimProfile = {
   "github": "https://github.com/IbrahimAbdelsattar",
   "linkedin": "https://www.linkedin.com/in/ibrahim-abdelsattar/",
   "kaggle": "https://www.kaggle.com/ibrahimabdelsattar10",
-  "portfolio": "https://ibrahim-ai-specialist.vercel.app/",
+  "portfolio": "https://www.ibrahim-abdelsattar.cloud/",
   "education": {
     "institution": "MTI University (Modern University for Technology and Information)",
     "degree": "Bachelor of Computer Science & Artificial Intelligence",
