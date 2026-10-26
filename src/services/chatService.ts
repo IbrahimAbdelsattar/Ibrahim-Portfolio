@@ -1,4 +1,5 @@
 ﻿import { readSseData } from "../lib/sse.ts";
+import { CHAT_CLIENT_TIMEOUT_MS, CHAT_HISTORY_CHARS, CHAT_HISTORY_TURNS, CHAT_MAX_MESSAGE_CHARS } from "../lib/chatLimits.ts";
 
 export interface ChatMessage {
   id: string;
@@ -31,13 +32,13 @@ export async function sendChatMessage(
   onText?: (text: string) => void,
 ): Promise<{ text: string; isLive: true; isSecurityWarning?: boolean }> {
   const message = userQuery.trim();
-  if (!message || message.length > 2000) throw new Error("Message must contain 1 to 2000 characters");
+  if (!message || message.length > CHAT_MAX_MESSAGE_CHARS) throw new Error(`Message must contain 1 to ${CHAT_MAX_MESSAGE_CHARS} characters`);
   const recentHistory = history
     .filter(m => m.id !== "welcome" && !m.isError && !m.isSecurityWarning)
-    .slice(-8)
-    .map(m => ({ role: m.sender === "user" ? "user" : "assistant", content: m.text }));
+    .slice(-CHAT_HISTORY_TURNS)
+    .map(m => ({ role: m.sender === "user" ? "user" : "assistant", content: m.text.slice(0, CHAT_HISTORY_CHARS) }));
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
+  const timeout = setTimeout(() => controller.abort(), CHAT_CLIENT_TIMEOUT_MS);
   const requestSignal = signal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
   try {
     const response = await fetch("/api/chat", {

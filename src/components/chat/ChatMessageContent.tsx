@@ -1,9 +1,11 @@
 import React from "react";
 import { hasRtlText } from "@/data/chatUi";
 import { stripForbiddenCharacters } from "@/services/chatService";
+import { stabilizeStreamingMarkdown } from "@/lib/streamingText";
 
 interface ChatMessageContentProps {
   text: string;
+  isStreaming?: boolean;
 }
 
 // Isolates embedded Latin/English phrases inside RTL text to prevent BiDi reordering
@@ -83,8 +85,9 @@ const renderInlineTokens = (content: string, isRtlContext: boolean): React.React
   });
 };
 
-export const ChatMessageContent = React.memo(({ text }: ChatMessageContentProps) => {
-  const sanitizedText = stripForbiddenCharacters(text);
+export const ChatMessageContent = React.memo(({ text, isStreaming = false }: ChatMessageContentProps) => {
+  const cleanText = stripForbiddenCharacters(text);
+  const sanitizedText = isStreaming ? stabilizeStreamingMarkdown(cleanText) : cleanText;
   const rootIsRtl = hasRtlText(sanitizedText);
   const lines = sanitizedText.split("\n");
 

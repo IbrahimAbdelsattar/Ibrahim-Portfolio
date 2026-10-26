@@ -175,3 +175,43 @@ test('a paid fallback is rejected and failed credentials never trigger model fal
   const auth=await fetchChat(post({message:'Hello',stream:true}),{...config,OPENROUTER_FALLBACK_MODEL:'openrouter/free'});
   assert.equal(auth.status,502);assert.equal(calls,1);
 });
+
+test('requests from the same IP have no local quota and accept larger questions and previous replies', async () => {
+  let calls = 0;
+  globalThis.fetch = async (_, options) => {
+    calls++;
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.max_tokens, 4096);
+    assert.equal(payload.messages.at(-1).content.length, 3000);
+    assert.equal(payload.messages.at(-2).content.length, 8000);
+    return Response.json({ choices: [{ message: { content: 'A complete reply.' } }] });
+  };
+  for (let i = 0; i < 35; i++) {
+    const request = post({ message: 'x'.repeat(3000), history: [{ role: 'assistant', content: 'y'.repeat(8000) }] });
+    request.headers.set('x-forwarded-for', '192.0.2.123');
+    const response = await fetchChat(request, config);
+    assert.equal(response.status, 200);
+    await response.text();
+  }
+  assert.equal(calls, 35);
+});
+
+test('a healthy stream can continue past the former 40/45-second timeouts', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let source, providerSignal, firstText;
+  const first = new Promise(resolve => { firstText = resolve; });
+  wire(async (_, options) => {
+    providerSignal = options.signal;
+    return responseFor(new ReadableStream({ start(c) { source = c; } }));
+  });
+  const answer = sendChatMessage('Hello', [], undefined, () => firstText());
+  // Let the asynchronous request reach the provider stream.
+  while (!source) await Promise.resolve();
+  source.enqueue(encoder.encode(delta('First part. ')));
+  await first;
+  t.mock.timers.tick(60_000);
+  assert.equal(providerSignal.aborted, false);
+  source.enqueue(encoder.encode(delta('Still streaming.') + 'data: [DONE]\n\n'));
+  source.close();
+  assert.equal((await answer).text, 'First part. Still streaming.');
+});

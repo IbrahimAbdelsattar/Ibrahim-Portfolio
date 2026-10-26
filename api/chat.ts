@@ -1,10 +1,11 @@
 import { buildAssistantContext, IBRAHIM_SYSTEM_PROMPT } from "../src/data/ibrahimKnowledge.ts";
 import type { ConversationTurn } from "../src/data/ibrahimKnowledge.ts";
 import { readSseData } from "../src/lib/sse.ts";
+import { CHAT_HISTORY_CHARS, CHAT_HISTORY_TURNS, CHAT_MAX_MESSAGE_CHARS, CHAT_MAX_OUTPUT_TOKENS,
+  CHAT_MAX_REQUEST_BYTES, CHAT_PROVIDER_TIMEOUT_MS } from "../src/lib/chatLimits.ts";
 
 type ChatEnvironment = Record<string, string | undefined>;
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
-const attempts = new Map<string, { count: number; reset: number }>();
 
 function waitForRetry(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -95,30 +96,22 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
     } catch { return json({ error: "Origin not allowed" }, 403); }
   }
   if (!request.headers.get("content-type")?.includes("application/json")) return json({ error: "Use JSON" }, 415);
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  if (ip) {
-    const now = Date.now();
-    if (attempts.size > 2000) for (const [key, value] of attempts) if (value.reset < now) attempts.delete(key);
-    const entry = attempts.get(ip);
-    if (entry && entry.reset > now) { if (entry.count++ >= 30) return json({ error: "Please try again shortly" }, 429); }
-    else attempts.set(ip, { count: 1, reset: now + 60_000 });
-  }
   let body: { message?: unknown; history?: unknown; stream?: unknown };
   try {
-    if (Number(request.headers.get("content-length") ?? 0) > 16_000) return json({ error: "Message too large" }, 413);
+    if (Number(request.headers.get("content-length") ?? 0) > CHAT_MAX_REQUEST_BYTES) return json({ error: "Message too large" }, 413);
     const raw = await request.text();
-    if (raw.length > 16_000) return json({ error: "Message too large" }, 413);
+    if (new TextEncoder().encode(raw).length > CHAT_MAX_REQUEST_BYTES) return json({ error: "Message too large" }, 413);
     body = JSON.parse(raw);
     if (!body || typeof body !== "object") return json({ error: "Invalid request" }, 400);
   } catch { return json({ error: "Invalid JSON" }, 400); }
-  if (typeof body.message !== "string" || !body.message.trim() || body.message.length > 2000)
-    return json({ error: "Message must contain 1–2000 characters" }, 400);
+  if (typeof body.message !== "string" || !body.message.trim() || body.message.length > CHAT_MAX_MESSAGE_CHARS)
+    return json({ error: `Message must contain 1–${CHAT_MAX_MESSAGE_CHARS} characters` }, 400);
   const message = body.message.trim();
   if (body.stream !== undefined && typeof body.stream !== "boolean") return json({ error: "Invalid stream option" }, 400);
   const streaming = body.stream === true;
   const rawHistory = body.history ?? [];
-  if (!Array.isArray(rawHistory) || rawHistory.length > 8 || rawHistory.some(turn =>
-    !turn || !["user", "assistant"].includes(turn.role) || typeof turn.content !== "string" || turn.content.length > 4000
+  if (!Array.isArray(rawHistory) || rawHistory.length > CHAT_HISTORY_TURNS || rawHistory.some(turn =>
+    !turn || !["user", "assistant"].includes(turn.role) || typeof turn.content !== "string" || turn.content.length > CHAT_HISTORY_CHARS
   )) return json({ error: "Invalid conversation history" }, 400);
   const history: ConversationTurn[] = rawHistory.map(turn => ({ role: turn.role, content: turn.content }));
 
@@ -150,7 +143,7 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
       key: gatewayKey, model: env.AI_GATEWAY_MODEL || "google/gemini-3.1-flash-lite" }] : []),
   ];
   if (!providers.length) return json({ error: "Chatbot is not configured" }, 503);
-  const deadline = Date.now() + 40_000;
+  const deadline = Date.now() + CHAT_PROVIDER_TIMEOUT_MS;
   let timedOut = false;
   let authenticationFailed = false;
   let busy = false;
@@ -165,7 +158,7 @@ export async function fetchChat(request: Request, env: ChatEnvironment = process
     try {
       const options = {
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.key}` },
-        body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: 700,
+        body: JSON.stringify({ model: provider.model, temperature: 0.2, max_tokens: CHAT_MAX_OUTPUT_TOKENS,
           messages: [{ role: "system", content: `${IBRAHIM_SYSTEM_PROMPT}\n\nVERIFIED PUBLIC EVIDENCE:\n${buildAssistantContext(message, history, true)}` },
             ...history, { role: "user", content: message }], stream: streaming,
           ...(provider.name === "openrouter" ? { reasoning: { enabled: false }, provider: { sort: "latency" } } : {}),

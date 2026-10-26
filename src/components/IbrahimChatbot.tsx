@@ -7,6 +7,8 @@ import { chatLocaleForMessage, chatUi, hasRtlText, initialChatLocale } from "@/d
 import { ChatServiceError, sendChatMessage, type ChatMessage } from "@/services/chatService";
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion";
 import type { ChatLocale } from "@/data/chatUi";
+import { CHAT_MAX_MESSAGE_CHARS } from "@/lib/chatLimits";
+import { createStreamingText } from "@/lib/streamingText";
 
 const timestamp = (locale: string) => new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 
@@ -20,11 +22,13 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => [{
     id: "welcome", sender: "bot", text: chatUi[locale].welcome, timestamp: timestamp(locale),
   }]);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatLogRef = useRef<HTMLDivElement>(null);
+  const followReply = useRef(true);
+  const streamRef = useRef<ReturnType<typeof createStreamingText> | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const requestPending = useRef(false);
   const requestRef = useRef<AbortController | null>(null);
-  useEffect(() => () => requestRef.current?.abort(), []);
+  useEffect(() => () => { requestRef.current?.abort(); streamRef.current?.stop(); }, []);
   const ui = chatUi[locale];
   const direction = locale === "ar" ? "rtl" : "ltr";
 
@@ -33,15 +37,21 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) chatEndRef.current?.scrollIntoView({ behavior: reducedMotion || isTyping ? "instant" : "smooth", block: "end" });
-  }, [messages, isOpen, isTyping, reducedMotion]);
+    if (!isOpen || !followReply.current) return;
+    const frame = requestAnimationFrame(() => {
+      const log = chatLogRef.current;
+      if (log && followReply.current) log.scrollTop = log.scrollHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [messages, isOpen]);
 
   const handleSend = async (textToSend?: string, retry = false) => {
     const messageText = (textToSend ?? input).trim();
-    if (!messageText || messageText.length > 2000 || requestPending.current) return;
+    if (!messageText || messageText.length > CHAT_MAX_MESSAGE_CHARS || requestPending.current) return;
     requestPending.current = true;
     const controller = new AbortController();
     requestRef.current = controller;
+    followReply.current = true;
     const nextLocale = chatLocaleForMessage(messageText, locale);
     setLocale(nextLocale);
     onLocaleChange?.(nextLocale);
@@ -57,36 +67,37 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
     setReplyStarted(false);
     const replyId = crypto.randomUUID();
     let partialText = "";
-    let renderTimer: ReturnType<typeof setTimeout> | undefined;
     const showReply = (text: string, isError = false) => {
       setMessages(prev => {
         const reply = { id: replyId, sender: "bot" as const, text, timestamp: timestamp(nextLocale), isError };
         return prev.some(m => m.id === replyId) ? prev.map(m => m.id === replyId ? reply : m) : [...prev, reply];
       });
     };
+    const presentation = createStreamingText(text => {
+      if (!controller.signal.aborted) { setReplyStarted(true); showReply(text); }
+    });
+    streamRef.current = presentation;
     try {
       const response = await sendChatMessage(messageText, history, controller.signal, text => {
         if (controller.signal.aborted || !text) return;
         partialText = text;
-        // Batch tokens so long Markdown replies do not rerender on every network packet.
-        if (!renderTimer) renderTimer = setTimeout(() => {
-          renderTimer = undefined;
-          if (!controller.signal.aborted) { setReplyStarted(true); showReply(partialText); }
-        }, 32);
+        if (reducedMotion) { setReplyStarted(true); showReply(text); }
+        else presentation.update(text);
       });
       if (controller.signal.aborted) return;
-      clearTimeout(renderTimer);
-      showReply(response.text);
+      if (reducedMotion) showReply(response.text);
+      else await presentation.complete(response.text);
     } catch (error) {
       if (controller.signal.aborted) return;
-      clearTimeout(renderTimer);
+      presentation.stop();
       // Retain partial text for reading, but exclude this failed turn from future context.
       const notice = error instanceof ChatServiceError
         ? error.code === "PROVIDER_RATE_LIMITED" ? chatUi[nextLocale].rateLimited : chatUi[nextLocale].busy
         : chatUi[nextLocale].unavailable;
       showReply(partialText ? `${partialText}\n\n${notice}` : notice, true);
     } finally {
-      clearTimeout(renderTimer);
+      presentation.stop();
+      streamRef.current = null;
       requestPending.current = false;
       requestRef.current = null;
       setIsTyping(false);
@@ -97,6 +108,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
   const handleReset = () => {
     if (requestPending.current) return;
     setInput("");
+    followReply.current = true;
     setMessages([{ id: "welcome", sender: "bot", text: ui.welcome, timestamp: timestamp(locale) }]);
     inputRef.current?.focus();
   };
@@ -131,8 +143,9 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
                 </button>
               </div>
             </header>
-            <div role="log" aria-live="polite" aria-relevant="additions" aria-busy={isTyping} aria-label={ui.title} dir="ltr"
-              className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-4 py-5 custom-scrollbar">
+            <div ref={chatLogRef} role="log" aria-live="polite" aria-relevant="additions" aria-busy={isTyping} aria-label={ui.title} dir="ltr"
+              onScroll={e => { const log = e.currentTarget; followReply.current = log.scrollHeight - log.clientHeight - log.scrollTop < 64; }}
+              className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain [overflow-anchor:none] px-4 py-5 custom-scrollbar">
               {messages.map((msg, index) => {
                 const rtl = hasRtlText(msg.text);
                 return (
@@ -147,7 +160,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
                         msg.sender === "user" ? "rounded-br-md bg-primary text-primary-foreground" : msg.isError
                           ? "rounded-bl-md border border-destructive/20 bg-destructive/5" : "rounded-bl-md border border-border bg-muted/40"
                       }`}>
-                        {msg.sender === "user" ? <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p> : <ChatMessageContent text={msg.text} />}
+                        {msg.sender === "user" ? <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p> : <ChatMessageContent text={msg.text} isStreaming={isTyping && index === messages.length - 1 && !msg.isError} />}
                         {msg.isError && index === messages.length - 1 && (
                           <button disabled={isTyping} onClick={() => handleSend(messages[index - 1]?.text, true)}
                             className="mt-3 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium transition hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -167,7 +180,6 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
                   </span>{ui.typing}
                 </div>
               )}
-              <div ref={chatEndRef} />
             </div>
             {messages.length === 1 && (
               <div className="shrink-0 px-4 pb-4">
@@ -184,7 +196,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
             )}
             <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="shrink-0 border-t border-border bg-background/50 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <div className="flex items-end gap-2 rounded-2xl border border-border bg-card p-2 transition focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10">
-                <textarea ref={inputRef} dir="auto" rows={2} maxLength={2000} value={input} placeholder={ui.placeholder} aria-label={ui.placeholder}
+                <textarea ref={inputRef} dir="auto" rows={2} maxLength={CHAT_MAX_MESSAGE_CHARS} value={input} placeholder={ui.placeholder} aria-label={ui.placeholder}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSend(); } }}
                   className="max-h-32 min-h-12 flex-1 resize-none bg-transparent px-2 py-1.5 text-base sm:text-sm leading-relaxed placeholder:text-muted-foreground focus:outline-none"
@@ -196,7 +208,7 @@ const IbrahimChatbot = ({ isOpen, onClose, onLocaleChange }: ChatProps) => {
               </div>
               <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
                 <span className="flex items-center gap-1"><Sparkles className="h-3 w-3" />{ui.assistant}</span>
-                {input.length > 1600 ? <span dir="ltr">{input.length}/2000</span> : <span className="hidden sm:block">{ui.hint}</span>}
+                {input.length > CHAT_MAX_MESSAGE_CHARS * 0.8 ? <span dir="ltr">{input.length}/{CHAT_MAX_MESSAGE_CHARS}</span> : <span className="hidden sm:block">{ui.hint}</span>}
               </div>
             </form>
           </motion.section>

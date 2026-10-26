@@ -41,19 +41,19 @@ test('network failures and timeouts reject without using offline answers', async
   }
 });
 
-test('keeps the last eight valid conversation messages and validates input before fetching', async () => {
+test('keeps the last twelve valid conversation messages and validates input before fetching', async () => {
   globalThis.fetch = async (_, options) => {
     const body = JSON.parse(options.body);
     assert.equal(body.message, 'Follow up');
-    assert.equal(body.history.length, 8);
+    assert.equal(body.history.length, 12);
     assert.equal(body.history[0].content, 'Message 2');
     return new Response(JSON.stringify({ reply: 'Answer', isLive: true }));
   };
-  await sendChatMessage(' Follow up ', Array.from({ length: 10 }, (_, i) =>
+  await sendChatMessage(' Follow up ', Array.from({ length: 14 }, (_, i) =>
     ({ id: String(i), sender: 'user', text: `Message ${i}` })));
   globalThis.fetch = () => { throw new Error('Should not fetch'); };
-  await assert.rejects(sendChatMessage(' '), /1 to 2000/);
-  await assert.rejects(sendChatMessage('x'.repeat(2001)), /1 to 2000/);
+  await assert.rejects(sendChatMessage(' '), /1 to 10000/);
+  await assert.rejects(sendChatMessage('x'.repeat(10001)), /1 to 10000/);
 });
 
 test('frontend preserves safe provider availability codes for localized retry notices', async () => {
