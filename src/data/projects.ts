@@ -68,7 +68,7 @@ export const projects: Project[] = [
       ]
     },
     "sourcePrivate": true,
-    "liveUrl": "https://dawrly.space",
+    "notes": ["Not currently live; no public deployment is available."],
     "relatedRepos": [
       {
         "slug": "tea-tec",
@@ -126,6 +126,7 @@ export const projects: Project[] = [
       ]
     },
     "sourcePrivate": true,
+    "liveUrl": "https://wajehni-academy-843213893012.europe-west1.run.app",
     "image": "/project-images/wajehni-ai.jpg",
     "repository": "Nexus_Academy",
     "sourceKind": "project"
